@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Motor Canvas 60FPS (Cero Lag)</title>
+    <title>Free Fire - Niveles y Lobby</title>
     <style>
         * {
             box-sizing: border-box;
@@ -46,6 +46,69 @@
             position: relative;
         }
 
+        /* LOBBY Y SELECCIONADOR DE NIVELES */
+        #screenLobby, #screenLevels {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 8, 16, 0.96);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        .oculto { display: none !important; }
+
+        .lobby-title {
+            font-size: 24px;
+            color: #ffaa00;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255,170,0,0.5);
+        }
+        .lobby-subtitle {
+            font-size: 11px;
+            color: #00ffff;
+            margin-bottom: 25px;
+        }
+        .main-btn {
+            background: linear-gradient(135deg, #ffaa00, #ff4400);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,170,0,0.4);
+            margin-top: 10px;
+        }
+        .main-btn:active { transform: scale(0.95); }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            max-height: 60vh;
+            overflow-y: auto;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .level-card {
+            background: #141420;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: #00ff66;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .level-card:active { background: #00ff66; color: #000; }
+
         .top-hud-stats {
             display: flex;
             justify-content: space-between;
@@ -71,7 +134,6 @@
             cursor: pointer;
         }
 
-        /* ARENA CANVAS */
         .battle-arena {
             flex: 1;
             display: flex;
@@ -82,11 +144,7 @@
             overflow: hidden;
         }
 
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+        canvas { display: block; width: 100%; height: 100%; }
 
         .controls-hud {
             display: flex;
@@ -105,9 +163,10 @@
             gap: 6px;
         }
 
+        /* JOYSTICK MÁS GRANDE */
         .joystick-base {
-            width: 75px;
-            height: 75px;
+            width: 95px;
+            height: 95px;
             background: rgba(30, 30, 50, 0.6);
             border: 2px solid rgba(255, 170, 0, 0.6);
             border-radius: 50%;
@@ -118,8 +177,8 @@
             touch-action: none;
         }
         .joystick-knob {
-            width: 34px;
-            height: 34px;
+            width: 44px;
+            height: 44px;
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             border-radius: 50%;
@@ -205,12 +264,26 @@
 </head>
 <body>
 
+    <!-- LOBBY INICIAL -->
+    <div id="screenLobby">
+        <h1 class="lobby-title">FREE FIRE 2D</h1>
+        <p class="lobby-subtitle">Edición Cero Lag - Motor 60FPS</p>
+        <button class="main-btn" onclick="irASeleccionNiveles()">JUGAR</button>
+    </div>
+
+    <!-- PANTALLA DE NIVELES (1 AL 20) -->
+    <div id="screenLevels" class="oculto">
+        <h2 class="lobby-title" style="font-size: 18px;">SELECCIONA UN NIVEL</h2>
+        <div class="levels-grid" id="levelsGridContainer"></div>
+        <button class="main-btn" style="padding: 8px 20px; font-size: 12px; margin-top: 15px;" onclick="volverAlLobby()">Volver</button>
+    </div>
+
     <div id="efectoDaño"></div>
 
     <div class="app-container">
         
         <div class="top-hud-stats">
-            <span>🗺️ DISTANCIA: <strong id="txtDistancia" style="color:#00ffff;">0m</strong></span>
+            <span>🗺️ <strong id="txtNivelInfo" style="color:#ffaa00;">NIVEL 1</strong></span>
             <div class="volume-control-box">
                 <span>🔊 VOL:</span>
                 <input type="range" id="volRange" min="0" max="1" step="0.05" value="0.8" oninput="cambiarVolumen(this.value)">
@@ -257,7 +330,7 @@
 
             <div class="info-bottom-bar">
                 <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-                <span id="chatLog">¡Motor Canvas a 60 FPS reales!</span>
+                <span id="chatLog">¡Sobrevive a las hordas zombis!</span>
             </div>
 
         </div>
@@ -278,16 +351,17 @@
         let vida = 100;
         let oro = 0;
         let distancia = 0;
+        let nivelActual = 1;
         let mundoX = 0;
         let jugadorX = 80;
-        let jugadorY = 40;
+        let jugadorY = 0;
         let velocidadY = 0;
         let saltando = false;
         let volando = false;
         let tiempoVueloRestante = 0;
         let impulsoSalto = 14;
         let skinActual = { nombre: 'Alok', emoji: '🥷', color: '#ffaa00' };
-        let gameActive = true;
+        let gameActive = false;
 
         let boxes = [];
         let coins = [];
@@ -295,7 +369,7 @@
         let projectiles = [];
         let bullets = [];
 
-        // AUDIO
+        // --- SISTEMA DE AUDIO Y MÚSICA RESTAURADOS ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const masterGain = audioCtx.createGain();
         masterGain.gain.value = 0.8;
@@ -317,7 +391,74 @@
             osc.stop(audioCtx.currentTime + dur);
         }
 
-        // JOYSTICK
+        // Bucle de música de supervivencia de fondo
+        const notasBajo = [110, 110, 98, 98, 82.41, 82.41, 73.42, 73.42];
+        let pasoMusica = 0;
+        setInterval(() => {
+            if (!gameActive || audioCtx.state === 'suspended') return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.value = notasBajo[pasoMusica % notasBajo.length];
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(masterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+            pasoMusica++;
+        }, 300);
+
+        window.addEventListener('pointerdown', () => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }, { once: true });
+
+        // --- CREAR NIVELES DEL 1 AL 20 EN HTML ---
+        function construirMenuNiveles() {
+            let container = document.getElementById('levelsGridContainer');
+            container.innerHTML = '';
+            for (let i = 1; i <= 20; i++) {
+                let card = document.createElement('div');
+                card.className = 'level-card';
+                card.textContent = `Nivel ${i}`;
+                card.onclick = () => iniciarNivel(i);
+                container.appendChild(card);
+            }
+        }
+        construirMenuNiveles();
+
+        function irASeleccionNiveles() {
+            document.getElementById('screenLobby').classList.add('oculto');
+            document.getElementById('screenLevels').classList.remove('oculto');
+        }
+
+        function volverAlLobby() {
+            document.getElementById('screenLevels').classList.add('oculto');
+            document.getElementById('screenLobby').classList.remove('oculto');
+        }
+
+        function iniciarNivel(num) {
+            nivelActual = num;
+            document.getElementById('screenLevels').classList.add('oculto');
+            document.getElementById('txtNivelInfo').textContent = `NIVEL ${nivelActual}`;
+            
+            // Reiniciar variables de juego
+            vida = 100;
+            document.getElementById('hpFill').style.width = '100%';
+            document.getElementById('hpText').textContent = '100 HP';
+            mundoX = 0;
+            jugadorY = 0;
+            boxes = [];
+            coins = [];
+            enemies = [];
+            projectiles = [];
+            bullets = [];
+
+            generarMundoParaNivel(nivelActual);
+            gameActive = true;
+        }
+
+        // --- JOYSTICK GRANDE ---
         const joyBase = document.getElementById('joystickBase');
         const joyKnob = document.getElementById('joystickKnob');
         let joyActive = false;
@@ -327,7 +468,7 @@
             let rect = joyBase.getBoundingClientRect();
             let centroX = rect.left + rect.width / 2;
             let deltaX = clientX - centroX;
-            let radioMax = 25;
+            let radioMax = 35; // Rango más amplio para el joystick grande
             if (deltaX > radioMax) deltaX = radioMax;
             if (deltaX < -radioMax) deltaX = -radioMax;
             joyKnob.style.transform = `translate(${deltaX}px, 0px)`;
@@ -338,29 +479,25 @@
         window.addEventListener('pointermove', (e) => { if (joyActive) actualizarJoystick(e.clientX); });
         window.addEventListener('pointerup', () => { joyActive = false; direccionMovimiento = 0; joyKnob.style.transform = `translate(0px, 0px)`; });
 
-        // INICIALIZAR MUNDO
-        function generarMundo() {
-            for (let i = 1; i < 400; i++) {
-                let posX = i * 220 + Math.random() * 40;
-                let alturaCaja = (i % 2 === 0) ? 0 : (40 + Math.random() * 70);
+        // --- GENERADOR DE MUNDO SEGÚN EL NIVEL ---
+        function generarMundoParaNivel(nivel) {
+            let cantidadZombis = 30 + (nivel * 15);
+            for (let i = 1; i < cantidadZombis; i++) {
+                let posX = i * 200 + Math.random() * 30;
+                let alturaCaja = (i % 2 === 0) ? 0 : (40 + Math.random() * 60);
 
                 boxes.push({ x: posX, y: alturaCaja, w: 45, h: 30 });
-
-                coins.push({
-                    x: posX + 20,
-                    y: alturaCaja > 0 ? alturaCaja + 45 : 35 + Math.random() * 80,
-                    recolectada: false
-                });
+                coins.push({ x: posX + 20, y: alturaCaja > 0 ? alturaCaja + 45 : 35 + Math.random() * 70, recolectada: false });
 
                 let tipos = [
-                    { emoji: '🧟', tipo: 'caminante', hp: 50, color: '#ff0055', vel: 0.8 },
-                    { emoji: '🤮', tipo: 'toxico', hp: 75, color: '#00ff66', vel: 0.5 },
-                    { emoji: '🏺', tipo: 'momia', hp: 100, color: '#ffaa00', vel: 0.7 }
+                    { emoji: '🧟', hp: 40 + (nivel * 5), color: '#ff0055', vel: 0.7 + (nivel * 0.02) },
+                    { emoji: '🤮', hp: 60 + (nivel * 5), color: '#00ff66', vel: 0.5 + (nivel * 0.02) },
+                    { emoji: '🏺', hp: 80 + (nivel * 10), color: '#ffaa00', vel: 0.6 + (nivel * 0.02) }
                 ];
                 let elegido = tipos[Math.floor(Math.random() * tipos.length)];
 
                 enemies.push({
-                    x: posX + 140 + Math.random() * 50,
+                    x: posX + 130 + Math.random() * 40,
                     y: 0,
                     hp: elegido.hp,
                     maxHp: elegido.hp,
@@ -394,7 +531,7 @@
             if (!gameActive) return;
             if (btn === 1) {
                 reproducirSonido(800, 'sawtooth', 0.08);
-                bullets.push({ x: mundoX + jugadorX + 40, y: jugadorY + 30, vida: 20 });
+                bullets.push({ x: mundoX + jugadorX + 40, y: jugadorY + 30 });
                 let jugadorMundoX = mundoX + jugadorX;
                 enemies.forEach(en => {
                     if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 100) {
@@ -437,24 +574,20 @@
             }, 1000);
         }
 
-        // BUCLE DE RENDERIZADO CANVAS (60 FPS FLUIDOS)
+        // BUCLE FÍSICO 60 FPS
         function actualizarFisicas() {
             if (!gameActive) return;
 
-            // Movimiento lateral
             if (Math.abs(direccionMovimiento) > 0.1) {
                 let velocidad = volando ? 10 : 7;
                 mundoX += direccionMovimiento * velocidad;
                 if (mundoX < 0) mundoX = 0;
                 distancia = Math.floor(mundoX / 5);
-                document.getElementById('txtDistancia').textContent = distancia + 'm';
             }
 
-            // Desbloqueos
             if (distancia >= 100) document.getElementById('btnAccion2').classList.remove('locked');
             if (distancia >= 300) document.getElementById('btnAccion3').classList.remove('locked');
 
-            // Salto y Gravedad
             if (saltando || volando) {
                 if (volando) {
                     if (jugadorY < canvas.height - 120) jugadorY += 3;
@@ -483,7 +616,6 @@
 
             let jugadorMundoX = mundoX + jugadorX;
 
-            // Monedas
             coins.forEach(c => {
                 if (!c.recolectada && Math.abs(c.x - jugadorMundoX) < 25 && Math.abs(c.y - jugadorY) < 30) {
                     c.recolectada = true;
@@ -493,31 +625,34 @@
                 }
             });
 
-            // Zombis
             enemies.forEach(en => {
                 if (en.hp > 0) {
                     if (en.x > jugadorMundoX + 20) en.x -= en.vel;
                     else if (en.x < jugadorMundoX - 20) en.x += (en.vel * 0.5);
 
                     if (Math.abs(en.x - jugadorMundoX) < 20 && jugadorY <= 10 && !volando) {
-                        let daño = skinActual.nombre === 'Mecha' ? 1 : 2;
+                        let daño = skinActual.nombre === 'Mecha' ? 1 : (2 + Math.floor(nivelActual / 3));
                         vida = Math.max(0, vida - daño);
                         document.getElementById('hpFill').style.width = vida + '%';
                         document.getElementById('hpText').textContent = vida + ' HP';
+                        if (vida <= 0) {
+                            gameActive = false;
+                            alert("¡Has sido derrotado! Vuelve a intentarlo.");
+                            volverAlLobby();
+                        }
                     }
 
-                    if (Math.abs(en.x - jugadorMundoX) < 200 && Math.random() < 0.01) {
+                    if (Math.abs(en.x - jugadorMundoX) < 200 && Math.random() < 0.012) {
                         projectiles.push({ x: en.x, y: 30, vx: -3 });
                     }
                 }
             });
 
-            // Proyectiles enemigos
             projectiles.forEach((p, idx) => {
                 p.x += p.vx;
                 if (Math.abs(p.x - jugadorMundoX) < 18 && jugadorY < 30 && !volando) {
                     if (skinActual.nombre !== 'Mecha') {
-                        vida = Math.max(0, vida - 10);
+                        vida = Math.max(0, vida - (8 + nivelActual));
                         document.getElementById('hpFill').style.width = vida + '%';
                         document.getElementById('hpText').textContent = vida + ' HP';
                         let ov = document.getElementById('efectoDaño');
@@ -534,11 +669,9 @@
         function dibujarJuego() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Suelo base
             ctx.fillStyle = '#ffaa00';
             ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
 
-            // Dibujar Cajas
             boxes.forEach(b => {
                 let screenX = b.x - mundoX;
                 if (screenX > -60 && screenX < canvas.width + 60) {
@@ -549,7 +682,6 @@
                 }
             });
 
-            // Dibujar Monedas
             coins.forEach(c => {
                 if (!c.recolectada) {
                     let screenX = c.x - mundoX;
@@ -567,7 +699,6 @@
                 }
             });
 
-            // Dibujar Zombis
             enemies.forEach(en => {
                 if (en.hp > 0) {
                     let screenX = en.x - mundoX;
@@ -581,7 +712,6 @@
                 }
             });
 
-            // Dibujar Proyectiles zombis
             ctx.fillStyle = '#00ff66';
             projectiles.forEach(p => {
                 let screenX = p.x - mundoX;
@@ -590,7 +720,6 @@
                 ctx.fill();
             });
 
-            // Dibujar Balas jugador
             ctx.fillStyle = '#ffff00';
             bullets.forEach((b, idx) => {
                 b.x += 15;
@@ -599,7 +728,6 @@
                 if (b.x > mundoX + canvas.width) bullets.splice(idx, 1);
             });
 
-            // Dibujar Jugador Principal
             let playerScreenY = canvas.height - 65 - jugadorY;
             ctx.font = '24px sans-serif';
             ctx.fillText(skinActual.emoji, jugadorX, playerScreenY);
@@ -611,13 +739,13 @@
         }
 
         function loop() {
-            actualizarFisicas();
-            dibujarJuego();
+            if (gameActive) {
+                actualizarFisicas();
+                dibujarJuego();
+            }
             requestAnimationFrame(loop);
         }
 
-        document.getElementById('hpFill').style.width = vida + '%';
-        generarMundo();
         requestAnimationFrame(loop);
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Duelo & Supervivencia Pro</title>
+    <title>Free Fire - Supervivencia Pro</title>
     <style>
         * {
             box-sizing: border-box;
@@ -29,17 +29,6 @@
             pointer-events: none;
             z-index: 1;
             overflow: hidden;
-        }
-        .particle {
-            position: absolute;
-            bottom: -20px;
-            font-size: 14px;
-            animation: floatUp 4s linear infinite;
-            opacity: 0.6;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
-            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
 
         #efectoDaño {
@@ -135,14 +124,11 @@
         /* ARENA DE JUEGO */
         .battle-arena {
             flex: 1;
-            min-height: 250px;
+            min-height: 260px;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
             background: linear-gradient(135deg, rgba(20, 25, 40, 0.95), rgba(10, 15, 25, 0.95));
             border: 2px solid #ffaa00;
             border-radius: 12px;
-            padding: 12px;
             position: relative;
             overflow: hidden;
             box-shadow: inset 0 0 30px rgba(255, 170, 0, 0.15);
@@ -153,54 +139,20 @@
             bottom: 0; left: 0; right: 0;
             height: 4px;
             background: linear-gradient(90deg, #ff0055, #ffaa00, #00ffff);
+            z-index: 20;
         }
 
         .fighter {
             position: absolute;
             bottom: 12px;
+            left: 20px;
             text-align: center;
-            transition: left 0.05s linear, bottom 0.1s ease-out;
-        }
-        #fighterP1 { left: 20px; bottom: 12px; }
-        #fighterP2 { right: 20px; bottom: 12px; }
-
-        /* CAJAS Y PLATAFORMAS */
-        .platform-box {
-            position: absolute;
-            bottom: 12px;
-            background: linear-gradient(135deg, #8B4513, #A0522D);
-            border: 2px solid #CD853F;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            z-index: 3;
-        }
-
-        .enemy-container {
-            position: absolute;
-            bottom: 12px;
-            text-align: center;
-            transition: left 0.05s linear;
-        }
-
-        /* PROYECTIL DE VENENO */
-        .venom-projectile {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #00ff66;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #00ff66, 0 0 20px #00ff66;
-            z-index: 12;
-            pointer-events: none;
+            z-index: 10;
         }
 
         .fighter-model {
-            width: 50px;
-            height: 80px;
+            width: 45px;
+            height: 75px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -210,16 +162,16 @@
 
         .body-container {
             position: relative;
-            width: 28px;
-            height: 55px;
+            width: 26px;
+            height: 50px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .head { font-size: 20px; line-height: 20px; z-index: 2; filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); }
+        .head { font-size: 18px; line-height: 18px; z-index: 2; filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); }
         .torso {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background: #ffaa00;
             border-radius: 4px;
             position: relative;
@@ -229,43 +181,65 @@
         .arm {
             position: absolute;
             width: 4px;
-            height: 14px;
+            height: 12px;
             background: #ffaa00;
             border-radius: 2px;
             top: 1px;
         }
-        .arm.left { left: -6px; transform-origin: top center; transform: rotate(10deg); }
-        .arm.right { right: -6px; transform-origin: top center; transform: rotate(-10deg); }
+        .arm.left { left: -5px; }
+        .arm.right { right: -5px; }
 
         .legs { display: flex; gap: 3px; margin-top: 1px; z-index: 1; }
         .leg {
             width: 4px;
-            height: 14px;
+            height: 12px;
             background: #33334d;
             border-radius: 2px;
-            position: relative;
         }
-        .leg::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            width: 6px;
-            height: 2px;
-            background: #111;
-            border-radius: 2px;
-        }
-        .leg.left::after { right: -1px; }
-        .leg.right::after { left: -1px; }
 
         .fighter-skin-name {
             font-size: 7px;
             color: #00ffff;
             background: rgba(0,0,0,0.85);
-            padding: 1px 5px;
+            padding: 1px 4px;
             border-radius: 3px;
             margin-top: 2px;
             text-transform: uppercase;
             white-space: nowrap;
+        }
+
+        /* CAJAS Y OBSTÁCULOS */
+        .platform-box {
+            position: absolute;
+            bottom: 12px;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border: 2px solid #CD853F;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            z-index: 4;
+        }
+
+        /* ENEMIGOS */
+        .enemy-item {
+            position: absolute;
+            bottom: 12px;
+            text-align: center;
+            z-index: 8;
+        }
+
+        /* PROYECTIL DE VENENO */
+        .venom-ball {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #00ff66;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff66, 0 0 20px #00ff66;
+            z-index: 15;
         }
 
         .bullet-effect {
@@ -273,13 +247,13 @@
             height: 3px;
             background: #ffff00;
             box-shadow: 0 0 8px #ffaa00;
-            z-index: 10;
+            z-index: 12;
             pointer-events: none;
             animation: dispararBala 0.15s linear forwards;
         }
         @keyframes dispararBala {
             0% { width: 0px; opacity: 1; }
-            100% { width: 100px; opacity: 0; }
+            100% { width: 80px; opacity: 0; }
         }
 
         .controls-hud {
@@ -350,11 +324,9 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-            transition: transform 0.1s;
         }
         .round-action-btn span { font-size: 8px; font-weight: bold; margin-top: -1px; color: #fff; text-shadow: 0 1px 2px #000; }
         .round-action-btn:active { transform: scale(0.92); }
-        .round-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
         #btnAccion1 { background: linear-gradient(135deg, rgba(255,0,85,0.85), rgba(255,170,0,0.85)); border-color: #ffaa00; }
         #btnAccion2 { background: linear-gradient(135deg, rgba(255,170,0,0.85), rgba(255,68,0,0.85)); border-color: #ffaa00; }
@@ -379,7 +351,6 @@
             border: 1px solid #444;
             color: #ffaa00;
         }
-
         #chatLog { font-size: 8px; color: #00ffcc; font-style: italic; text-align: center; }
     </style>
 </head>
@@ -404,9 +375,9 @@
             <button class="char-mini-btn" onclick="elegirPersonaje('Bot FF', '🤖', '#888888')">🤖 Bot</button>
         </div>
 
-        <!-- ARENA CON CAJAS Y PLATAFORMAS -->
+        <!-- ARENA DE JUEGO -->
         <div class="battle-arena" id="arenaBox">
-            <div class="fighter" id="fighterP1">
+            <div class="fighter" id="fighterP1" style="left: 20px; bottom: 12px;">
                 <div class="fighter-model" id="modelP1">
                     <div class="body-container">
                         <div class="head" id="headP1">🥷</div>
@@ -420,24 +391,8 @@
                 </div>
             </div>
 
-            <div class="fighter" id="fighterP2" style="right: 20px; display: none;">
-                <div class="fighter-model">
-                    <div class="body-container">
-                        <div class="head">🤖</div>
-                        <div class="torso" style="background: #ff0055;">
-                            <div class="arm left" style="background:#ff0055;"></div>
-                            <div class="arm right" style="background:#ff0055;"></div>
-                        </div>
-                        <div class="legs"><div class="leg left"></div><div class="leg right"></div></div>
-                    </div>
-                    <div class="fighter-skin-name" style="color:#ff0055;" id="lblRival">BOT FF</div>
-                </div>
-            </div>
-
-            <!-- CONTENEDOR DE CAJAS/OBSTÁCULOS -->
+            <!-- CONTENEDORES PARA RENDERIZAR DINÁMICAMENTE -->
             <div id="obstaclesArea"></div>
-
-            <!-- CONTENEDOR DE ZOMBIS Y PROYECTILES -->
             <div id="enemiesArea"></div>
             <div id="projectilesArea"></div>
         </div>
@@ -485,7 +440,7 @@
                 <span class="store-item" id="btnTiendaArma" onclick="comprarMejora()">⚡ MP40 (100G)</span>
             </div>
 
-            <div id="chatLog">¡Salta las cajas, esquiva el veneno y sobrevive!</div>
+            <div id="chatLog">¡Oleada activa! Salta las cajas y destruye a los zombis.</div>
 
         </div>
 
@@ -494,11 +449,10 @@
     <script>
         let modoActual = 'survival';
         let vida = 100;
-        let vidaRival = 100;
         let oro = 0;
         let oleada = 1;
-        let posX1 = 30;
-        let posY1 = 12; // Altura para salto
+        let posX1 = 20;
+        let posY1 = 12;
         let saltando = false;
         let velocidadY = 0;
         let escudoActivo = false;
@@ -514,7 +468,7 @@
             let gain = audioCtx.createGain();
             osc.type = tipo;
             osc.frequency.value = frecuencia;
-            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duracion);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -522,33 +476,25 @@
             osc.stop(audioCtx.currentTime + duracion);
         }
 
-        function moverJugador(direccion) {
-            posX1 = Math.max(10, Math.min(240, posX1 + (direccion * 15)));
+        function moverJugador(dir) {
+            posX1 = Math.max(10, Math.min(260, posX1 + (dir * 15)));
             document.getElementById("fighterP1").style.left = posX1 + "px";
             reproducirSonido(350, 'sine', 0.03);
-
-            // Verificar si subió a una caja
-            boxes.forEach(box => {
-                if (posX1 >= box.x && posX1 <= box.x + box.w && posY1 >= box.h - 10 && posY1 <= box.h + 10) {
-                    posY1 = box.h;
-                    document.getElementById("fighterP1").style.bottom = posY1 + "px";
-                }
-            });
         }
 
         function saltarJugador() {
             if (saltando || !gameActive) return;
             saltando = true;
-            velocidadY = 14;
+            velocidadY = 16;
             reproducirSonido(500, 'triangle', 0.15);
 
             let saltoInterval = setInterval(() => {
                 posY1 += velocidadY;
-                velocidadY -= 2; // Gravedad
+                velocidadY -= 2.2; // Gravedad
 
-                // Verificar si cae sobre una caja
+                // Verificar si aterriza sobre alguna caja
                 boxes.forEach(box => {
-                    if (posX1 >= box.x - 10 && posX1 <= box.x + box.w && posY1 <= box.h + 5 && posY1 >= box.h - 5) {
+                    if (posX1 >= box.x - 15 && posX1 <= box.x + box.w && posY1 <= box.h + 5 && posY1 >= box.h - 8) {
                         posY1 = box.h;
                         saltando = false;
                         velocidadY = 0;
@@ -568,37 +514,15 @@
         function cambiarModo(modo) {
             modoActual = modo;
             document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            let arenaP2 = document.getElementById("fighterP2");
-            let enemiesArea = document.getElementById("enemiesArea");
-            let obstaclesArea = document.getElementById("obstaclesArea");
-            let spanOro = document.getElementById("spanOroContainer");
-            let btnTienda = document.getElementById("btnTiendaArma");
+            document.getElementById(modo === 'bot' ? 'modeBot' : (modo === '1v1' ? 'mode1v1' : 'modeSurvival')).classList.add('active');
             
-            if (modo === 'bot') {
-                document.getElementById('modeBot').classList.add('active');
-                document.getElementById('lblModoActual').textContent = "VS BOT";
-                arenaP2.style.display = 'block';
-                enemiesArea.innerHTML = '';
-                obstaclesArea.innerHTML = '';
-                spanOro.style.display = 'none';
-                btnTienda.style.display = 'none';
-                vidaRival = 100;
-            } else if (modo === '1v1') {
-                document.getElementById('mode1v1').classList.add('active');
-                document.getElementById('lblModoActual').textContent = "MULTIJUGADOR 1V1";
-                arenaP2.style.display = 'block';
-                enemiesArea.innerHTML = '';
-                obstaclesArea.innerHTML = '';
-                spanOro.style.display = 'none';
-                btnTienda.style.display = 'none';
-                vidaRival = 100;
-            } else if (modo === 'survival') {
-                document.getElementById('modeSurvival').classList.add('active');
-                document.getElementById('lblModoActual').textContent = "ZOMBIE SURVIVAL";
-                arenaP2.style.display = 'none';
-                spanOro.style.display = 'inline';
-                btnTienda.style.display = 'inline';
+            if (modo === 'survival') {
                 iniciarOleadaSurvival();
+            } else {
+                document.getElementById('obstaclesArea').innerHTML = '';
+                document.getElementById('enemiesArea').innerHTML = '';
+                document.getElementById('projectilesArea').innerHTML = '';
+                document.getElementById('chatLog').textContent = "Modo Duelo activado.";
             }
             reproducirSonido(500, 'triangle', 0.1);
         }
@@ -613,61 +537,45 @@
             reproducirSonido(600, 'sine', 0.1);
         }
 
-        function ejecutarAccion(tipoBtn) {
+        function ejecutarAccion(tipo) {
             if (!gameActive) return;
 
-            if (tipoBtn === 1) { // Fuego / Disparo
+            if (tipo === 1) { // Disparo
                 reproducirSonido(800, 'sawtooth', 0.08);
                 let arena = document.getElementById("arenaBox");
                 let bala = document.createElement("div");
                 bala.className = "bullet-effect";
                 bala.style.left = (posX1 + 40) + "px";
-                bala.style.bottom = (posY1 + 30) + "px";
+                bala.style.bottom = (posY1 + 35) + "px";
                 arena.appendChild(bala);
                 setTimeout(() => bala.remove(), 150);
 
-                if (modoActual === 'survival') {
-                    if (enemies.length > 0) {
-                        let target = enemies[0];
-                        target.hp -= 25;
-                        if (target.hp <= 0) {
-                            enemies.shift();
-                            oro += 35;
-                            document.getElementById('txtOro').textContent = oro;
-                            document.getElementById('chatLog').textContent = "💀 ¡Objetivo abatido! (+35 Oro)";
-                            if (enemies.length === 0) {
-                                oleada++;
-                                iniciarOleadaSurvival();
-                            }
+                if (modoActual === 'survival' && enemies.length > 0) {
+                    let target = enemies[0];
+                    target.hp -= 25;
+                    if (target.hp <= 0) {
+                        enemies.shift();
+                        oro += 40;
+                        document.getElementById('txtOro').textContent = oro;
+                        document.getElementById('chatLog').textContent = "💀 ¡Enemigo abatido! (+40 Oro)";
+                        if (enemies.length === 0) {
+                            oleada++;
+                            iniciarOleadaSurvival();
                         }
-                        renderizarTodo();
                     }
-                } else {
-                    vidaRival = Math.max(0, vidaRival - 20);
-                    document.getElementById('chatLog').textContent = `🎯 ¡Impacto! Vida rival: ${vidaRival} HP`;
-                    if (vidaRival <= 0) {
-                        alert("🎉 ¡VICTORIA! Oponente derrotado.");
-                        vidaRival = 100;
-                    }
+                    renderizarTodo();
                 }
-            } 
-            else if (tipoBtn === 2) {
-                reproducirSonido(950, 'square', 0.2);
-                document.getElementById('chatLog').textContent = "⚡ ¡Aura de velocidad y daño activa!";
-            } 
-            else if (tipoBtn === 3) {
+            } else if (tipo === 3) { // Curar
                 vida = Math.min(100, vida + 35);
                 document.getElementById('hpFill').style.width = vida + "%";
                 document.getElementById('hpText').textContent = vida + " HP";
                 reproducirSonido(700, 'triangle', 0.2);
                 document.getElementById('chatLog').textContent = "💉 ¡Curado (+35 HP)!";
-            } 
-            else if (tipoBtn === 4) {
+            } else if (tipo === 4) { // Gloo
                 escudoActivo = true;
                 let overlay = document.getElementById("efectoGloo");
                 overlay.classList.add("escudo-activo");
                 reproducirSonido(650, 'sine', 0.25);
-                document.getElementById('chatLog').textContent = "🛡️ ¡Pared Gloo desplegada!";
                 setTimeout(() => {
                     escudoActivo = false;
                     overlay.classList.remove("escudo-activo");
@@ -679,36 +587,34 @@
             enemies = [];
             boxes = [];
             
-            // Generar cajas y obstáculos a diferentes distancias
-            let numBoxes = 2 + Math.floor(oleada / 2);
-            for(let i=0; i<numBoxes; i++) {
+            // Generar cajas escalonadas
+            for(let i=0; i<3; i++) {
                 boxes.push({
-                    x: 90 + (i * 75),
-                    w: 35,
-                    h: 30 + (i % 2 === 0 ? 20 : 0)
+                    x: 100 + (i * 70),
+                    w: 40,
+                    h: 25 + (i * 12)
                 });
             }
 
-            // Generar zombis y momias variadas
-            let cantidad = 3 + (oleada * 2);
+            // Generar variedad de zombis y momias
             let tipos = [
                 { emoji: '🧟', tipo: 'normal', hp: 50, color: '#ff0055' },
                 { emoji: '🤮', tipo: 'toxico', hp: 75, color: '#00ff66' },
                 { emoji: '🏺', tipo: 'momia', hp: 100, color: '#ffaa00' }
             ];
 
+            let cantidad = 3 + (oleada * 2);
             for (let i = 0; i < cantidad; i++) {
                 let elegido = tipos[Math.floor(Math.random() * tipos.length)];
                 enemies.push({
-                    id: Math.random(),
-                    x: 320 + (i * 55),
+                    x: 300 + (i * 60),
                     hp: elegido.hp,
                     emoji: elegido.emoji,
                     tipo: elegido.tipo,
                     color: elegido.color
                 });
             }
-            document.getElementById('chatLog').textContent = `🧟 ¡Oleada ${oleada} iniciada! Cuidado con las momias y zombis tóxicos.`;
+            document.getElementById('chatLog').textContent = `🧟 ¡Oleada ${oleada}: Zombis y Momias en camino!`;
             renderizarTodo();
         }
 
@@ -717,23 +623,23 @@
             let obsArea = document.getElementById("obstaclesArea");
             obsArea.innerHTML = '';
             boxes.forEach(b => {
-                let boxDiv = document.createElement("div");
-                boxDiv.className = "platform-box";
-                boxDiv.style.left = b.x + "px";
-                boxDiv.style.width = b.w + "px";
-                boxDiv.style.height = b.h + "px";
-                boxDiv.innerHTML = "📦";
-                obsArea.appendChild(boxDiv);
+                let d = document.createElement("div");
+                d.className = "platform-box";
+                d.style.left = b.x + "px";
+                d.style.width = b.w + "px";
+                d.style.height = b.h + "px";
+                d.innerHTML = "📦";
+                obsArea.appendChild(d);
             });
 
             // Renderizar Enemigos
-            let area = document.getElementById("enemiesArea");
-            area.innerHTML = '';
+            let enArea = document.getElementById("enemiesArea");
+            enArea.innerHTML = '';
             enemies.forEach(en => {
-                let div = document.createElement("div");
-                div.className = "enemy-container";
-                div.style.left = en.x + "px";
-                div.innerHTML = `
+                let d = document.createElement("div");
+                d.className = "enemy-item";
+                d.style.left = en.x + "px";
+                d.innerHTML = `
                     <div class="fighter-model">
                         <div class="body-container">
                             <div class="head">${en.emoji}</div>
@@ -741,12 +647,12 @@
                                 <div class="arm left" style="background:${en.color};"></div>
                                 <div class="arm right" style="background:${en.color};"></div>
                             </div>
-                            <div class="legs"><div class="leg left"></div><div class="leg right"></div></div>
+                            <div class="legs"><div class="leg"></div><div class="leg"></div></div>
                         </div>
                         <div class="fighter-skin-name" style="color:${en.color};">HP:${en.hp}</div>
                     </div>
                 `;
-                area.appendChild(div);
+                enArea.appendChild(d);
             });
         }
 
@@ -754,72 +660,66 @@
             if (oro >= 100) {
                 oro -= 100;
                 document.getElementById('txtOro').textContent = oro;
-                document.getElementById('chatLog').textContent = "🔥 ¡Compraste la MP40 Max!";
-                reproducirSonido(900, 'triangle', 0.3);
+                document.getElementById('chatLog').textContent = "🔥 ¡Mejora MP40 comprada!";
             } else {
                 document.getElementById('chatLog').textContent = "❌ Oro insuficiente (Necesitas 100G).";
             }
         }
 
-        // Bucle Principal de Movimiento, Enemigos y Veneno
+        // Bucle de juego y ataques venenosos
         setInterval(() => {
-            if (!gameActive) return;
+            if (!gameActive || modoActual !== 'survival') return;
 
-            if (modoActual === 'survival') {
-                // Movimiento y ataques de zombis / momias
-                enemies.forEach(en => {
-                    en.x -= 1.5;
+            enemies.forEach(en => {
+                en.x -= 1.2;
 
-                    // Zombis tóxicos o momias lanzan veneno a distancia
-                    if (en.tipo === 'toxico' || en.tipo === 'momia') {
-                        if (Math.random() < 0.03 && en.x > posX1 + 50 && en.x < 280) {
-                            projectiles.push({ x: en.x, y: 30, vx: -3 });
-                            reproducirSonido(200, 'sawtooth', 0.1);
-                        }
+                // Si es zombi tóxico o momia, lanza veneno
+                if ((en.tipo === 'toxico' || en.tipo === 'momia') && Math.random() < 0.025 && en.x > posX1 + 40 && en.x < 260) {
+                    projectiles.push({ x: en.x, y: 30, vx: -3.5 });
+                    reproducirSonido(220, 'sawtooth', 0.1);
+                }
+
+                // Daño por contacto directo
+                if (Math.abs(en.x - posX1) < 25 && posY1 <= 20) {
+                    if (!escudoActivo) {
+                        vida = Math.max(0, vida - 1);
+                        document.getElementById('hpFill').style.width = vida + "%";
+                        document.getElementById('hpText').textContent = vida + " HP";
                     }
+                }
+            });
 
-                    // Daño por contacto si están cerca
-                    if (Math.abs(en.x - posX1) < 25 && posY1 <= 20) {
-                        if (!escudoActivo) {
-                            vida = Math.max(0, vida - 1);
-                            document.getElementById('hpFill').style.width = vida + "%";
-                            document.getElementById('hpText').textContent = vida + " HP";
-                        }
+            // Mover proyectiles de veneno
+            let projArea = document.getElementById("projectilesArea");
+            projArea.innerHTML = '';
+            projectiles.forEach((p, index) => {
+                p.x += p.vx;
+                if (Math.abs(p.x - posX1) < 20 && posY1 < 35) {
+                    if (!escudoActivo) {
+                        vida = Math.max(0, vida - 12);
+                        document.getElementById('hpFill').style.width = vida + "%";
+                        document.getElementById('hpText').textContent = vida + " HP";
+                        let overlay = document.getElementById("efectoDaño");
+                        overlay.classList.add("recibiendo-daño");
+                        setTimeout(() => overlay.classList.remove("recibiendo-daño"), 200);
                     }
-                });
+                    projectiles.splice(index, 1);
+                } else if (p.x < 0) {
+                    projectiles.splice(index, 1);
+                } else {
+                    let ball = document.createElement("div");
+                    ball.className = "venom-ball";
+                    ball.style.left = p.x + "px";
+                    ball.style.bottom = p.y + "px";
+                    projArea.appendChild(ball);
+                }
+            });
 
-                // Mover proyectiles de veneno
-                let projArea = document.getElementById("projectilesArea");
-                projArea.innerHTML = '';
-                projectiles.forEach((p, index) => {
-                    p.x += p.vx;
-                    // Colisión con jugador
-                    if (Math.abs(p.x - posX1) < 20 && posY1 < 35) {
-                        if (!escudoActivo) {
-                            vida = Math.max(0, vida - 10);
-                            document.getElementById('hpFill').style.width = vida + "%";
-                            document.getElementById('hpText').textContent = vida + " HP";
-                            let overlay = document.getElementById("efectoDaño");
-                            overlay.classList.add("recibiendo-daño");
-                            setTimeout(() => overlay.classList.remove("recibiendo-daño"), 200);
-                        }
-                        projectiles.splice(index, 1);
-                    } else if (p.x < 0) {
-                        projectiles.splice(index, 1);
-                    } else {
-                        let ball = document.createElement("div");
-                        ball.className = "venom-projectile";
-                        ball.style.left = p.x + "px";
-                        ball.style.bottom = p.y + "px";
-                        projArea.appendChild(ball);
-                    }
-                });
-
-                renderizarTodo();
-            }
+            renderizarTodo();
         }, 80);
 
         document.getElementById('hpFill').style.width = vida + "%";
+        iniciarOleadaSurvival();
     </script>
 </body>
 </html>

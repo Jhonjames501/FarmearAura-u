@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Supervivencia Total (Optimizado)</title>
+    <title>Free Fire - Supervivencia Total (Dinámico)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -197,7 +197,6 @@
 
         .platform-box {
             position: absolute;
-            bottom: 0px;
             background: linear-gradient(135deg, #8B4513, #A0522D);
             border: 2px solid #CD853F;
             border-radius: 4px;
@@ -208,6 +207,21 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.5);
             z-index: 4;
             pointer-events: auto;
+        }
+
+        .floating-coin {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle, #ffff00, #ff8800);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            box-shadow: 0 0 10px #ffaa00;
+            z-index: 9;
         }
 
         .enemy-item {
@@ -402,6 +416,7 @@
 
             <div id="worldContainer">
                 <div id="obstaclesArea"></div>
+                <div id="coinsArea"></div>
                 <div id="enemiesArea"></div>
                 <div id="projectilesArea"></div>
             </div>
@@ -450,7 +465,7 @@
 
             <div class="info-bottom-bar">
                 <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-                <span id="chatLog">¡Vuelo optimizado sin tirones!</span>
+                <span id="chatLog">¡Zombies separados y cielo lleno de cajas y monedas!</span>
             </div>
 
         </div>
@@ -473,6 +488,7 @@
         let gameActive = true;
 
         let boxes = [];
+        let coins = [];
         let enemies = [];
         let projectiles = [];
 
@@ -539,7 +555,7 @@
             let radioMax = 28;
 
             if (deltaX > radioMax) deltaX = radioMax;
-            if (deltaX < -radioMax) deltaX = radioMax;
+            if (deltaX < -radioMax) deltaX = -radioMax;
 
             joyKnob.style.transform = `translate(${deltaX}px, 0px)`;
             direccionMovimiento = deltaX / radioMax;
@@ -560,7 +576,7 @@
             }
         });
 
-        // Bucle principal fluido unificado
+        // Bucle unificado principal
         setInterval(() => {
             if (!gameActive) return;
 
@@ -591,22 +607,34 @@
 
         function inicializarMundo() {
             for(let i = 1; i < 300; i++) {
-                let posX = i * 200 + Math.random() * 50;
+                // Generar Cajas en el suelo y Cajas flotantes en el aire
+                let posX = i * 220 + Math.random() * 40;
+                let alturaCaja = (i % 2 === 0) ? 0 : (50 + Math.random() * 70); // Si es mayor a 0, queda flotando en el aire
+
                 boxes.push({
                     x: posX,
+                    y: alturaCaja,
                     w: 45,
-                    h: 35 + (i % 3 === 0 ? 25 : 0)
+                    h: 35
                 });
 
+                // Generar Puntos / Monedas en el aire y sobre cajas
+                coins.push({
+                    x: posX + 20,
+                    y: alturaCaja > 0 ? alturaCaja + 45 : 40 + Math.random() * 80,
+                    recolectada: false
+                });
+
+                // Zombis bien separados individualmente (sin amontonarse de 2 en 2)
                 let tipos = [
-                    { emoji: '🧟', tipo: 'caminante', hp: 50, color: '#ff0055', velocidad: 1.2 },
-                    { emoji: '🤮', tipo: 'toxico', hp: 75, color: '#00ff66', velocidad: 0.8 },
-                    { emoji: '🏺', tipo: 'momia', hp: 100, color: '#ffaa00', velocidad: 1.0 }
+                    { emoji: '🧟', tipo: 'caminante', hp: 50, color: '#ff0055', velocidad: 1.0 },
+                    { emoji: '🤮', tipo: 'toxico', hp: 75, color: '#00ff66', velocidad: 0.7 },
+                    { emoji: '🏺', tipo: 'momia', hp: 100, color: '#ffaa00', velocidad: 0.9 }
                 ];
                 let elegido = tipos[Math.floor(Math.random() * tipos.length)];
                 
                 enemies.push({
-                    x: posX + 120,
+                    x: posX + 140 + Math.random() * 60, // Espaciado independiente
                     hp: elegido.hp,
                     emoji: elegido.emoji,
                     tipo: elegido.tipo,
@@ -652,7 +680,7 @@
 
                 let jugadorMundoX = mundoX + posX1;
                 boxes.forEach(box => {
-                    if (jugadorMundoX >= box.x - 15 && jugadorMundoX <= box.x + box.w && posY1 <= box.h + 5 && posY1 >= box.h - 8) {
+                    if (box.y === 0 && jugadorMundoX >= box.x - 15 && jugadorMundoX <= box.x + box.w && posY1 <= box.h + 5 && posY1 >= box.h - 8) {
                         posY1 = box.h;
                         saltando = false;
                         impulsoSalto = 16;
@@ -700,7 +728,7 @@
                 let jugadorMundoX = mundoX + posX1;
                 enemies.forEach(en => {
                     if (Math.abs(en.x - jugadorMundoX) < 110) {
-                        en.hp -= (transformacionActual === 'dragon' ? 90 : 35);
+                        en.hp -= 35;
                         if (en.hp <= 0) {
                             oro += 50;
                             document.getElementById('txtOro').textContent = oro;
@@ -721,7 +749,6 @@
             }
         }
 
-        // --- VUELO OPTIMIZADO (SIN CONFLICTOS DE BUCLES) ---
         function activarVuelo() {
             if (volando) return;
             volando = true;
@@ -736,7 +763,6 @@
             overlay.classList.add("transformado-activo");
             setTimeout(() => overlay.classList.remove("transformado-activo"), 500);
 
-            // Elevarse inicial suave
             let subidaInicial = setInterval(() => {
                 if (!volando) { clearInterval(subidaInicial); return; }
                 if (posY1 < 140) {
@@ -785,16 +811,43 @@
                 let d = document.createElement("div");
                 d.className = "platform-box";
                 d.style.left = b.x + "px";
+                d.style.bottom = b.y + "px";
                 d.style.width = b.w + "px";
                 d.style.height = b.h + "px";
                 d.innerHTML = "📦";
                 obsArea.appendChild(d);
             });
+
+            let coinArea = document.getElementById("coinsArea");
+            coinArea.innerHTML = '';
+            coins.forEach(c => {
+                if (!c.recolectada) {
+                    let d = document.createElement("div");
+                    d.className = "floating-coin";
+                    d.style.left = c.x + "px";
+                    d.style.bottom = c.y + "px";
+                    d.innerHTML = "🪙";
+                    coinArea.appendChild(d);
+                }
+            });
         }
 
+        // Bucle de físicas, colisiones de monedas y zombis individuales
         setInterval(() => {
             if (!gameActive) return;
             let jugadorMundoX = mundoX + posX1;
+
+            // Recolectar monedas / puntos en el aire
+            coins.forEach(c => {
+                if (!c.recolectada && Math.abs(c.x - jugadorMundoX) < 20 && Math.abs(c.y - posY1) < 25) {
+                    c.recolectada = true;
+                    oro += 20;
+                    document.getElementById('txtOro').textContent = oro;
+                    reproducirSonido(1200, 'sine', 0.08, 1.2);
+                    document.getElementById('chatLog').textContent = "🪙 ¡Moneda recolectada (+20 Oro)!";
+                    renderizarMundo();
+                }
+            });
 
             enemies.forEach(en => {
                 if (en.hp > 0) {

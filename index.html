@@ -10,6 +10,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Courier New', Courier, monospace;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
             background-color: #030303;
@@ -69,7 +70,7 @@
             text-transform: uppercase;
         }
 
-        /* Barra de Vida / Estamina */
+        /* Barra de Estamina */
         .stamina-container {
             background: #111;
             border: 2px solid #333;
@@ -146,7 +147,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Tienda Funcional Interactiva */
+        /* TIENDA INTERACTIVA */
         .shop-panel {
             background: #121212;
             border: 1px dashed #d4af37;
@@ -173,17 +174,29 @@
             text-align: center;
             font-size: 9px;
             border: 1px solid #444;
-            cursor: pointer;
+            cursor: not-allowed;
+            opacity: 0.3;
             transition: 0.2s;
+            user-select: none;
         }
-        .shop-item:hover {
+        /* Estado Disponible para Comprar */
+        .shop-item.available {
+            opacity: 1;
             border-color: #00ff66;
+            background: #112211;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,255,102,0.4);
         }
+        .shop-item.available:active {
+            transform: scale(0.95);
+        }
+        /* Estado Comprado */
         .shop-item.bought {
-            background: #0f2215;
-            border-color: #00ff66;
-            opacity: 0.8;
+            opacity: 0.85;
+            border-color: #d4af37;
+            background: #221d0a;
             cursor: default;
+            box-shadow: none;
         }
         .shop-icon {
             font-size: 18px;
@@ -251,20 +264,20 @@
         <div class="shop-panel">
             <h3 class="shop-title">Tienda de Mejoras</h3>
             <div class="shop-items">
-                <div class="shop-item" onclick="comprarMejora('lentes')">
+                <div class="shop-item" id="itemLentes">
                     <div class="shop-icon">🕶️</div>
                     <p><b>Lentes</b></p>
-                    <p style="color:#d4af37;">500 Aura</p>
+                    <p style="color:#d4af37;" id="precioLentes">500 Aura</p>
                 </div>
-                <div class="shop-item" onclick="comprarMejora('corte')">
+                <div class="shop-item" id="itemCorte">
                     <div class="shop-icon">✂️</div>
                     <p><b>Fade Pro</b></p>
-                    <p style="color:#d4af37;">2,000 Aura</p>
+                    <p style="color:#d4af37;" id="precioCorte">2,000 Aura</p>
                 </div>
-                <div class="shop-item" onclick="comprarMejora('oro')">
+                <div class="shop-item" id="itemOro">
                     <div class="shop-icon">⛓️</div>
                     <p><b>Cadenita</b></p>
-                    <p style="color:#d4af37;">10,000 Aura</p>
+                    <p style="color:#d4af37;" id="precioOro">10,000 Aura</p>
                 </div>
             </div>
         </div>
@@ -277,12 +290,11 @@
     </div>
 
     <script>
-        let aura = 0;
+        let aura = 1000; // Iniciamos con 1000 de aura temporalmente para que puedas probar la tienda de inmediato en cuanto cargues la página.
         let estamina = 100;
-        let powerClick = 1; // Cuánto sube por clic
-        let auraPorSegundoo = 0; // Auto-farm
+        let powerClick = 1;
+        let auraPorSegundo = 0;
 
-        // Estado de compras
         let mejorasCompradas = { lentes: false, corte: false, oro: false };
 
         const btnFarmear = document.getElementById("btnFarmear");
@@ -294,6 +306,10 @@
         const apsTexto = document.getElementById("apsTexto");
         const fraseSigma = document.getElementById("fraseSigma");
 
+        const itemLentes = document.getElementById("itemLentes");
+        const itemCorte = document.getElementById("itemCorte");
+        const itemOro = document.getElementById("itemOro");
+
         const nivelesConfig = [
             { auraMin: 0, nombre: "NPC Beta", emoji: "🧟", frase: "Sigues mirando la tele en lugar de tradear cripto." },
             { auraMin: 200, nombre: "Sigma Male", emoji: "🗿", frase: "Ignoras a todo el mundo. Tu mente está en la cima." },
@@ -302,15 +318,15 @@
             { auraMin: 15000, nombre: "Dios del Aura", emoji: "👑", frase: "Has trascendido la realidad. Eres intocable." }
         ];
 
-        // Bucle de Auto-Farm (Aura por segundo) y bajada de estamina
+        // Bucle de Auto-Farm
         setInterval(() => {
-            if (auraPorSegundoo > 0) {
-                aura += auraPorSegundoo;
+            if (auraPorSegundo > 0) {
+                aura += auraPorSegundo;
             }
             if (estamina > 0) {
                 estamina -= 1;
             } else {
-                if (aura > 5) aura -= 2; // Penalización si se acaba la energía
+                if (aura > 5) aura -= 2;
             }
             actualizarJuego();
         }, 1000);
@@ -325,36 +341,75 @@
             crearTextoFlotante(e, `+${ganado}`);
         });
 
-        function comprarMejora(tipo) {
-            if (tipo === 'lentes' && !mejorasCompradas.lentes && aura >= 500) {
+        // Eventos táctiles y de clic para los botones de la tienda
+        itemLentes.addEventListener("click", () => {
+            if (!mejorasCompradas.lentes && aura >= 500) {
                 aura -= 500;
                 mejorasCompradas.lentes = true;
                 powerClick += 3;
-                auraPorSegundoo += 2; // Da +2 por segundo
+                auraPorSegundo += 2;
                 fraseSigma.textContent = "🕶️ Te compraste los lentes oscuros. Nadie sabe qué estás pensando.";
-            } else if (tipo === 'corte' && !mejorasCompradas.corte && aura >= 2000) {
+                actualizarJuego();
+            }
+        });
+
+        itemCorte.addEventListener("click", () => {
+            if (!mejorasCompradas.corte && aura >= 2000) {
                 aura -= 2000;
                 mejorasCompradas.corte = true;
                 powerClick += 8;
-                auraPorSegundoo += 10; // Da +10 por segundo
+                auraPorSegundo += 10;
                 fraseSigma.textContent = "✂️ Corte Fade impecable. Las miradas se desvían a tu paso.";
-            } else if (tipo === 'oro' && !mejorasCompradas.oro && aura >= 10000) {
+                actualizarJuego();
+            }
+        });
+
+        itemOro.addEventListener("click", () => {
+            if (!mejorasCompradas.oro && aura >= 10000) {
                 aura -= 10000;
                 mejorasCompradas.oro = true;
                 powerClick += 25;
-                auraPorSegundoo += 50; // Da +50 por segundo
+                auraPorSegundo += 50;
                 fraseSigma.textContent = "⛓️ Cadenita de oro puro desbloqueada. Aura estelar.";
+                actualizarJuego();
             }
-            actualizarJuego();
-        }
+        });
 
         function actualizarJuego() {
             puntosAura.textContent = Math.floor(aura);
-            apsTexto.textContent = `Generando: +${auraPorSegundoo} Aura/seg`;
+            apsTexto.textContent = `Generando: +${auraPorSegundo} Aura/seg`;
             staminaBarra.style.width = estamina + "%";
             staminaTexto.textContent = Math.floor(estamina) + "%";
 
-            // Determinar Rango Actual
+            // Control visual dinámico de la tienda
+            if (mejorasCompradas.lentes) {
+                itemLentes.className = "shop-item bought";
+                document.getElementById("precioLentes").textContent = "COMPRADO ✅";
+            } else if (aura >= 500) {
+                itemLentes.className = "shop-item available";
+            } else {
+                itemLentes.className = "shop-item";
+            }
+
+            if (mejorasCompradas.corte) {
+                itemCorte.className = "shop-item bought";
+                document.getElementById("precioCorte").textContent = "COMPRADO ✅";
+            } else if (aura >= 2000) {
+                itemCorte.className = "shop-item available";
+            } else {
+                itemCorte.className = "shop-item";
+            }
+
+            if (mejorasCompradas.oro) {
+                itemOro.className = "shop-item bought";
+                document.getElementById("precioOro").textContent = "COMPRADO ✅";
+            } else if (aura >= 10000) {
+                itemOro.className = "shop-item available";
+            } else {
+                itemOro.className = "shop-item";
+            }
+
+            // Rango Actual
             let nivelActualConfig = nivelesConfig[0];
             for (let i = 0; i < nivelesConfig.length; i++) {
                 if (aura >= nivelesConfig[i].auraMin) {
@@ -366,11 +421,6 @@
 
             rangoEtiqueta.textContent = nivelActualConfig.nombre;
             imagenPersonaje.textContent = nivelActualConfig.emoji;
-
-            // Cambiar frase si cambió de rango (solo si no compraron mejora recientemente)
-            if (Math.random() < 0.05) {
-                fraseSigma.textContent = `"${nivelActualConfig.frase}"`;
-            }
         }
 
         function crearTextoFlotante(e, texto) {

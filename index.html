@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batalla de Aura: Free Fire Plaza Edition</title>
+    <title>Batalla de Aura: Free Fire Cuerpo Completo</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -26,7 +26,6 @@
             overflow-x: hidden;
         }
 
-        /* Partículas flotantes de fondo */
         .particles-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -46,7 +45,6 @@
             100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
 
-        /* Capa de efecto visual de Hielo */
         #efectoHielo {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -60,7 +58,6 @@
         }
         .congelado { opacity: 1 !important; }
 
-        /* Capa de Escudo Pared Gloo */
         #efectoGloo {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -138,6 +135,7 @@
         }
         .mode-btn.active { background: #ffaa00; color: #080810; }
 
+        /* --- ARENA Y CUERPO COMPLETO DEL PERSONAJE --- */
         .battle-arena {
             display: flex;
             justify-content: space-between;
@@ -145,7 +143,7 @@
             background: linear-gradient(135deg, #1b263b, #0d1b2a);
             border: 2px solid #00ffff;
             border-radius: 12px;
-            padding: 20px 15px;
+            padding: 15px 10px;
             margin-bottom: 8px;
             position: relative;
             overflow: hidden;
@@ -162,39 +160,100 @@
 
         .fighter {
             text-align: center;
-            width: 42%;
+            width: 44%;
             position: relative;
         }
         .fighter-model {
-            width: 75px;
-            height: 95px;
-            background: rgba(0, 0, 0, 0.4);
+            width: 80px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.5);
             border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            margin: 0 auto 6px auto;
+            border-radius: 12px;
+            margin: 0 auto 4px auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            padding-top: 8px;
             position: relative;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            backdrop-filter: blur(2px);
         }
-        .fighter-avatar {
-            font-size: 45px;
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+
+        /* Estructura del monigote de cuerpo completo */
+        .body-container {
+            position: relative;
+            width: 40px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+        .head {
+            font-size: 26px;
+            line-height: 26px;
+            z-index: 2;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.6));
+        }
+        .torso {
+            width: 24px;
+            height: 28px;
+            background: #ffaa00;
+            border-radius: 6px;
+            position: relative;
+            margin-top: -2px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        /* Brazos con manos */
+        .arm {
+            position: absolute;
+            width: 8px;
+            height: 24px;
+            background: #ffaa00;
+            border-radius: 4px;
+            top: 2px;
+        }
+        .arm.left { left: -9px; transform-origin: top center; transform: rotate(15deg); }
+        .arm.right { right: -9px; transform-origin: top center; transform: rotate(-15deg); }
+
+        /* Piernas con pies */
+        .legs {
+            display: flex;
+            gap: 4px;
+            margin-top: 1px;
+            z-index: 1;
+        }
+        .leg {
+            width: 8px;
+            height: 24px;
+            background: #33334d;
+            border-radius: 4px;
+            position: relative;
+        }
+        /* Pies */
+        .leg::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            width: 12px;
+            height: 5px;
+            background: #111;
+            border-radius: 3px;
+        }
+        .leg.left::after { right: -2px; }
+        .leg.right::after { left: -2px; }
+
         .fighter-skin-name {
             font-size: 7px;
             color: #00ffff;
-            background: rgba(0,0,0,0.7);
-            padding: 1px 4px;
+            background: rgba(0,0,0,0.8);
+            padding: 1px 5px;
             border-radius: 4px;
-            margin-top: 2px;
+            margin-top: 4px;
             text-transform: uppercase;
         }
         .fighter-name { font-size: 10px; font-weight: bold; margin-bottom: 2px; }
-        .fighter-score { font-size: 24px; font-weight: bold; text-shadow: 0 0 10px currentColor; }
+        .fighter-score { font-size: 22px; font-weight: bold; text-shadow: 0 0 10px currentColor; }
         
         .vs-badge {
             font-size: 15px;
@@ -229,21 +288,22 @@
         }
         .char-option.activo { border-color: #00ff66; background: #113322; box-shadow: 0 0 10px #00ff66; transform: scale(1.05); }
 
-        @keyframes emotePlaza {
+        /* Gestos de batalla y baile dinámicos */
+        @keyframes baileCompleto {
             0% { transform: translateY(0) rotate(0deg) scale(1); }
-            20% { transform: translateY(-15px) rotate(-12deg) scale(1.2); filter: drop-shadow(0 0 20px #00ff66); }
-            40% { transform: translateY(0) rotate(5deg) scale(1); }
-            60% { transform: translateY(-15px) rotate(12deg) scale(1.2); filter: drop-shadow(0 0 20px #ffaa00); }
+            25% { transform: translateY(-8px) rotate(-10deg) scale(1.08); filter: drop-shadow(0 0 12px #00ff66); }
+            50% { transform: translateY(0) rotate(0deg) scale(1); }
+            75% { transform: translateY(-8px) rotate(10deg) scale(1.08); filter: drop-shadow(0 0 12px #ffaa00); }
             100% { transform: translateY(0) rotate(0deg) scale(1); }
         }
-        .animar-baile { animation: emotePlaza 0.4s ease-in-out; }
+        .animar-baile { animation: baileCompleto 0.4s ease-in-out; }
 
-        @keyframes emoteRivalAnim {
+        @keyframes rivalAccion {
             0% { transform: translateX(0) scale(1); }
-            50% { transform: translateX(-15px) scale(1.15) rotate(-6deg); filter: drop-shadow(0 0 15px #ff0055); }
+            50% { transform: translateX(-10px) scale(1.1) rotate(-5deg); filter: drop-shadow(0 0 12px #ff0055); }
             100% { transform: translateX(0) scale(1); }
         }
-        .animar-rival { animation: emoteRivalAnim 0.35s ease-in-out; }
+        .animar-rival { animation: rivalAccion 0.35s ease-in-out; }
 
         @keyframes danioEfecto {
             0% { filter: brightness(1); transform: scale(1); }
@@ -370,7 +430,6 @@
         .chat-btn:hover { background: #333; border-color: #ff0055; }
         #chatLog { font-size: 9px; color: #00ffcc; margin-top: 3px; font-style: italic; }
 
-        /* Alerta de último nivel */
         #alertaBooyah {
             position: fixed;
             top: 30%;
@@ -418,19 +477,30 @@
         <div class="card">
             <h2>Elige tu Skin de Personaje</h2>
             <div class="selector-box">
-                <div class="char-option activo" onclick="cambiarGuerrero('🥷', 'Alok', this)">🥷</div>
-                <div class="char-option" onclick="cambiarGuerrero('🕵️‍♂️', 'Chrono', this)">🕵️‍♂️</div>
-                <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', 'Criminal', this)">🦹‍♂️</div>
-                <div class="char-option" onclick="cambiarGuerrero('🤖', 'Kenta', this)">🤖</div>
+                <div class="char-option activo" onclick="cambiarGuerrero('🥷', 'Alok', '#ffaa00', this)">🥷</div>
+                <div class="char-option" onclick="cambiarGuerrero('🕵️‍♂️', 'Chrono', '#00ffff', this)">🕵️‍♂️</div>
+                <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', 'Criminal', '#ff0055', this)">🦹‍♂️</div>
+                <div class="char-option" onclick="cambiarGuerrero('🤖', 'Kenta', '#00ff66', this)">🤖</div>
             </div>
         </div>
 
         <div class="card" style="border-color: #00ffff;">
             
             <div class="battle-arena">
+                <!-- JUGADOR 1 (Cuerpo Completo) -->
                 <div class="fighter" id="fighterP1">
                     <div class="fighter-model">
-                        <div class="fighter-avatar" id="avatarP1">🥷</div>
+                        <div class="body-container">
+                            <div class="head" id="headP1">🥷</div>
+                            <div class="torso" id="torsoP1">
+                                <div class="arm left"></div>
+                                <div class="arm right"></div>
+                            </div>
+                            <div class="legs">
+                                <div class="leg left"></div>
+                                <div class="leg right"></div>
+                            </div>
+                        </div>
                         <div class="fighter-skin-name" id="skinNameP1">Alok</div>
                     </div>
                     <div class="fighter-name" style="color: #00ff66;">TÚ (<span id="multiplicadorText">x1</span>)</div>
@@ -439,9 +509,20 @@
 
                 <div class="vs-badge">VS</div>
 
+                <!-- JUGADOR 2 / BOT (Cuerpo Completo) -->
                 <div class="fighter" id="fighterP2">
                     <div class="fighter-model">
-                        <div class="fighter-avatar" id="avatarP2">🤖</div>
+                        <div class="body-container">
+                            <div class="head" id="headP2">🤖</div>
+                            <div class="torso" id="torsoP2" style="background: #00ff66;">
+                                <div class="arm left"></div>
+                                <div class="arm right"></div>
+                            </div>
+                            <div class="legs">
+                                <div class="leg left"></div>
+                                <div class="leg right"></div>
+                            </div>
+                        </div>
                         <div class="fighter-skin-name" id="skinNameP2">Bot FF</div>
                     </div>
                     <div class="fighter-name" id="labelRival" style="color: #ff0055;">BOT RIVAL</div>
@@ -466,9 +547,9 @@
             <button class="gloo-btn" id="btnGloo" onclick="activarParedGloo()">🛡️ Poner Pared Gloo (Escudo)</button>
 
             <div class="store-box">
-                <div class="store-item" onclick="comprarMejora(500, 2, 'Criminal')">🎭 Criminal<br><b>500 (x2)</b></div>
-                <div class="store-item" onclick="comprarMejora(3000, 5, 'MP40 Max')">⚡ MP40<br><b>3k (x5)</b></div>
-                <div class="store-item" onclick="comprarMejora(10000, 15, 'Angelical')">🪽 Botas<br><b>10k (x15)</b></div>
+                <div class="store-item" onclick="comprarMejora(500, 2, 'Criminal', '#ff0055')">🎭 Criminal<br><b>500 (x2)</b></div>
+                <div class="store-item" onclick="comprarMejora(3000, 5, 'MP40 Max', '#00ffff')">⚡ MP40<br><b>3k (x5)</b></div>
+                <div class="store-item" onclick="comprarMejora(10000, 15, 'Angelical', '#ffffff')">🪽 Botas<br><b>10k (x15)</b></div>
             </div>
 
             <div class="chat-container">
@@ -492,6 +573,7 @@
         let estaCansado = false;
         let avatarActual = '🥷';
         let skinNombreActual = 'Alok';
+        let colorSkinActual = '#ffaa00';
         let poderCargado = true;
         let ataqueCargado = true;
         let escudoActivo = false;
@@ -523,7 +605,6 @@
             if (navigator.vibrate) navigator.vibrate(40);
         }
 
-        // Generar partículas flotantes automáticas
         setInterval(() => {
             let container = document.getElementById("particlesContainer");
             if(container.childElementCount > 15) return;
@@ -588,7 +669,9 @@
                 document.getElementById('panelOnline').style.display = 'none';
                 document.getElementById('labelRival').textContent = "BOT RIVAL";
                 document.getElementById('skinNameP2').textContent = "Bot FF";
-                document.getElementById('avatarP2').textContent = "🤖";
+                document.getElementById('headP2').textContent = "🤖";
+                document.getElementById('torsoP2').style.background = "#00ff66";
+                document.querySelectorAll('#fighterP2 .arm').forEach(a => a.style.background = "#00ff66");
                 iniciarBot();
             } else {
                 document.getElementById('btnModoOnline').classList.add('active');
@@ -599,25 +682,37 @@
             }
         }
 
-        function cambiarGuerrero(emoji, nombreSkin, el) {
+        function cambiarGuerrero(emoji, nombreSkin, colorHex, el) {
             document.querySelectorAll('.char-option').forEach(e => e.classList.remove('activo'));
             el.classList.add('activo');
             avatarActual = emoji;
             skinNombreActual = nombreSkin;
-            document.getElementById("avatarP1").textContent = emoji;
+            colorSkinActual = colorHex;
+            
+            document.getElementById("headP1").textContent = emoji;
             document.getElementById("skinNameP1").textContent = nombreSkin;
+            document.getElementById("torsoP1").style.background = colorHex;
+            document.querySelectorAll('#fighterP1 .arm').forEach(a => a.style.background = colorHex);
+            
             reproducirSonido(600, 'sine', 0.1);
             sincronizarDatos();
         }
 
-        function comprarMejora(costo, multValor, nombre) {
+        function comprarMejora(costo, multValor, nombre, colorHex) {
             if (score1 >= costo) {
                 score1 -= costo;
                 multiplicador = multValor;
+                skinNombreActual = nombre;
+                colorSkinActual = colorHex;
+                
                 document.getElementById("scoreP1").textContent = score1;
                 document.getElementById("multiplicadorText").textContent = `x${multiplicador}`;
+                document.getElementById("skinNameP1").textContent = nombre;
+                document.getElementById("torsoP1").style.background = colorHex;
+                document.querySelectorAll('#fighterP1 .arm').forEach(a => a.style.background = colorHex);
+
                 reproducirSonido(880, 'triangle', 0.3);
-                alert(`¡Equipaste ${nombre}! Tu multiplicador subió a x${multiplicador}`);
+                alert(`¡Equipaste ${nombre}! Multiplicador x${multiplicador}`);
                 sincronizarDatos();
             } else {
                 reproducirSonido(150, 'sawtooth', 0.2);
@@ -817,8 +912,12 @@
                 } else if(data.score !== undefined) {
                     score2 = data.score;
                     document.getElementById("scoreP2").textContent = score2;
-                    if(data.avatar) document.getElementById("avatarP2").textContent = data.avatar;
+                    if(data.avatar) document.getElementById("headP2").textContent = data.avatar;
                     if(data.skinNombre) document.getElementById("skinNameP2").textContent = data.skinNombre;
+                    if(data.colorSkin) {
+                        document.getElementById("torsoP2").style.background = data.colorSkin;
+                        document.querySelectorAll('#fighterP2 .arm').forEach(a => a.style.background = data.colorSkin);
+                    }
                     
                     let f2 = document.getElementById("fighterP2");
                     f2.classList.add("animar-rival");
@@ -830,7 +929,12 @@
 
         function sincronizarDatos() {
             if (conn && conn.open) {
-                conn.send({ score: score1, avatar: avatarActual, skinNombre: skinNombreActual });
+                conn.send({ 
+                    score: score1, 
+                    avatar: avatarActual, 
+                    skinNombre: skinNombreActual, 
+                    colorSkin: colorSkinActual 
+                });
             }
         }
     </script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmear Aura PRO - Edición Sigma</title>
+    <title>Farmear Aura: Ultimate Edition</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,173 +12,239 @@
             font-family: 'Courier New', Courier, monospace;
         }
         body {
-            background-color: #050505;
-            color: #eee;
+            background-color: #030303;
+            color: #f0f0f0;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background-image: linear-gradient(0deg, #1a1a1a 0%, #050505 100%);
+            background-image: radial-gradient(circle at center, #151515 0%, #030303 100%);
+            overflow-x: hidden;
         }
         .main-layout {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
-            max-width: 450px;
-            padding: 20px;
+            max-width: 420px;
+            padding: 15px;
         }
 
-        /* Sección del Personaje / Emoji */
+        /* Cabecera de Rango */
         .character-display {
-            background: #111;
+            background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
             border: 3px solid #d4af37;
-            border-radius: 16px;
-            height: 180px;
+            border-radius: 20px;
+            height: 200px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
-        .avatar-emoji {
-            font-size: 75px;
-            transition: transform 0.2s ease;
-        }
-        .avatar-emoji:hover {
-            transform: scale(1.1);
-        }
-        .rank-tag {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #d4af37;
-            color: #050505;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
+        
+        /* Personaje Animado en Movimiento Real */
+        .avatar-container {
+            font-size: 80px;
+            animation: floatCharacter 2s ease-in-out infinite;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8));
         }
 
-        /* Sección de Stats */
+        @keyframes floatCharacter {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .rank-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: #d4af37;
+            color: #030303;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Barra de Vida / Estamina Realista */
+        .stamina-container {
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: left;
+        }
+        .stamina-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #aaa;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .stamina-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #222;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+        .stamina-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff3333, #00ff00);
+            transition: width 0.3s linear;
+        }
+
+        /* Panel de Puntos */
         .stats-panel {
             background: #111;
             border: 2px solid #444;
             border-radius: 16px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
         }
         .aura-counter {
-            font-size: 48px;
+            font-size: 44px;
             font-weight: bold;
-            color: #00ff00;
-            margin: 10px 0;
-            text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+            color: #00ff66;
+            margin: 5px 0;
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
         }
 
-        /* Botón Principal */
+        /* Botón de Acción Principal con Animación de Clic */
         .action-btn {
             width: 100%;
-            padding: 20px;
-            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            padding: 18px;
+            background: linear-gradient(90deg, #ff0055, #7a00ff, #00ffcc);
             background-size: 200% 100%;
-            animation: gradientAnimation 3s linear infinite;
+            animation: gradientAnimation 4s linear infinite;
             border: none;
             color: white;
             font-weight: bold;
-            font-size: 18px;
-            border-radius: 12px;
+            font-size: 17px;
+            border-radius: 14px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 20px rgba(122, 0, 255, 0.4);
+            position: relative;
+            overflow: hidden;
         }
         .action-btn:active {
-            transform: translateY(2px);
-            box-shadow: none;
+            transform: scale(0.96);
         }
 
         @keyframes gradientAnimation {
-            0% { background-position: 100% 0%; }
-            100% { background-position: -100% 0%; }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* Tienda de Estilo */
+        /* Tienda Activa */
         .shop-panel {
-            background: #161616;
+            background: #121212;
             border: 1px dashed #d4af37;
             border-radius: 16px;
-            padding: 15px;
+            padding: 12px;
         }
         .shop-title {
             color: #d4af37;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
         .shop-items {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             justify-content: center;
         }
         .shop-item {
-            background: #222;
+            background: #1a1a1a;
             border-radius: 8px;
             padding: 8px;
-            width: 110px;
+            width: 32%;
             text-align: center;
             font-size: 9px;
             border: 1px solid #333;
-            opacity: 0.5;
+            opacity: 0.4;
         }
         .shop-item.unlocked {
             opacity: 1;
-            border-color: #d4af37;
-            background: #252210;
+            border-color: #00ff66;
+            background: #112211;
         }
         .shop-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        /* Números Flotantes al hacer clic */
+        .floating-text {
+            position: absolute;
+            color: #00ff66;
+            font-weight: bold;
+            font-size: 18px;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.3); }
         }
     </style>
 </head>
 <body>
 
-    <div class="main-layout">
+    <div class="main-layout" id="gameScreen">
         
-        <!-- VISTA DEL PERSONAJE -->
-        <div class="character-display">
+        <!-- PERSONAJE EN MOVIMIENTO -->
+        <div class="character-display" id="cajaAvatar">
             <div class="rank-tag" id="rangoEtiqueta">NPC Beta</div>
-            <div class="avatar-emoji" id="imagenPersonaje">💀</div>
+            <div class="avatar-container" id="imagenPersonaje">🧟</div>
         </div>
 
-        <!-- VISTA DE DATOS -->
+        <!-- VIDA / ESTAMINA REALISTA -->
+        <div class="stamina-container">
+            <div class="stamina-label">
+                <span>⚡ Energía / Vida Realista</span>
+                <span id="staminaTexto">100%</span>
+            </div>
+            <div class="stamina-bar-bg">
+                <div class="stamina-bar-fill" id="staminaBarra" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
         <div class="stats-panel">
             <div class="aura-counter" id="puntosAura">0</div>
-            <p style="font-size: 11px; color: #888;">PUNTOS DE AURA ACUMULADOS</p>
+            <p style="font-size: 10px; color: #777;">PUNTOS DE AURA</p>
         </div>
 
-        <!-- BOTÓN DE ACCIÓN -->
-        <button class="action-btn" id="btnFarmear">✨ FARMEAR AURA ✨</button>
+        <!-- BOTÓN PRINCIPAL -->
+        <button class="action-btn" id="btnFarmear">🔥 FARMEAR AURA 🔥</button>
 
-        <!-- TIENDA / MEJORAS -->
+        <!-- TIENDA -->
         <div class="shop-panel">
-            <h3 class="shop-title">Tienda de Estilo Sigma</h3>
+            <h3 class="shop-title">Mejoras Sigma</h3>
             <div class="shop-items">
                 <div class="shop-item" id="shopLentes">
                     <div class="shop-icon">🕶️</div>
-                    <p>Lentes Oscuros (1,000 Aura)</p>
+                    <p>Lentes (500)</p>
                 </div>
                 <div class="shop-item" id="shopCorte">
                     <div class="shop-icon">✂️</div>
-                    <p>Corte Fade Pro (5,000 Aura)</p>
+                    <p>Fade (2k)</p>
                 </div>
                 <div class="shop-item" id="shopCadenita">
                     <div class="shop-icon">⛓️</div>
-                    <p>Cadenita de Oro (10,000 Aura)</p>
+                    <p>Oro (10k)</p>
                 </div>
             </div>
         </div>
@@ -187,39 +253,58 @@
 
     <script>
         let aura = 0;
+        let estamina = 100; // Sistema de vida/energía realista (de 0 a 100)
         let rangoActual = "NPC Beta";
 
         const btnFarmear = document.getElementById("btnFarmear");
         const puntosAura = document.getElementById("puntosAura");
         const rangoEtiqueta = document.getElementById("rangoEtiqueta");
         const imagenPersonaje = document.getElementById("imagenPersonaje");
-        
+        const staminaBarra = document.getElementById("staminaBarra");
+        const staminaTexto = document.getElementById("staminaTexto");
+        const cajaAvatar = document.getElementById("cajaAvatar");
+
         const shopLentes = document.getElementById("shopLentes");
         const shopCorte = document.getElementById("shopCorte");
         const shopCadenita = document.getElementById("shopCadenita");
 
-        // Configuración de rangos con emojis dinámicos
+        // Rangos con animaciones y estilos de personaje
         const nivelesConfig = [
-            { auraMin: 0, nombre: "NPC Beta", emoji: "💀" },
-            { auraMin: 100, nombre: "Sigma Male", emoji: "🗿" },
-            { auraMin: 500, nombre: "Gigachad", emoji: "💪" },
-            { auraMin: 2000, nombre: "Patrick Bateman", emoji: "🕴️" },
-            { auraMin: 10000, nombre: "Dios del Aura Pura", emoji: "👑" }
+            { auraMin: 0, nombre: "NPC Beta", emoji: "🧟" },
+            { auraMin: 150, nombre: "Sigma Male", emoji: "🗿" },
+            { auraMin: 600, nombre: "Gigachad 💪", emoji: "🦾" },
+            { auraMin: 2500, nombre: "Patrick Bateman", emoji: "🕴️" },
+            { auraMin: 12000, nombre: "Dios del Aura", emoji: "👑" }
         ];
 
-        btnFarmear.addEventListener("click", () => {
-            let ganado = Math.floor(Math.random() * 20) + 5;
+        // Decremento de estamina realista en el tiempo (si dejas de farmear, pierdes vida/energía)
+        setInterval(() => {
+            if (estamina > 0) {
+                estamina -= 1.5; // Baja poco a poco
+                if (estamina < 0) estamina = 0;
+            } else {
+                // Penalización si la estamina llega a 0 (pierdes aura lentamente por falta de actividad)
+                if (aura > 10) aura -= 5;
+            }
+            actualizarEstaminaVisual();
+        }, 1000);
+
+        btnFarmear.addEventListener("click", (e) => {
+            let ganado = Math.floor(Math.random() * 15) + 5;
             aura += ganado;
+            
+            // Subir estamina al hacer clic (acción de farmear)
+            estamina += 8;
+            if (estamina > 100) estamina = 100;
 
             actualizarJuego();
-            animarBoton();
+            crearTextoFlotantFlotante(e, `+${ganado}`);
         });
 
         function actualizarJuego() {
             puntosAura.textContent = aura;
 
             let nivelActualConfig = nivelesConfig[0];
-
             for (let i = 0; i < nivelesConfig.length; i++) {
                 if (aura >= nivelesConfig[i].auraMin) {
                     nivelActualConfig = nivelesConfig[i];
@@ -228,21 +313,39 @@
                 }
             }
 
-            rangoActual = nivelActualConfig.nombre;
-            rangoEtiqueta.textContent = rangoActual;
+            rangoEtiqueta.textContent = nivelActualConfig.nombre;
             imagenPersonaje.textContent = nivelActualConfig.emoji;
 
-            // Desbloqueo visual de la tienda
-            if(aura >= 1000) shopLentes.classList.add('unlocked');
-            if(aura >= 5000) shopCorte.classList.add('unlocked');
-            if(aura >= 10000) shopCadenita.classList.add('unlocked');
+            // Desbloqueo de tienda
+            if(aura >= 500) shopLentes.classList.add('unlocked');
+            if(aura >= 2000) shopCorte.classList.add('unlocked');
+            if(aura >= 12000) shopCadenita.classList.add('unlocked');
         }
 
-        function animarBoton() {
-            btnFarmear.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                btnFarmear.style.transform = 'scale(1)';
-            }, 100);
+        function actualizarEstaminaVisual() {
+            staminaBarra.style.width = estamina + "%";
+            staminaTexto.textContent = Math.floor(estamina) + "%";
+
+            // Cambiar color de la barra según la salud/energía
+            if (estamina < 30) {
+                staminaBarra.style.background = "#ff2222"; // Peligro
+            } else {
+                staminaBarra.style.background = "linear-gradient(90deg, #ffaa00, #00ff66)";
+            }
+        }
+
+        function crearTextoFlotantFlotante(e, texto) {
+            let el = document.createElement("div");
+            el.className = "floating-text";
+            el.textContent = texto;
+            
+            // Posicionar cerca del clic o del botón
+            let rect = btnFarmear.getBoundingClientRect();
+            el.style.left = (rect.left + rect.width / 2 + (Math.random() * 40 - 20)) + "px";
+            el.style.top = rect.top + "px";
+            
+            document.body.appendChild(el);
+            setTimeout(() => { el.remove(); }, 800);
         }
 
         actualizarJuego();

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sobrevive a la Horda: Free Fire Survival</title>
+    <title>Free Fire - Duelo & Supervivencia</title>
     <style>
         * {
             box-sizing: border-box;
@@ -15,7 +15,7 @@
         html, body {
             width: 100%;
             min-height: 100vh;
-            background-color: #05050a;
+            background-color: #080810;
             color: #f0f0f0;
             overflow-x: hidden;
             overflow-y: auto;
@@ -71,8 +71,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            gap: 8px;
-            padding: 8px;
+            gap: 6px;
+            padding: 6px;
             width: 100%;
             max-width: 500px;
             min-height: 100vh;
@@ -81,39 +81,74 @@
             z-index: 5;
         }
 
-        /* BARRA SUPERIOR */
-        .top-hud {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(18, 18, 28, 0.95);
-            border: 1px solid #ffaa00;
-            border-radius: 10px;
-            padding: 8px 12px;
-            backdrop-filter: blur(5px);
+        /* SELECTOR DE MODO / PESTAÑAS SUPERIORES */
+        .top-mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
+            background: #12121c;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 4px;
         }
-        .hud-stats {
-            display: flex;
-            gap: 12px;
-            font-size: 11px;
+        .mode-btn {
+            background: #1c1c2e;
+            border: 1px solid #555;
+            color: #aaa;
+            font-size: 9px;
             font-weight: bold;
+            padding: 6px 2px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
         }
-        .hud-stats span span { color: #00ff66; }
+        .mode-btn.active {
+            background: linear-gradient(135deg, #ffaa00, #ff4400);
+            color: #000;
+            border-color: #ffaa00;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+        }
 
-        /* ARENA DE SUPERVIVENCIA */
+        /* SELECTOR DE PERSONAJES */
+        .character-select-bar {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(18, 18, 28, 0.9);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 4px;
+        }
+        .char-mini-btn {
+            background: #22223b;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 11px;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .char-mini-btn.selected {
+            border-color: #00ff66;
+            opacity: 1;
+            background: #2a2a4a;
+            box-shadow: 0 0 6px rgba(0,255,102,0.4);
+        }
+
+        /* ARENA DE JUEGO */
         .battle-arena {
             flex: 1;
-            min-height: 200px;
+            min-height: 220px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: linear-gradient(135deg, rgba(20, 25, 40, 0.95), rgba(10, 15, 25, 0.95));
-            border: 2px solid #ff0055;
+            border: 2px solid #ffaa00;
             border-radius: 12px;
             padding: 12px;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(255, 0, 85, 0.2);
+            box-shadow: inset 0 0 30px rgba(255, 170, 0, 0.15);
         }
         .battle-arena::after {
             content: "";
@@ -127,11 +162,11 @@
             position: absolute;
             bottom: 12px;
             text-align: center;
-            transition: left 0.1s linear;
+            transition: left 0.08s linear;
         }
         #fighterP1 { left: 20px; }
-        
-        /* ENEMIGOS MÚLTIPLES EN PANTALLA */
+        #fighterP2 { right: 20px; }
+
         .enemy-container {
             position: absolute;
             bottom: 12px;
@@ -209,7 +244,7 @@
             white-space: nowrap;
         }
 
-        /* EFECTO DE DISPARO BALA */
+        /* EFECTO DE BALA */
         .bullet-effect {
             position: absolute;
             height: 3px;
@@ -221,17 +256,17 @@
         }
         @keyframes dispararBala {
             0% { width: 0px; opacity: 1; }
-            100% { width: 120px; opacity: 0; }
+            100% { width: 100px; opacity: 0; }
         }
 
-        /* PANEL DE CONTROLES INFERIOR */
+        /* PANEL DE CONTROLES */
         .controls-hud {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             background: rgba(18, 18, 28, 0.95);
             border: 1px solid #444;
-            padding: 10px;
+            padding: 8px;
             border-radius: 12px;
         }
 
@@ -246,51 +281,48 @@
             gap: 5px;
         }
         .joy-btn {
-            width: 42px;
+            width: 46px;
             height: 38px;
             background: #252538;
             border: 1px solid #ffaa00;
             color: #ffaa00;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
         }
         .joy-btn:active { background: #ffaa00; color: #080810; }
 
-        .hp-container {
-            flex: 1;
-        }
+        .hp-container { flex: 1; }
         .hp-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
         .hp-bar-bg { width: 100%; background: #222; height: 7px; border-radius: 3px; overflow: hidden; }
         .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.2s ease; }
 
-        /* RECUADRO TRANSLÚCIDO PARA LOS ATAQUES (HUD CLÁSICO) */
+        /* BOTONES DE ACCIÓN (HUD CLÁSICO) */
         .attacks-box-hud {
-            background: rgba(20, 20, 35, 0.55);
+            background: rgba(20, 20, 35, 0.6);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 14px;
-            padding: 8px;
+            border-radius: 12px;
+            padding: 6px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
         .actions-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 8px;
             justify-items: center;
             width: 100%;
         }
         .round-action-btn {
-            width: 52px;
-            height: 52px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.8);
-            font-size: 18px;
+            font-size: 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -303,51 +335,32 @@
         .round-action-btn:active { transform: scale(0.92); }
         .round-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        #btnDisparar { background: linear-gradient(135deg, rgba(255,0,85,0.85), rgba(255,170,0,0.85)); border-color: #ffaa00; }
-        #btnEspecial { background: linear-gradient(135deg, rgba(255,170,0,0.85), rgba(255,68,0,0.85)); border-color: #ffaa00; font-size: 16px; }
-        #btnBotiquin { background: linear-gradient(135deg, rgba(0,255,102,0.85), rgba(0,150,80,0.85)); border-color: #00ff66; }
-        #btnGlooRedondo { background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(136,204,255,0.85)); border-color: #ffffff; }
+        #btnAccion1 { background: linear-gradient(135deg, rgba(255,0,85,0.85), rgba(255,170,0,0.85)); border-color: #ffaa00; }
+        #btnAccion2 { background: linear-gradient(135deg, rgba(255,170,0,0.85), rgba(255,68,0,0.85)); border-color: #ffaa00; }
+        #btnAccion3 { background: linear-gradient(135deg, rgba(0,255,102,0.85), rgba(0,150,80,0.85)); border-color: #00ff66; }
+        #btnAccion4 { background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(136,204,255,0.85)); border-color: #ffffff; }
 
-        /* Tienda */
-        .store-bar {
+        /* Tienda o Stats extra */
+        .info-bottom-bar {
             display: flex;
-            gap: 5px;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 8px;
+            background: #141420;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #333;
         }
         .store-item { 
             background: #1f1f33; 
-            padding: 5px 8px; 
-            border-radius: 5px; 
-            font-size: 8px; 
-            text-align: center; 
-            border: 1px solid #333; 
+            padding: 3px 6px; 
+            border-radius: 4px; 
             cursor: pointer;
-            color: #ccc;
-            flex: 1;
+            border: 1px solid #444;
+            color: #ffaa00;
         }
-        .store-item:hover { border-color: #ffaa00; color: #fff; }
 
         #chatLog { font-size: 8px; color: #00ffcc; font-style: italic; text-align: center; }
-
-        #alertaOleada {
-            position: fixed;
-            top: 35%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(0,0,0,0.95);
-            border: 3px solid #ff0055;
-            color: #ff0055;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 12px;
-            z-index: 2000;
-            text-align: center;
-            box-shadow: 0 0 30px #ff0055;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-        }
-        .mostrar-alerta { transform: translate(-50%, -50%) scale(1) !important; }
     </style>
 </head>
 <body>
@@ -355,23 +368,27 @@
     <div class="particles-container" id="particlesContainer"></div>
     <div id="efectoDaño"></div>
     <div id="efectoGloo"></div>
-    <div id="alertaOleada">🧟 ¡OLEADA 2 ENTRANTE! 🧟</div>
 
-    <!-- CONTENEDOR PRINCIPAL -->
     <div class="app-container">
         
-        <!-- PARTE SUPERIOR: Estadísticas de Supervivencia -->
-        <div class="top-hud">
-            <div class="hud-stats">
-                <span>🛡️ OLEADA: <span id="txtOleada">1</span></span>
-                <span>💎 ORO: <span id="txtOro">0</span></span>
-                <span>💀 BAJAS: <span id="txtBajas">0</span></span>
-            </div>
+        <!-- SELECTOR DE MODO (Tus modos anteriores + Supervivencia) -->
+        <div class="top-mode-selector">
+            <button class="mode-btn active" id="modeBot" onclick="cambiarModo('bot')">MODO VS BOT</button>
+            <button class="mode-btn" id="mode1v1" onclick="cambiarModo('1v1')">MULTIJUGADOR 1V1</button>
+            <button class="mode-btn" id="modeSurvival" onclick="cambiarModo('survival')">ZOMBIE SURVIVAL</button>
         </div>
 
-        <!-- CENTRO: Arena de Supervivencia -->
+        <!-- SELECTOR DE PERSONAJES (Tus personajes clásicos) -->
+        <div class="character-select-bar">
+            <button class="char-mini-btn selected" onclick="elegirPersonaje('Alok', '🥷', '#ffaa00')">🥷 Alok</button>
+            <button class="char-mini-btn" onclick="elegirPersonaje('Kelly', '🏃‍♀️', '#ff0055')">🏃‍♀️ Kelly</button>
+            <button class="char-mini-btn" onclick="elegirPersonaje('Chrono', '🛡️', '#00ffff')">🛡️ Chrono</button>
+            <button class="char-mini-btn" onclick="elegirPersonaje('Bot FF', '🤖', '#888888')">🤖 Bot</button>
+        </div>
+
+        <!-- ARENA DE JUEGO -->
         <div class="battle-arena" id="arenaBox">
-            <!-- JUGADOR -->
+            <!-- JUGADOR 1 -->
             <div class="fighter" id="fighterP1">
                 <div class="fighter-model" id="modelP1">
                     <div class="body-container">
@@ -380,16 +397,28 @@
                             <div class="arm left"></div>
                             <div class="arm right"></div>
                         </div>
-                        <div class="legs">
-                            <div class="leg left"></div>
-                            <div class="leg right"></div>
-                        </div>
+                        <div class="legs"><div class="leg left"></div><div class="leg right"></div></div>
                     </div>
                     <div class="fighter-skin-name" id="skinNameP1">Alok</div>
                 </div>
             </div>
 
-            <!-- CONTENEDOR DE ENEMIGOS ACTIVOS -->
+            <!-- JUGADOR 2 O ENEMIGOS (según el modo) -->
+            <div class="fighter" id="fighterP2" style="right: 20px;">
+                <div class="fighter-model">
+                    <div class="body-container">
+                        <div class="head">🤖</div>
+                        <div class="torso" style="background: #ff0055;">
+                            <div class="arm left" style="background:#ff0055;"></div>
+                            <div class="arm right" style="background:#ff0055;"></div>
+                        </div>
+                        <div class="legs"><div class="leg left"></div><div class="leg right"></div></div>
+                    </div>
+                    <div class="fighter-skin-name" style="color:#ff0055;" id="lblRival">BOT FF</div>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR PARA ZOMBIS EN MODO SUPERVIVENCIA -->
             <div id="enemiesArea"></div>
         </div>
 
@@ -398,12 +427,13 @@
             
             <div class="mid-controls-row">
                 <div class="joystick-group">
+                    <!-- JOYSTICK CORREGIDO CON EVENTOS TÁCTILES Y DE CLIC FLUIDOS -->
                     <button class="joy-btn" onmousedown="moverJugador(-1)" ontouchstart="moverJugador(-1)">◀</button>
                     <button class="joy-btn" onmousedown="moverJugador(1)" ontouchstart="moverJugador(1)">▶</button>
                 </div>
                 <div class="hp-container">
                     <div class="hp-label">
-                        <span>❤️ VIDA (HP)</span>
+                        <span id="txtInfoHp">❤️ VIDA (HP)</span>
                         <span id="hpText">100 HP</span>
                     </div>
                     <div class="hp-bar-bg">
@@ -412,44 +442,45 @@
                 </div>
             </div>
 
-            <!-- RECUADRO TRANSLÚCIDO PARA LOS ATAQUES (ESTILO FREE FIRE HUD) -->
+            <!-- BOTONES DE ACCIÓN (HUD CLÁSICO) -->
             <div class="attacks-box-hud">
                 <div class="actions-grid">
-                    <button class="round-action-btn" id="btnDisparar" onclick="dispararArma()" title="Disparar">
-                        🎯<span>Disparo</span>
+                    <button class="round-action-btn" id="btnAccion1" onclick="ejecutarAccion(1)">
+                        🔥<span id="txtBtn1">Fuego</span>
                     </button>
-                    <button class="round-action-btn" id="btnEspecial" onclick="usarHabilidadEspecial()" title="Habilidad">
-                        ⚡<span>Aura</span>
+                    <button class="round-action-btn" id="btnAccion2" onclick="ejecutarAccion(2)">
+                        ⚡<span id="txtBtn2">Aura</span>
                     </button>
-                    <button class="round-action-btn" id="btnBotiquin" onclick="usarBotiquin()" title="Botiquín">
-                        💉<span>Curar</span>
+                    <button class="round-action-btn" id="btnAccion3" onclick="ejecutarAccion(3)">
+                        💉<span id="txtBtn3">Botiquín</span>
                     </button>
-                    <button class="round-action-btn" id="btnGlooRedondo" onclick="activarParedGloo()" title="Pared Gloo">
-                        🛡️<span>Gloo</span>
+                    <button class="round-action-btn" id="btnAccion4" onclick="ejecutarAccion(4)">
+                        🛡️<span id="txtBtn4">Gloo</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Tienda de Armas y Mejoras -->
-            <div class="store-bar">
-                <div class="store-item" onclick="comprarArma(100, 2, 'MP40 Max', '#00ffff')">⚡ MP40 (100G)</div>
-                <div class="store-item" onclick="comprarArma(300, 4, 'Scar Titan', '#ff0055')">🔥 SCAR (300G)</div>
-                <div class="store-item" onclick="comprarArma(600, 8, 'M1887 Dragón', '#ffffff')">🐉 M1887 (600G)</div>
+            <!-- BARRA DE INFORMACIÓN O TIENDA DE ORO -->
+            <div class="info-bottom-bar" id="bottomBarInfo">
+                <span>MODO ACTIVO: <strong id="lblModoActual" style="color:#ffaa00;">VS BOT</strong></span>
+                <span id="spanOroContainer" style="display:none;">💎 ORO: <strong id="txtOro" style="color:#00ff66;">0</strong></span>
+                <span class="store-item" id="btnTiendaArma" style="display:none;" onclick="comprarMejora()">⚡ MP40 (100G)</span>
             </div>
 
-            <div id="chatLog">¡Sobrevive a las oleadas de enemigos!</div>
+            <div id="chatLog">¡Listo para la batalla en Free Fire!</div>
 
         </div>
 
     </div>
 
     <script>
+        let modoActual = 'bot'; // 'bot', '1v1', 'survival'
         let vida = 100;
+        let vidaRival = 100;
         let oro = 0;
-        let bajas = 0;
         let oleada = 1;
-        let dañoArma = 1;
         let posX1 = 30;
+        let posX2 = 250;
         let escudoActivo = false;
         let enemies = [];
         let gameActive = true;
@@ -461,7 +492,7 @@
             let gain = audioCtx.createGain();
             osc.type = tipo;
             osc.frequency.value = frecuencia;
-            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duracion);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -469,71 +500,145 @@
             osc.stop(audioCtx.currentTime + duracion);
         }
 
+        // Joystick de movimiento funcional y fluido
         function moverJugador(direccion) {
-            posX1 = Math.max(10, Math.min(150, posX1 + (direccion * 12));
+            posX1 = Math.max(10, Math.min(220, posX1 + (direccion * 15)));
             document.getElementById("fighterP1").style.left = posX1 + "px";
-            reproducirSonido(400, 'sine', 0.04);
-        }
+            reproducirSonido(350, 'sine', 0.03);
 
-        // Partículas flotantes de fondo
-        setInterval(() => {
-            let container = document.getElementById("particlesContainer");
-            if(container.childElementCount > 10) return;
-            let p = document.createElement("div");
-            p.className = "particle";
-            let iconos = ['🔥', '⚡', '💥', '💀'];
-            p.textContent = iconos[Math.floor(Math.random() * iconos.length)];
-            p.style.left = Math.random() * 100 + "vw";
-            p.style.animationDuration = (3 + Math.random() * 2) + "s";
-            container.appendChild(p);
-            setTimeout(() => p.remove(), 4000);
-        }, 1000);
-
-        function dispararArma() {
-            if (!gameActive) return;
-            reproducirSonido(800, 'sawtooth', 0.08);
-
-            // Crear efecto de bala visual saliendo del jugador
-            let arena = document.getElementById("arenaBox");
-            let bala = document.createElement("div");
-            bala.className = "bullet-effect";
-            bala.style.left = (posX1 + 40) + "px";
-            bala.style.bottom = "40px";
-            arena.appendChild(bala);
-            setTimeout(() => bala.remove(), 150);
-
-            // Impactar al enemigo más cercano que esté en rango
-            if (enemies.length > 0) {
-                // Ordenar enemigos por cercanía
-                let target = enemies[0];
-                target.hp -= dañoArma;
-                
-                if (target.hp <= 0) {
-                    eliminarEnemigo(target);
-                } else {
-                    actualizarRenderEnemigos();
-                }
-            }
-        }
-
-        function spawnEnemigos() {
-            if (!gameActive) return;
-            let cantidad = 2 + oleada;
-            enemies = [];
-            for (let i = 0; i < cantidad; i++) {
-                let enemigoX = 320 + (i * 65);
-                enemies.push({
-                    id: Math.random(),
-                    x: enemigoX,
-                    hp: 2 * oleada,
-                    maxHp: 2 * oleada,
-                    tipo: oleada >= 3 ? '🤖' : '🧟'
+            // Si estamos en modo supervivencia, evaluar cercanía a zombis
+            if (modoActual === 'survival' && enemies.length > 0) {
+                enemies.forEach(en => {
+                    if (Math.abs(en.x - posX1) < 40) {
+                        ejecutarAccion(1); // Ataca automáticamente si está cerca
+                    }
                 });
             }
-            actualizarRenderEnemigos();
         }
 
-        function actualizarRenderEnemigos() {
+        function cambiarModo(modo) {
+            modoActual = modo;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            
+            let arenaP2 = document.getElementById("fighterP2");
+            let enemiesArea = document.getElementById("enemiesArea");
+            let spanOro = document.getElementById("spanOroContainer");
+            let btnTienda = document.getElementById("btnTiendaArma");
+            
+            if (modo === 'bot') {
+                document.getElementById('modeBot').classList.add('active');
+                document.getElementById('lblModoActual').textContent = "VS BOT";
+                arenaP2.style.display = 'block';
+                enemiesArea.innerHTML = '';
+                spanOro.style.display = 'none';
+                btnTienda.style.display = 'none';
+                vidaRival = 100;
+                document.getElementById('lblRival').textContent = "BOT FF";
+            } else if (modo === '1v1') {
+                document.getElementById('mode1v1').classList.add('active');
+                document.getElementById('lblModoActual').textContent = "MULTIJUGADOR 1V1";
+                arenaP2.style.display = 'block';
+                enemiesArea.innerHTML = '';
+                spanOro.style.display = 'none';
+                btnTienda.style.display = 'none';
+                vidaRival = 100;
+                document.getElementById('lblRival').textContent = "JUGADOR 2";
+            } else if (modo === 'survival') {
+                document.getElementById('modeSurvival').classList.add('active');
+                document.getElementById('lblModoActual').textContent = "ZOMBIE SURVIVAL";
+                arenaP2.style.display = 'none';
+                spanOro.style.display = 'inline';
+                btnTienda.style.display = 'inline';
+                iniciarOleadaSurvival();
+            }
+            reproducirSonido(500, 'triangle', 0.1);
+        }
+
+        function elegirPersonaje(nombre, icono, color) {
+            document.querySelectorAll('.char-mini-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('headP1').textContent = icono;
+            document.getElementById('skinNameP1').textContent = nombre;
+            document.getElementById('torsoP1').style.background = color;
+            document.querySelectorAll('#fighterP1 .arm').forEach(a => a.style.background = color);
+            reproducirSonido(600, 'sine', 0.1);
+        }
+
+        // Acciones de los botones del HUD clásico
+        function ejecutarAccion(tipoBtn) {
+            if (!gameActive) return;
+
+            if (tipoBtn === 1) { // Fuego / Disparo
+                reproducirSonido(800, 'sawtooth', 0.08);
+                let arena = document.getElementById("arenaBox");
+                let bala = document.createElement("div");
+                bala.className = "bullet-effect";
+                bala.style.left = (posX1 + 40) + "px";
+                bala.style.bottom = "40px";
+                arena.appendChild(bala);
+                setTimeout(() => bala.remove(), 150);
+
+                if (modoActual === 'survival') {
+                    if (enemies.length > 0) {
+                        let target = enemies[0];
+                        target.hp -= 25;
+                        if (target.hp <= 0) {
+                            enemies.shift();
+                            oro += 30;
+                            document.getElementById('txtOro').textContent = oro;
+                            document.getElementById('chatLog').textContent = "💀 ¡Zombi abatido! (+30 Oro)";
+                            if (enemies.length === 0) {
+                                oleada++;
+                                iniciarOleadaSurvival();
+                            }
+                        }
+                        renderizarEnemigos();
+                    }
+                } else {
+                    // Daño al rival en modo Bot o 1v1
+                    vidaRival = Math.max(0, vidaRival - 20);
+                    document.getElementById('chatLog').textContent = `🎯 ¡Impacto al rival! Vida rival: ${vidaRival} HP`;
+                    if (vidaRival <= 0) {
+                        alert("🎉 ¡VICTORIA! Has derrotado a tu oponente.");
+                        vidaRival = 100;
+                    }
+                }
+            } 
+            else if (tipoBtn === 2) { // Aura / Especial
+                reproducirSonido(950, 'square', 0.2);
+                document.getElementById('chatLog').textContent = "⚡ ¡Habilidad especial activada!";
+            } 
+            else if (tipoBtn === 3) { // Botiquín / Curar
+                vida = Math.min(100, vida + 35);
+                document.getElementById('hpFill').style.width = vida + "%";
+                document.getElementById('hpText').textContent = vida + " HP";
+                reproducirSonido(700, 'triangle', 0.2);
+                document.getElementById('chatLog').textContent = "💉 ¡Te has curado (+35 HP)!";
+            } 
+            else if (tipoBtn === 4) { // Pared Gloo
+                escudoActivo = true;
+                let overlay = document.getElementById("efectoGloo");
+                overlay.classList.add("escudo-activo");
+                reproducirSonido(650, 'sine', 0.25);
+                document.getElementById('chatLog').textContent = "🛡️ ¡Pared Gloo desplegada! Inmune temporalmente.";
+                setTimeout(() => {
+                    escudoActivo = false;
+                    overlay.classList.remove("escudo-activo");
+                }, 4000);
+            }
+        }
+
+        function iniciarOleadaSurvival() {
+            enemies = [];
+            let cantidad = 2 + (oleada * 2);
+            for (let i = 0; i < cantidad; i++) {
+                enemies.push({ id: Math.random(), x: 280 + (i * 45), hp: 50 });
+            }
+            document.getElementById('chatLog').textContent = `🧟 ¡Oleada ${oleada} iniciada! Defiéndete.`;
+            renderizarEnemigos();
+        }
+
+        function renderizarEnemigos() {
             let area = document.getElementById("enemiesArea");
             area.innerHTML = '';
             enemies.forEach(en => {
@@ -543,148 +648,56 @@
                 div.innerHTML = `
                     <div class="fighter-model">
                         <div class="body-container">
-                            <div class="head">${en.tipo}</div>
-                            <div class="torso" style="background: #ff0055;">
+                            <div class="head">🧟</div>
+                            <div class="torso" style="background:#ff0055;">
                                 <div class="arm left" style="background:#ff0055;"></div>
                                 <div class="arm right" style="background:#ff0055;"></div>
                             </div>
                             <div class="legs"><div class="leg left"></div><div class="leg right"></div></div>
                         </div>
-                        <div class="fighter-skin-name" style="color:#ff0055;">HP: ${en.hp}</div>
+                        <div class="fighter-skin-name" style="color:#ff0055;">HP:${en.hp}</div>
                     </div>
                 `;
                 area.appendChild(div);
             });
         }
 
-        // Bucle Principal de Movimiento de Enemigos y Supervivencia
+        function comprarMejora() {
+            if (oro >= 100) {
+                oro -= 100;
+                document.getElementById('txtOro').textContent = oro;
+                document.getElementById('chatLog').textContent = "🔥 ¡Compraste la MP40 Max!";
+                reproducirSonido(900, 'triangle', 0.3);
+            } else {
+                document.getElementById('chatLog').textContent = "❌ Oro insuficiente (Necesitas 100G).";
+            }
+        }
+
+        // Bucle de movimiento de rivales / zombis
         setInterval(() => {
             if (!gameActive) return;
-
-            if (enemies.length === 0) {
-                oleada++;
-                document.getElementById("txtOleada").textContent = oleada;
-                let alerta = document.getElementById("alertaOleada");
-                alerta.innerHTML = `🔥 ¡OLEADA ${oleada} INICIADA! 🔥`;
-                alerta.classList.add("mostrar-alerta");
-                setTimeout(() => alerta.classList.remove("mostrar-alerta"), 2000);
-                spawnEnemigos();
+            if (modoActual === 'survival') {
+                enemies.forEach(en => {
+                    en.x -= 2;
+                    if (en.x <= posX1 + 25) {
+                        if (!escudoActivo) {
+                            vida = Math.max(0, vida - 5);
+                            document.getElementById('hpFill').style.width = vida + "%";
+                            document.getElementById('hpText').textContent = vida + " HP";
+                        }
+                        en.x += 40;
+                    }
+                });
+                renderizarEnemigos();
+            } else if (modoActual === 'bot') {
+                // Movimiento automático del bot rival
+                if (posX2 > posX1 + 50) posX2 -= 1;
+                document.getElementById('fighterP2').style.right = (400 - posX2) + "px";
             }
-
-            // Mover enemigos hacia la izquierda (hacia el jugador)
-            enemies.forEach(en => {
-                en.x -= 2 + (oleada * 0.3);
-                // Si el enemigo toca al jugador
-                if (en.x <= posX1 + 25) {
-                    recibirDaño(10);
-                    en.x += 60; // Empujar hacia atrás al golpear
-                }
-            });
-
-            actualizarRenderEnemigos();
         }, 100);
 
-        function recibirDaño(cantidad) {
-            if (escudoActivo) {
-                document.getElementById("chatLog").textContent = "🛡️ ¡Pared Gloo bloqueó el ataque enemigo!";
-                return;
-            }
-            vida = Math.max(0, vida - cantidad);
-            document.getElementById("hpFill").style.width = vida + "%";
-            document.getElementById("hpText").textContent = vida + " HP";
-
-            let overlay = document.getElementById("efectoDaño");
-            overlay.classList.add("recibiendo-daño");
-            setTimeout(() => overlay.classList.remove("recibiendo-daño"), 200);
-            reproducirSonido(120, 'sawtooth', 0.2);
-
-            if (vida <= 0) {
-                gameActive = false;
-                alert("💀 ¡TE ELIMINARON! Fin de la partida en Oleada " + oleada);
-                location.reload();
-            }
-        }
-
-        function eliminarEnemigo(en) {
-            enemies = enemies.filter(e => e.id !== en.id);
-            bajas++;
-            oro += 25 * oleada;
-            document.getElementById("txtBajas").textContent = bajas;
-            document.getElementById("txtOro").textContent = oro;
-            reproducirSonido(600, 'sine', 0.15);
-            actualizarRenderEnemigos();
-        }
-
-        function usarBotiquin() {
-            if (oro >= 50 && vida < 100) {
-                oro -= 50;
-                vida = Math.min(100, vida + 40);
-                document.getElementById("txtOro").textContent = oro;
-                document.getElementById("hpFill").style.width = vida + "%";
-                document.getElementById("hpText").textContent = vida + " HP";
-                reproducirSonido(700, 'triangle', 0.3);
-                document.getElementById("chatLog").textContent = "💉 ¡Botiquín usado con éxito (+40 HP)!";
-            } else {
-                document.getElementById("chatLog").textContent = "¡Necesitas 50 de oro o estar herido!";
-            }
-        }
-
-        function activarParedGloo() {
-            escudoActivo = true;
-            let escudoOverlay = document.getElementById("efectoGloo");
-            escudoOverlay.classList.add("escudo-activo");
-            reproducirSonido(700, 'triangle', 0.3);
-            document.getElementById("chatLog").textContent = "🛡️ ¡Pared Gloo desplegada! Inmune por 5 segundos.";
-            
-            let btnGloo = document.getElementById("btnGlooRedondo");
-            btnGloo.disabled = true;
-            
-            setTimeout(() => {
-                escudoActivo = false;
-                escudoOverlay.classList.remove("escudo-activo");
-            }, 5000);
-
-            let tiempo = 8;
-            let span = btnGloo.querySelector('span');
-            let intervalo = setInterval(() => {
-                span.textContent = `${tiempo}s`;
-                tiempo--;
-                if(tiempo < 0) {
-                    clearInterval(intervalo);
-                    btnGloo.disabled = false;
-                    span.textContent = "Gloo";
-                }
-            }, 1000);
-        }
-
-        function usarHabilidadEspecial() {
-            reproducirSonido(900, 'square', 0.3);
-            // Eliminar al enemigo más cercano automáticamente con la habilidad
-            if (enemies.length > 0) {
-                eliminarEnemigo(enemies[0]);
-                document.getElementById("chatLog").textContent = "⚡ ¡Habilidad Alok activada! Enemigo abatido.";
-            }
-        }
-
-        function comprarArma(costo, dañoNuevo, nombre, colorHex) {
-            if (oro >= costo) {
-                oro -= costo;
-                dañoArma = dañoNuevo;
-                document.getElementById("txtOro").textContent = oro;
-                document.getElementById("skinNameP1").textContent = nombre;
-                document.getElementById("torsoP1").style.background = colorHex;
-                document.querySelectorAll('#fighterP1 .arm').forEach(a => a.style.background = colorHex);
-
-                reproducirSonido(950, 'triangle', 0.3);
-                document.getElementById("chatLog").textContent = `¡Arma comprada: ${nombre} (Daño x${dañoNuevo})!`;
-            } else {
-                reproducirSonido(150, 'sawtooth', 0.2);
-                document.getElementById("chatLog").textContent = "¡Oro insuficiente para esta arma!";
-            }
-        }
-
-        // Inicializar primera oleada
-        spawnEnemigos();
+        // Inicializar barra de vida
+        document.getElementById('hpFill').style.width = vida + "%";
     </script>
 </body>
 </html>

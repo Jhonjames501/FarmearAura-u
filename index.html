@@ -239,6 +239,21 @@
         }
         .special-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
+        .attack-btn {
+            width: 100%;
+            padding: 9px;
+            background: linear-gradient(90deg, #00ffff, #0055ff);
+            color: #080810;
+            border: none;
+            font-weight: bold;
+            border-radius: 6px;
+            font-size: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .attack-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+
         .store-box {
             display: flex;
             justify-content: space-between;
@@ -349,6 +364,7 @@
             <button class="action-btn" id="btnFarmear">🔥 Framear Aura (Emote) 🔥</button>
 
             <button class="special-btn" id="btnPoder" onclick="usarPoderEspecial()">⚡ Baile Épico (+25 Aura)</button>
+            <button class="attack-btn" id="btnAtaque" onclick="lanzarAtaqueRival()">🧊 Tirar Globo Hielo (-10 Aura Rival)</button>
 
             <div class="store-box">
                 <div class="store-item" onclick="comprarMejora(500, 2, 'Criminal')">🎭 Criminal<br><b>500 (x2)</b></div>
@@ -378,9 +394,9 @@
         let avatarActual = '🥷';
         let skinNombreActual = 'Alok';
         let poderCargado = true;
+        let ataqueCargado = true;
         let peer, conn, botInterval;
 
-        // Configuración robusta de STUN/TURN para evitar bloqueos por compartir internet
         const peerOptions = {
             config: {
                 'iceServers': [
@@ -456,7 +472,6 @@
             score1 += 25 * multiplicador;
             document.getElementById("scoreP1").textContent = score1;
             reproducirSonido(900, 'square', 0.4);
-            alert("¡Baile Épico activado! +25 aura instantánea.");
             
             poderCargado = false;
             let btnPoder = document.getElementById("btnPoder");
@@ -474,6 +489,35 @@
             }, 1000);
             sincronizarDatos();
             verificarGanador();
+        }
+
+        function lanzarAtaqueRival() {
+            if (!ataqueCargado) return;
+            reproducirSonido(400, 'sawtooth', 0.3);
+            
+            ataqueCargado = false;
+            let btnAtaque = document.getElementById("btnAtaque");
+            btnAtaque.disabled = true;
+
+            if (conn && conn.open) {
+                conn.send({ tipo: 'ataque', valor: 10 });
+            } else if (modoJuego === 'cpu') {
+                score2 = Math.max(0, score2 - 10);
+                document.getElementById("scoreP2").textContent = score2;
+                alert("¡Le lanzaste un Globo de Hielo al Bot!");
+            }
+
+            let tiempo = 8;
+            let intervalo = setInterval(() => {
+                btnAtaque.textContent = `⏳ Recargando Hielo (${tiempo}s)...`;
+                tiempo--;
+                if(tiempo < 0) {
+                    clearInterval(intervalo);
+                    ataqueCargado = true;
+                    btnAtaque.disabled = false;
+                    btnAtaque.textContent = "🧊 Tirar Globo Hielo (-10 Aura Rival)";
+                }
+            }, 1000);
         }
 
         function enviarMensajeChat(texto) {
@@ -549,7 +593,6 @@
             document.getElementById("multiplicadorText").textContent = "x1";
         }
 
-        // Multijugador Online con servidores STUN integrados
         document.getElementById("crearSalaBtn").addEventListener("click", () => {
             let codigo = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById("myIdText").textContent = "Código: " + codigo;
@@ -592,15 +635,16 @@
             conn.on('data', (data) => {
                 if(data.tipo === 'chat') {
                     document.getElementById("chatLog").textContent = "Rival: " + data.contenido;
+                } else if(data.tipo === 'ataque') {
+                    score1 = Math.max(0, score1 - data.valor);
+                    document.getElementById("scoreP1").textContent = score1;
+                    alert("¡Te tiraron un Globo de Hielo! Perdiste 10 de aura.");
                 } else if(data.score !== undefined) {
                     score2 = data.score;
                     document.getElementById("scoreP2").textContent = score2;
-                    if(data.avatar) {
-                        document.getElementById("avatarP2").textContent = data.avatar;
-                    }
-                    if(data.skinNombre) {
-                        document.getElementById("skinNameP2").textContent = data.skinNombre;
-                    }
+                    if(data.avatar) document.getElementById("avatarP2").textContent = data.avatar;
+                    if(data.skinNombre) document.getElementById("skinNameP2").textContent = data.skinNombre;
+                    
                     let f2 = document.getElementById("fighterP2");
                     f2.classList.add("animar-rival");
                     setTimeout(() => f2.classList.remove("animar-rival"), 350);

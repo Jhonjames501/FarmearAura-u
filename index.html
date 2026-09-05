@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Supervivencia Total (Dinámico)</title>
+    <title>Free Fire - Cero Lag Total</title>
     <style>
         * {
             box-sizing: border-box;
@@ -17,9 +17,8 @@
             min-height: 100vh;
             background-color: #080810;
             color: #f0f0f0;
-            overflow-x: hidden;
-            overflow-y: auto;
-            position: relative;
+            overflow: hidden;
+            position: fixed;
             user-select: none;
         }
 
@@ -29,7 +28,7 @@
             background: radial-gradient(circle, rgba(255,0,0,0) 50%, rgba(255,0,0,0.5) 100%);
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.15s ease;
             z-index: 999;
         }
         .recibiendo-daño { opacity: 1 !important; }
@@ -40,7 +39,7 @@
             background: radial-gradient(circle, rgba(0,255,255,0) 30%, rgba(0,255,255,0.4) 100%);
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
             z-index: 997;
         }
         .transformado-activo { opacity: 1 !important; }
@@ -49,11 +48,11 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            gap: 6px;
-            padding: 6px;
+            gap: 4px;
+            padding: 4px;
             width: 100%;
             max-width: 500px;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0 auto;
             position: relative;
             z-index: 5;
@@ -65,8 +64,8 @@
             align-items: center;
             background: #12121c;
             border: 1px solid #444;
-            border-radius: 8px;
-            padding: 6px 10px;
+            border-radius: 6px;
+            padding: 4px 8px;
             font-size: 10px;
             font-weight: bold;
         }
@@ -79,7 +78,7 @@
             color: #ffaa00;
         }
         .volume-control-box input {
-            width: 50px;
+            width: 45px;
             accent-color: #ffaa00;
             cursor: pointer;
         }
@@ -87,14 +86,13 @@
         /* ARENA DE JUEGO */
         .battle-arena {
             flex: 1;
-            min-height: 320px;
             display: flex;
             background: linear-gradient(135deg, rgba(20, 25, 40, 0.95), rgba(10, 15, 25, 0.95));
             border: 2px solid #ffaa00;
-            border-radius: 12px;
+            border-radius: 10px;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(255, 170, 0, 0.15);
+            box-shadow: inset 0 0 20px rgba(255, 170, 0, 0.15);
         }
         .battle-arena::after {
             content: "";
@@ -121,7 +119,7 @@
             left: 50px;
             text-align: center;
             z-index: 10;
-            will-change: bottom;
+            will-change: bottom, transform;
         }
 
         .fighter-model {
@@ -142,7 +140,7 @@
             flex-direction: column;
             align-items: center;
         }
-        .head { font-size: 18px; line-height: 18px; z-index: 2; filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); }
+        .head { font-size: 18px; line-height: 18px; z-index: 2; }
         .torso {
             width: 16px;
             height: 16px;
@@ -174,15 +172,15 @@
             transform-origin: top center;
         }
 
-        .caminando .arm.left { animation: moverBrazoIzda 0.4s infinite alternate ease-in-out; }
-        .caminando .arm.right { animation: moverBrazoDcha 0.4s infinite alternate ease-in-out; }
-        .caminando .leg:nth-child(1) { animation: moverPierna1 0.4s infinite alternate ease-in-out; }
-        .caminando .leg:nth-child(2) { animation: moverPierna2 0.4s infinite alternate ease-in-out; }
+        .caminando .arm.left { animation: moverBrazoIzda 0.3s infinite alternate ease-in-out; }
+        .caminando .arm.right { animation: moverBrazoDcha 0.3s infinite alternate ease-in-out; }
+        .caminando .leg:nth-child(1) { animation: moverPierna1 0.3s infinite alternate ease-in-out; }
+        .caminando .leg:nth-child(2) { animation: moverPierna2 0.3s infinite alternate ease-in-out; }
 
-        @keyframes moverBrazoIzda { 0% { transform: rotate(-25deg); } 100% { transform: rotate(25deg); } }
-        @keyframes moverBrazoDcha { 0% { transform: rotate(25deg); } 100% { transform: rotate(-25deg); } }
-        @keyframes moverPierna1 { 0% { transform: rotate(20deg); } 100% { transform: rotate(-20deg); } }
-        @keyframes moverPierna2 { 0% { transform: rotate(-20deg); } 100% { transform: rotate(20deg); } }
+        @keyframes moverBrazoIzda { 0% { transform: rotate(-20deg); } 100% { transform: rotate(20deg); } }
+        @keyframes moverBrazoDcha { 0% { transform: rotate(20deg); } 100% { transform: rotate(-20deg); } }
+        @keyframes moverPierna1 { 0% { transform: rotate(15deg); } 100% { transform: rotate(-15deg); } }
+        @keyframes moverPierna2 { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
 
         .fighter-skin-name {
             font-size: 7px;
@@ -195,8 +193,13 @@
             white-space: nowrap;
         }
 
-        .platform-box {
+        /* Elementos del mapa pre-renderizados para cero lag */
+        .map-element {
             position: absolute;
+            will-change: transform;
+        }
+
+        .platform-box {
             background: linear-gradient(135deg, #8B4513, #A0522D);
             border: 2px solid #CD853F;
             border-radius: 4px;
@@ -204,13 +207,11 @@
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
             z-index: 4;
-            pointer-events: auto;
         }
 
         .floating-coin {
-            position: absolute;
             width: 18px;
             height: 18px;
             background: radial-gradient(circle, #ffff00, #ff8800);
@@ -220,50 +221,48 @@
             align-items: center;
             justify-content: center;
             font-size: 9px;
-            box-shadow: 0 0 10px #ffaa00;
+            box-shadow: 0 0 8px #ffaa00;
             z-index: 9;
         }
 
         .enemy-item {
-            position: absolute;
-            bottom: 0px;
             text-align: center;
             z-index: 8;
-            pointer-events: auto;
         }
 
         .venom-ball {
             position: absolute;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             background: #00ff66;
             border-radius: 50%;
-            box-shadow: 0 0 10px #00ff66, 0 0 20px #00ff66;
+            box-shadow: 0 0 8px #00ff66;
             z-index: 15;
+            will-change: transform;
         }
 
         .bullet-effect {
             position: absolute;
             height: 3px;
             background: #ffff00;
-            box-shadow: 0 0 8px #ffaa00;
+            box-shadow: 0 0 6px #ffaa00;
             z-index: 12;
             pointer-events: none;
-            animation: dispararBala 0.15s linear forwards;
+            animation: dispararBala 0.1s linear forwards;
         }
         @keyframes dispararBala {
             0% { width: 0px; opacity: 1; }
-            100% { width: 80px; opacity: 0; }
+            100% { width: 70px; opacity: 0; }
         }
 
         .controls-hud {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             background: rgba(18, 18, 28, 0.95);
             border: 1px solid #444;
-            padding: 8px;
-            border-radius: 12px;
+            padding: 6px;
+            border-radius: 10px;
         }
 
         .mid-controls-row {
@@ -274,8 +273,8 @@
         }
 
         .joystick-base {
-            width: 85px;
-            height: 85px;
+            width: 75px;
+            height: 75px;
             background: rgba(30, 30, 50, 0.6);
             border: 2px solid rgba(255, 170, 0, 0.6);
             border-radius: 50%;
@@ -284,24 +283,23 @@
             align-items: center;
             justify-content: center;
             touch-action: none;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
         .joystick-knob {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             border-radius: 50%;
             position: absolute;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
             cursor: pointer;
             pointer-events: none;
         }
 
-        .hp-container { flex: 1; padding: 0 5px; }
+        .hp-container { flex: 1; padding: 0 4px; }
         .hp-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
-        .hp-bar-bg { width: 100%; background: #222; height: 7px; border-radius: 3px; overflow: hidden; }
-        .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.2s ease; }
+        .hp-bar-bg { width: 100%; background: #222; height: 6px; border-radius: 3px; overflow: hidden; }
+        .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.1s ease; }
 
         .right-controls-panel {
             display: flex;
@@ -310,8 +308,8 @@
         }
 
         .jump-action-btn {
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, #00ffff, #0088cc);
             border: 2px solid #fff;
             border-radius: 50%;
@@ -319,10 +317,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 15px;
             color: #000;
             font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,255,255,0.4);
+            box-shadow: 0 3px 10px rgba(0,255,255,0.4);
             cursor: pointer;
             flex-shrink: 0;
         }
@@ -331,10 +329,9 @@
 
         .attacks-box-hud {
             background: rgba(20, 20, 35, 0.6);
-            backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 6px;
+            border-radius: 10px;
+            padding: 4px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -343,22 +340,22 @@
         .actions-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 6px;
             justify-items: center;
             width: 100%;
         }
         .round-action-btn {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.8);
-            font-size: 15px;
+            font-size: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.6);
             position: relative;
         }
         .round-action-btn span { font-size: 7px; font-weight: bold; margin-top: -1px; color: #fff; text-shadow: 0 1px 2px #000; }
@@ -376,8 +373,8 @@
             align-items: center;
             font-size: 8px;
             background: #141420;
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 3px 6px;
+            border-radius: 4px;
             border: 1px solid #333;
         }
         #chatLog { font-size: 8px; color: #00ffcc; font-style: italic; text-align: center; }
@@ -415,10 +412,7 @@
             </div>
 
             <div id="worldContainer">
-                <div id="obstaclesArea"></div>
-                <div id="coinsArea"></div>
-                <div id="enemiesArea"></div>
-                <div id="projectilesArea"></div>
+                <div id="elementsArea"></div>
             </div>
         </div>
 
@@ -465,7 +459,7 @@
 
             <div class="info-bottom-bar">
                 <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-                <span id="chatLog">¡Zombies separados y cielo lleno de cajas y monedas!</span>
+                <span id="chatLog">¡Motor ultra fluido sin lag!</span>
             </div>
 
         </div>
@@ -508,7 +502,7 @@
             let gain = audioCtx.createGain();
             osc.type = tipo;
             osc.frequency.value = frecuencia;
-            gain.gain.setValueAtTime(0.18 * volumenExtra, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.15 * volumenExtra, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duracion);
             osc.connect(gain);
             gain.connect(masterGain);
@@ -519,7 +513,6 @@
         function iniciarMusicaSupervivencia() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const notasBajo = [110, 110, 98, 98, 82.41, 82.41, 73.42, 73.42];
-            const notasMelodia = [220, 329.63, 440, 329.63, 246.94, 392, 493.88, 392];
             let paso = 0;
 
             setInterval(() => {
@@ -528,12 +521,12 @@
                 let gainBajo = audioCtx.createGain();
                 oscBajo.type = 'sawtooth';
                 oscBajo.frequency.value = notasBajo[paso % notasBajo.length];
-                gainBajo.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                gainBajo.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.28);
+                gainBajo.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                gainBajo.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
                 oscBajo.connect(gainBajo);
                 gainBajo.connect(masterGain);
                 oscBajo.start();
-                oscBajo.stop(audioCtx.currentTime + 0.28);
+                oscBajo.stop(audioCtx.currentTime + 0.25);
                 paso++;
             }, 300);
         }
@@ -552,7 +545,7 @@
             let rect = joyBase.getBoundingClientRect();
             let centroX = rect.left + rect.width / 2;
             let deltaX = clientX - centroX;
-            let radioMax = 28;
+            let radioMax = 25;
 
             if (deltaX > radioMax) deltaX = radioMax;
             if (deltaX < -radioMax) deltaX = -radioMax;
@@ -576,89 +569,85 @@
             }
         });
 
-        // Bucle unificado principal
-        setInterval(() => {
-            if (!gameActive) return;
-
-            let moving = Math.abs(direccionMovimiento) > 0.1;
-            let cuerpoP1 = document.getElementById('bodyP1');
-
-            if (moving || saltando || volando) {
-                cuerpoP1.classList.add('caminando');
-            } else {
-                cuerpoP1.classList.remove('caminando');
-            }
-
-            if (moving || saltando || volando) {
-                let velocidadBase = moving ? direccionMovimiento * 9 : (window.inerciaSaltoX || 0);
-                if (volando) velocidadBase = direccionMovimiento * 12;
-                
-                if (Math.abs(velocidadBase) > 0.5 || volando) {
-                    mundoX += velocidadBase;
-                    if (mundoX < 0) mundoX = 0;
-
-                    distancia = Math.floor(mundoX / 5);
-                    document.getElementById("txtDistancia").textContent = distancia + "m";
-                    document.getElementById("worldContainer").style.transform = `translateX(-${mundoX}px)`;
-                    verificarDesbloqueos();
-                }
-            }
-        }, 30);
-
         function inicializarMundo() {
-            for(let i = 1; i < 300; i++) {
-                // Generar Cajas en el suelo y Cajas flotantes en el aire
-                let posX = i * 220 + Math.random() * 40;
-                let alturaCaja = (i % 2 === 0) ? 0 : (50 + Math.random() * 70); // Si es mayor a 0, queda flotando en el aire
+            let container = document.getElementById("elementsArea");
+            let fragment = document.createDocumentFragment();
 
-                boxes.push({
-                    x: posX,
-                    y: alturaCaja,
-                    w: 45,
-                    h: 35
-                });
+            for(let i = 1; i < 200; i++) {
+                let posX = i * 240 + Math.random() * 50;
+                let alturaCaja = (i % 2 === 0) ? 0 : (55 + Math.random() * 65);
 
-                // Generar Puntos / Monedas en el aire y sobre cajas
-                coins.push({
-                    x: posX + 20,
-                    y: alturaCaja > 0 ? alturaCaja + 45 : 40 + Math.random() * 80,
-                    recolectada: false
-                });
+                // Crear caja en el DOM una sola vez
+                let boxDiv = document.createElement("div");
+                boxDiv.className = "map-element platform-box";
+                boxDiv.style.left = posX + "px";
+                boxDiv.style.bottom = alturaCaja + "px";
+                boxDiv.style.width = "45px";
+                boxDiv.style.height = "35px";
+                boxDiv.innerHTML = "📦";
+                fragment.appendChild(boxDiv);
+                boxes.push({ x: posX, y: alturaCaja, w: 45, h: 35, el: boxDiv });
 
-                // Zombis bien separados individualmente (sin amontonarse de 2 en 2)
+                // Crear moneda en el DOM una sola vez
+                let coinX = posX + 20;
+                let coinY = alturaCaja > 0 ? alturaCaja + 45 : 45 + Math.random() * 75;
+                let coinDiv = document.createElement("div");
+                coinDiv.className = "map-element floating-coin";
+                coinDiv.style.left = coinX + "px";
+                coinDiv.style.bottom = coinY + "px";
+                coinDiv.innerHTML = "🪙";
+                fragment.appendChild(coinDiv);
+                coins.push({ x: coinX, y: coinY, recolectada: false, el: coinDiv });
+
+                // Crear zombi individual separado correctamente
                 let tipos = [
-                    { emoji: '🧟', tipo: 'caminante', hp: 50, color: '#ff0055', velocidad: 1.0 },
-                    { emoji: '🤮', tipo: 'toxico', hp: 75, color: '#00ff66', velocidad: 0.7 },
-                    { emoji: '🏺', tipo: 'momia', hp: 100, color: '#ffaa00', velocidad: 0.9 }
+                    { emoji: '🧟', hp: 50, color: '#ff0055', vel: 0.9 },
+                    { emoji: '🤮', hp: 75, color: '#00ff66', vel: 0.6 },
+                    { emoji: '🏺', hp: 100, color: '#ffaa00', vel: 0.8 }
                 ];
                 let elegido = tipos[Math.floor(Math.random() * tipos.length)];
-                
-                enemies.push({
-                    x: posX + 140 + Math.random() * 60, // Espaciado independiente
-                    hp: elegido.hp,
-                    emoji: elegido.emoji,
-                    tipo: elegido.tipo,
-                    color: elegido.color,
-                    velocidad: elegido.velocidad
-                });
+                let enemyX = posX + 150 + Math.random() * 50;
+
+                let enemyDiv = document.createElement("div");
+                enemyDiv.className = "map-element enemy-item";
+                enemyDiv.style.left = enemyX + "px";
+                enemyDiv.style.bottom = "0px";
+                enemyDiv.innerHTML = `
+                    <div class="fighter-model">
+                        <div class="body-container caminando">
+                            <div class="head">${elegido.emoji}</div>
+                            <div class="torso" style="background:${elegido.color};">
+                                <div class="arm left" style="background:${elegido.color};"></div>
+                                <div class="arm right" style="background:${elegido.color};"></div>
+                            </div>
+                            <div class="legs">
+                                <div class="leg" style="background:${elegido.color};"></div>
+                                <div class="leg" style="background:${elegido.color};"></div>
+                            </div>
+                        </div>
+                        <div class="fighter-skin-name" style="color:${elegido.color};" id="enHp_${i}">HP:${elegido.hp}</div>
+                    </div>
+                `;
+                fragment.appendChild(enemyDiv);
+                enemies.push({ x: enemyX, hp: elegido.hp, maxHp: elegido.hp, vel: elegido.vel, el: enemyDiv, hpText: enemyDiv.querySelector(`#enHp_${i}`) });
             }
-            renderizarMundo();
+            container.appendChild(fragment);
         }
 
         function saltarJugador() {
             if (!gameActive) return;
 
             if (volando) {
-                posY1 = Math.min(220, posY1 + 15);
+                posY1 = Math.min(210, posY1 + 15);
                 document.getElementById("fighterP1").style.bottom = posY1 + "px";
-                reproducirSonido(880, 'sine', 0.1, 1.0);
+                reproducirSonido(880, 'sine', 0.08, 1.0);
                 return;
             }
 
             if (saltando) {
                 impulsoSalto = Math.min(26, impulsoSalto + 4);
                 velocidadY = impulsoSalto;
-                reproducirSonido(750, 'triangle', 0.15, 1.2);
+                reproducirSonido(750, 'triangle', 0.12, 1.2);
                 document.getElementById('chatLog').textContent = `🚀 ¡Salto propulsado en el aire!`;
                 return;
             }
@@ -666,17 +655,14 @@
             saltando = true;
             impulsoSalto = 16;
             velocidadY = impulsoSalto;
-            window.inerciaSaltoX = Math.abs(direccionMovimiento) > 0.1 ? direccionMovimiento * 10 : 6;
-            reproducirSonido(500, 'triangle', 0.15, 1.2);
+            window.inerciaSaltoX = Math.abs(direccionMovimiento) > 0.1 ? direccionMovimiento * 9 : 5;
+            reproducirSonido(500, 'triangle', 0.12, 1.2);
 
             let saltoInterval = setInterval(() => {
-                if (volando) {
-                    clearInterval(saltoInterval);
-                    return;
-                }
+                if (volando) { clearInterval(saltoInterval); return; }
 
                 posY1 += velocidadY;
-                velocidadY -= 2.0;
+                velocidadY -= 1.8;
 
                 let jugadorMundoX = mundoX + posX1;
                 boxes.forEach(box => {
@@ -698,7 +684,7 @@
                     clearInterval(saltoInterval);
                 }
                 document.getElementById("fighterP1").style.bottom = posY1 + "px";
-            }, 30);
+            }, 25);
         }
 
         function verificarDesbloqueos() {
@@ -723,20 +709,21 @@
                 bala.style.left = (posX1 + 40) + "px";
                 bala.style.bottom = (posY1 + 35) + "px";
                 arena.appendChild(bala);
-                setTimeout(() => bala.remove(), 150);
+                setTimeout(() => bala.remove(), 120);
 
                 let jugadorMundoX = mundoX + posX1;
                 enemies.forEach(en => {
-                    if (Math.abs(en.x - jugadorMundoX) < 110) {
+                    if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 110) {
                         en.hp -= 35;
                         if (en.hp <= 0) {
                             oro += 50;
                             document.getElementById('txtOro').textContent = oro;
-                            en.x = -2000;
+                            en.el.style.display = 'none';
+                        } else {
+                            en.hpText.textContent = "HP:" + en.hp;
                         }
                     }
                 });
-                renderizarMundo();
             } 
             else if (tipoBtn === 2 && !document.getElementById('btnAccion2').classList.contains('locked')) {
                 transformar('Lobo', '🐺', '#ff5500');
@@ -758,20 +745,20 @@
             transformar('Fénix Volador', '🦅', '#ff00ff');
             document.getElementById('txtBtnSalto').textContent = "ELEV.";
             
-            reproducirSonido(400, 'sine', 0.6, 2.0);
+            reproducirSonido(400, 'sine', 0.5, 2.0);
             let overlay = document.getElementById("efectoTransformacion");
             overlay.classList.add("transformado-activo");
-            setTimeout(() => overlay.classList.remove("transformado-activo"), 500);
+            setTimeout(() => overlay.classList.remove("transformado-activo"), 400);
 
             let subidaInicial = setInterval(() => {
                 if (!volando) { clearInterval(subidaInicial); return; }
-                if (posY1 < 140) {
+                if (posY1 < 130) {
                     posY1 += 8;
                     document.getElementById("fighterP1").style.bottom = posY1 + "px";
                 } else {
                     clearInterval(subidaInicial);
                 }
-            }, 25);
+            }, 20);
 
             let cuentaReg_vuelo = setInterval(() => {
                 tiempoVueloRestante--;
@@ -790,7 +777,7 @@
                             clearInterval(aterrizajeInterval);
                         }
                         document.getElementById("fighterP1").style.bottom = posY1 + "px";
-                    }, 30);
+                    }, 25);
                 }
             }, 1000);
         }
@@ -804,128 +791,106 @@
             document.getElementById('lblEstadoTransformacion').textContent = nombre;
         }
 
-        function renderizarMundo() {
-            let obsArea = document.getElementById("obstaclesArea");
-            obsArea.innerHTML = '';
-            boxes.forEach(b => {
-                let d = document.createElement("div");
-                d.className = "platform-box";
-                d.style.left = b.x + "px";
-                d.style.bottom = b.y + "px";
-                d.style.width = b.w + "px";
-                d.style.height = b.h + "px";
-                d.innerHTML = "📦";
-                obsArea.appendChild(d);
-            });
-
-            let coinArea = document.getElementById("coinsArea");
-            coinArea.innerHTML = '';
-            coins.forEach(c => {
-                if (!c.recolectada) {
-                    let d = document.createElement("div");
-                    d.className = "floating-coin";
-                    d.style.left = c.x + "px";
-                    d.style.bottom = c.y + "px";
-                    d.innerHTML = "🪙";
-                    coinArea.appendChild(d);
-                }
-            });
-        }
-
-        // Bucle de físicas, colisiones de monedas y zombis individuales
-        setInterval(() => {
+        // --- BUCLE PRINCIPAL ULTRA FLUIDO CON REQUESTANIMATIONFRAME ---
+        function gameLoop() {
             if (!gameActive) return;
+
+            let moving = Math.abs(direccionMovimiento) > 0.1;
+            let cuerpoP1 = document.getElementById('bodyP1');
+
+            if (moving || saltando || volando) {
+                cuerpoP1.classList.add('caminando');
+            } else {
+                cuerpoP1.classList.remove('caminando');
+            }
+
+            if (moving || saltando || volando) {
+                let velocidadBase = moving ? direccionMovimiento * 8 : (window.inerciaSaltoX || 0);
+                if (volando) velocidadBase = direccionMovimiento * 11;
+                
+                mundoX += velocidadBase;
+                if (mundoX < 0) mundoX = 0;
+
+                distancia = Math.floor(mundoX / 5);
+                document.getElementById("txtDistancia").textContent = distancia + "m";
+                document.getElementById("worldContainer").style.transform = `translateX(-${mundoX}px)`;
+                verificarDesbloqueos();
+            }
+
             let jugadorMundoX = mundoX + posX1;
 
-            // Recolectar monedas / puntos en el aire
+            // Colisión de Monedas en tiempo real
             coins.forEach(c => {
-                if (!c.recolectada && Math.abs(c.x - jugadorMundoX) < 20 && Math.abs(c.y - posY1) < 25) {
+                if (!c.recolectada && Math.abs(c.x - jugadorMundoX) < 22 && Math.abs(c.y - posY1) < 25) {
                     c.recolectada = true;
+                    c.el.style.display = 'none';
                     oro += 20;
                     document.getElementById('txtOro').textContent = oro;
-                    reproducirSonido(1200, 'sine', 0.08, 1.2);
-                    document.getElementById('chatLog').textContent = "🪙 ¡Moneda recolectada (+20 Oro)!";
-                    renderizarMundo();
+                    reproducirSonido(1200, 'sine', 0.06, 1.0);
                 }
             });
 
+            // Movimiento de zombis individualizado
             enemies.forEach(en => {
                 if (en.hp > 0) {
-                    if (en.x > jugadorMundoX + 30) {
-                        en.x -= en.velocidad;
-                    } else if (en.x < jugadorMundoX - 30) {
-                        en.x += (en.velocidad * 0.5);
+                    if (en.x > jugadorMundoX + 25) {
+                        en.x -= en.vel;
+                    } else if (en.x < jugadorMundoX - 25) {
+                        en.x += (en.vel * 0.4);
                     }
+                    en.el.style.transform = `translateX(${en.x}px)`;
 
-                    if (Math.abs(en.x - jugadorMundoX) < 220 && Math.random() < 0.025) {
-                        projectiles.push({ x: en.x, y: 30, vx: -3.5 });
-                    }
-
-                    if (Math.abs(en.x - jugadorMundoX) < 22 && posY1 <= 15 && !volando) {
+                    if (Math.abs(en.x - jugadorMundoX) < 20 && posY1 <= 15 && !volando) {
                         let daño = transformacionActual === 'mecha' ? 1 : 2;
                         vida = Math.max(0, vida - daño);
                         document.getElementById('hpFill').style.width = vida + "%";
                         document.getElementById('hpText').textContent = vida + " HP";
                     }
+
+                    if (Math.abs(en.x - jugadorMundoX) < 200 && Math.random() < 0.015) {
+                        projectiles.push({ x: en.x, y: 30, vx: -3, el: crearProyectilDOM(en.x) });
+                    }
                 }
             });
 
-            let enArea = document.getElementById("enemiesArea");
-            enArea.innerHTML = '';
-            enemies.forEach(en => {
-                if (en.hp > 0) {
-                    let d = document.createElement("div");
-                    d.className = "enemy-item";
-                    d.style.left = en.x + "px";
-                    d.innerHTML = `
-                        <div class="fighter-model">
-                            <div class="body-container caminando">
-                                <div class="head">${en.emoji}</div>
-                                <div class="torso" style="background:${en.color};">
-                                    <div class="arm left" style="background:${en.color};"></div>
-                                    <div class="arm right" style="background:${en.color};"></div>
-                                </div>
-                                <div class="legs">
-                                    <div class="leg" style="background:${en.color};"></div>
-                                    <div class="leg" style="background:${en.color};"></div>
-                                </div>
-                            </div>
-                            <div class="fighter-skin-name" style="color:${en.color};">HP:${en.hp}</div>
-                        </div>
-                    `;
-                    enArea.appendChild(d);
-                }
-            });
-
-            let projArea = document.getElementById("projectilesArea");
-            projArea.innerHTML = '';
+            // Control de proyectiles
             projectiles.forEach((p, index) => {
                 p.x += p.vx;
-                if (Math.abs(p.x - jugadorMundoX) < 20 && posY1 < 35 && !volando) {
+                p.el.style.transform = `translateX(${p.x}px)`;
+
+                if (Math.abs(p.x - jugadorMundoX) < 18 && posY1 < 35 && !volando) {
                     if (transformacionActual !== 'mecha') {
                         vida = Math.max(0, vida - 10);
                         document.getElementById('hpFill').style.width = vida + "%";
                         document.getElementById('hpText').textContent = vida + " HP";
                         let overlay = document.getElementById("efectoDaño");
                         overlay.classList.add("recibiendo-daño");
-                        setTimeout(() => overlay.classList.remove("recibiendo-daño"), 200);
+                        setTimeout(() => overlay.classList.remove("recibiendo-daño"), 150);
                     }
+                    p.el.remove();
                     projectiles.splice(index, 1);
                 } else if (p.x < mundoX - 50) {
+                    p.el.remove();
                     projectiles.splice(index, 1);
-                } else {
-                    let ball = document.createElement("div");
-                    ball.className = "venom-ball";
-                    ball.style.left = p.x + "px";
-                    ball.style.bottom = p.y + "px";
-                    projArea.appendChild(ball);
                 }
             });
-        }, 40);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function crearProyectilDOM(xInicial) {
+            let ball = document.createElement("div");
+            ball.className = "venom-ball";
+            ball.style.left = xInicial + "px";
+            ball.style.bottom = "30px";
+            document.getElementById("worldContainer").appendChild(ball);
+            return ball;
+        }
 
         document.getElementById('hpFill').style.width = vida + "%";
         inicializarMundo();
         iniciarMusicaSupervivencia();
+        requestAnimationFrame(gameLoop);
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Supervivencia Total con Vuelo y Animación</title>
+    <title>Free Fire - Supervivencia Total (Optimizado)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -112,6 +112,7 @@
             width: 50000px;
             height: 100%;
             pointer-events: none;
+            will-change: transform;
         }
 
         .fighter {
@@ -120,6 +121,7 @@
             left: 50px;
             text-align: center;
             z-index: 10;
+            will-change: bottom;
         }
 
         .fighter-model {
@@ -151,7 +153,6 @@
             z-index: 2;
         }
         
-        /* Animaciones para brazos y piernas */
         .arm {
             position: absolute;
             width: 4px;
@@ -173,7 +174,6 @@
             transform-origin: top center;
         }
 
-        /* Animación caminando para zombis y personaje */
         .caminando .arm.left { animation: moverBrazoIzda 0.4s infinite alternate ease-in-out; }
         .caminando .arm.right { animation: moverBrazoDcha 0.4s infinite alternate ease-in-out; }
         .caminando .leg:nth-child(1) { animation: moverPierna1 0.4s infinite alternate ease-in-out; }
@@ -450,7 +450,7 @@
 
             <div class="info-bottom-bar">
                 <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-                <span id="chatLog">¡Zombies con movimiento y Habilidad de Vuelo lista!</span>
+                <span id="chatLog">¡Vuelo optimizado sin tirones!</span>
             </div>
 
         </div>
@@ -500,7 +500,6 @@
             osc.stop(audioCtx.currentTime + duracion);
         }
 
-        // --- MÚSICA DE FONDO DE SUPERVIVENCIA ---
         function iniciarMusicaSupervivencia() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const notasBajo = [110, 110, 98, 98, 82.41, 82.41, 73.42, 73.42];
@@ -519,19 +518,6 @@
                 gainBajo.connect(masterGain);
                 oscBajo.start();
                 oscBajo.stop(audioCtx.currentTime + 0.28);
-
-                if (paso % 2 === 0) {
-                    let oscMel = audioCtx.createOscillator();
-                    let gainMel = audioCtx.createGain();
-                    oscMel.type = 'triangle';
-                    oscMel.frequency.value = notasMelodia[(paso / 2) % notasMelodia.length];
-                    gainMel.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                    gainMel.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.25);
-                    oscMel.connect(gainMel);
-                    gainMel.connect(masterGain);
-                    oscMel.start();
-                    oscMel.stop(audioCtx.currentTime + 0.25);
-                }
                 paso++;
             }, 300);
         }
@@ -574,31 +560,31 @@
             }
         });
 
-        // Bucle de movimiento y animación del personaje
+        // Bucle principal fluido unificado
         setInterval(() => {
-            if (gameActive) {
-                let moving = Math.abs(direccionMovimiento) > 0.1;
-                let cuerpoP1 = document.getElementById('bodyP1');
+            if (!gameActive) return;
 
-                if (moving || saltando || volando) {
-                    cuerpoP1.classList.add('caminando');
-                } else {
-                    cuerpoP1.classList.remove('caminando');
-                }
+            let moving = Math.abs(direccionMovimiento) > 0.1;
+            let cuerpoP1 = document.getElementById('bodyP1');
 
-                if (moving || saltando || volando) {
-                    let velocidadBase = moving ? direccionMovimiento * 9 : (window.inerciaSaltoX || 0);
-                    if (volando) velocidadBase = direccionMovimiento * 12; // Más velocidad al volar
-                    
-                    if (Math.abs(velocidadBase) > 0.5 || volando) {
-                        mundoX += velocidadBase;
-                        if (mundoX < 0) mundoX = 0;
+            if (moving || saltando || volando) {
+                cuerpoP1.classList.add('caminando');
+            } else {
+                cuerpoP1.classList.remove('caminando');
+            }
 
-                        distancia = Math.floor(mundoX / 5);
-                        document.getElementById("txtDistancia").textContent = distancia + "m";
-                        document.getElementById("worldContainer").style.transform = `translateX(-${mundoX}px)`;
-                        verificarDesbloqueos();
-                    }
+            if (moving || saltando || volando) {
+                let velocidadBase = moving ? direccionMovimiento * 9 : (window.inerciaSaltoX || 0);
+                if (volando) velocidadBase = direccionMovimiento * 12;
+                
+                if (Math.abs(velocidadBase) > 0.5 || volando) {
+                    mundoX += velocidadBase;
+                    if (mundoX < 0) mundoX = 0;
+
+                    distancia = Math.floor(mundoX / 5);
+                    document.getElementById("txtDistancia").textContent = distancia + "m";
+                    document.getElementById("worldContainer").style.transform = `translateX(-${mundoX}px)`;
+                    verificarDesbloqueos();
                 }
             }
         }, 30);
@@ -631,13 +617,12 @@
             renderizarMundo();
         }
 
-        // --- SALTO Y CONTROL DE VUELO ---
         function saltarJugador() {
             if (!gameActive) return;
 
             if (volando) {
-                // Si está volando, el botón de saltar sirve para elevarse más en el aire
-                posY1 += 15;
+                posY1 = Math.min(220, posY1 + 15);
+                document.getElementById("fighterP1").style.bottom = posY1 + "px";
                 reproducirSonido(880, 'sine', 0.1, 1.0);
                 return;
             }
@@ -736,9 +721,9 @@
             }
         }
 
-        // --- HABILIDAD DE VUELO POR 6 SEGUNDOS ---
+        // --- VUELO OPTIMIZADO (SIN CONFLICTOS DE BUCLES) ---
         function activarVuelo() {
-            if (volando) return; // Ya está activo
+            if (volando) return;
             volando = true;
             saltando = false;
             tiempoVueloRestante = 6;
@@ -751,6 +736,17 @@
             overlay.classList.add("transformado-activo");
             setTimeout(() => overlay.classList.remove("transformado-activo"), 500);
 
+            // Elevarse inicial suave
+            let subidaInicial = setInterval(() => {
+                if (!volando) { clearInterval(subidaInicial); return; }
+                if (posY1 < 140) {
+                    posY1 += 8;
+                    document.getElementById("fighterP1").style.bottom = posY1 + "px";
+                } else {
+                    clearInterval(subidaInicial);
+                }
+            }, 25);
+
             let cuentaReg_vuelo = setInterval(() => {
                 tiempoVueloRestante--;
                 document.getElementById('chatLog').textContent = `🦅 ¡Volando! Tiempo restante: ${tiempoVueloRestante}s`;
@@ -761,7 +757,6 @@
                     document.getElementById('txtBtnSalto').textContent = "SALTAR";
                     document.getElementById('chatLog').textContent = `⚠️ Aterrizaje completado. Vuelo finalizado.`;
                     
-                    // Descenso suave al suelo
                     let aterrizajeInterval = setInterval(() => {
                         posY1 -= 6;
                         if (posY1 <= 6) {
@@ -772,18 +767,6 @@
                     }, 30);
                 }
             }, 1000);
-
-            // Bucle constante de elevación mientras dure el vuelo
-            let loopVuelo = setInterval(() => {
-                if (!volando) {
-                    clearInterval(loopVuelo);
-                    return;
-                }
-                if (posY1 < 180) {
-                    posY1 += 4;
-                }
-                document.getElementById("fighterP1").style.bottom = posY1 + "px";
-            }, 40);
         }
 
         function transformar(nombre, icono, color) {
@@ -809,7 +792,6 @@
             });
         }
 
-        // Bucle de actualización de enemigos y animación de caminata de los zombis
         setInterval(() => {
             if (!gameActive) return;
             let jugadorMundoX = mundoX + posX1;
@@ -842,7 +824,6 @@
                     let d = document.createElement("div");
                     d.className = "enemy-item";
                     d.style.left = en.x + "px";
-                    // Se les añade la clase .caminando para que sus brazos y piernas oscilen de forma animada
                     d.innerHTML = `
                         <div class="fighter-model">
                             <div class="body-container caminando">

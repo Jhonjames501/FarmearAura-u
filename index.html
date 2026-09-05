@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmear Aura PRO - El Juego</title>
+    <title>Farmear Aura PRO - Edición Sigma</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Courier New', Courier, monospace; /* Fuente más retro */
+            font-family: 'Courier New', Courier, monospace;
         }
         body {
             background-color: #050505;
@@ -29,26 +29,24 @@
             padding: 20px;
         }
 
-        /* Sección del Personaje */
+        /* Sección del Personaje / Emoji */
         .character-display {
             background: #111;
             border: 3px solid #d4af37;
             border-radius: 16px;
-            height: 200px;
+            height: 180px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
-            overflow: hidden;
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
         }
-        .character-img {
-            max-width: 150px;
-            height: auto;
-            transition: transform 0.3s ease;
+        .avatar-emoji {
+            font-size: 75px;
+            transition: transform 0.2s ease;
         }
-        .character-img:hover {
-            transform: scale(1.1); /* Un efecto al pasar el mouse/dedo */
+        .avatar-emoji:hover {
+            transform: scale(1.1);
         }
         .rank-tag {
             position: absolute;
@@ -74,18 +72,18 @@
         .aura-counter {
             font-size: 48px;
             font-weight: bold;
-            color: #00ff00; /* Verde neón */
+            color: #00ff00;
             margin: 10px 0;
-            text-shadow: 0 0 5px #00ff00;
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
         }
 
         /* Botón Principal */
         .action-btn {
             width: 100%;
             padding: 20px;
-            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3); /* Barra de colores */
+            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
             background-size: 200% 100%;
-            animation: gradientAnimation 3s linear infinite; /* Animación de colores */
+            animation: gradientAnimation 3s linear infinite;
             border: none;
             color: white;
             font-weight: bold;
@@ -101,13 +99,12 @@
             box-shadow: none;
         }
 
-        /* Animación del botón */
         @keyframes gradientAnimation {
             0% { background-position: 100% 0%; }
             100% { background-position: -100% 0%; }
         }
 
-        /* Sección de la Tienda (NUEVO) */
+        /* Tienda de Estilo */
         .shop-panel {
             background: #161616;
             border: 1px dashed #d4af37;
@@ -116,34 +113,35 @@
         }
         .shop-title {
             color: #d4af37;
-            font-size: 14px;
+            font-size: 12px;
             text-align: center;
             margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .shop-items {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
         }
         .shop-item {
             background: #222;
             border-radius: 8px;
-            padding: 10px;
-            width: 100px;
+            padding: 8px;
+            width: 110px;
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             border: 1px solid #333;
-            opacity: 0.6; /* Items bloqueados por defecto */
+            opacity: 0.5;
         }
         .shop-item.unlocked {
             opacity: 1;
             border-color: #d4af37;
-            cursor: pointer;
+            background: #252210;
         }
-        .shop-item img {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 5px;
+        .shop-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
         }
     </style>
 </head>
@@ -151,32 +149,36 @@
 
     <div class="main-layout">
         
+        <!-- VISTA DEL PERSONAJE -->
         <div class="character-display">
             <div class="rank-tag" id="rangoEtiqueta">NPC Beta</div>
-            <img src="img/npc.png" alt="Tu personaje actual" class="character-img" id="imagenPersonaje">
+            <div class="avatar-emoji" id="imagenPersonaje">💀</div>
         </div>
 
+        <!-- VISTA DE DATOS -->
         <div class="stats-panel">
             <div class="aura-counter" id="puntosAura">0</div>
-            <p style="font-size: 12px; color: #aaa;">Puntos de Aura Total</p>
+            <p style="font-size: 11px; color: #888;">PUNTOS DE AURA ACUMULADOS</p>
         </div>
 
+        <!-- BOTÓN DE ACCIÓN -->
         <button class="action-btn" id="btnFarmear">✨ FARMEAR AURA ✨</button>
 
+        <!-- TIENDA / MEJORAS -->
         <div class="shop-panel">
-            <h3 class="shop-title">TIENDA DE ESTILO (Próximamente)</h3>
+            <h3 class="shop-title">Tienda de Estilo Sigma</h3>
             <div class="shop-items">
                 <div class="shop-item" id="shopLentes">
-                    <img src="img/item_lentes.png" alt="Lentes de sol">
-                    <p>Lentes de Sol Retro (1000 Aura)</p>
+                    <div class="shop-icon">🕶️</div>
+                    <p>Lentes Oscuros (1,000 Aura)</p>
                 </div>
                 <div class="shop-item" id="shopCorte">
-                    <img src="img/item_corte.png" alt="Corte Fade">
-                    <p>Corte Fade Profesional (5000 Aura)</p>
+                    <div class="shop-icon">✂️</div>
+                    <p>Corte Fade Pro (5,000 Aura)</p>
                 </div>
                 <div class="shop-item" id="shopCadenita">
-                    <img src="img/item_cadenita.png" alt="Cadenita de oro">
-                    <p>Cadenita de Oro (10000 Aura)</p>
+                    <div class="shop-icon">⛓️</div>
+                    <p>Cadenita de Oro (10,000 Aura)</p>
                 </div>
             </div>
         </div>
@@ -184,34 +186,28 @@
     </div>
 
     <script>
-        // --- ESTADO DEL JUEGO ---
         let aura = 0;
         let rangoActual = "NPC Beta";
 
-        // --- ELEMENTOS DEL DOM ---
         const btnFarmear = document.getElementById("btnFarmear");
         const puntosAura = document.getElementById("puntosAura");
         const rangoEtiqueta = document.getElementById("rangoEtiqueta");
         const imagenPersonaje = document.getElementById("imagenPersonaje");
         
-        // Items de la tienda (por ahora solo referencia visual)
         const shopLentes = document.getElementById("shopLentes");
         const shopCorte = document.getElementById("shopCorte");
         const shopCadenita = document.getElementById("shopCadenita");
 
-        // --- CONFIGURACIÓN DE RANKS E IMÁGENES ---
-               const nivelesConfig = [
-            { auraMin: 0, nombre: "NPC Beta", img: "https://w7.pngwing.com/pngs/79/378/png-transparent-rage-comic-internet-meme-trollface-youtube-troll-face-white-face-logo.png" },
-            { auraMin: 100, nombre: "Sigma Male 🗿", img: "https://i.pinimg.com/736x/52/f2/03/52f2036e97ebf5021469844fd8e60c42.jpg" },
-            { auraMin: 500, nombre: "Gigachad 💪", img: "https://i.kym-cdn.com/entries/icons/mobile/000/036/994/He_is_GigaChad.jpg" },
-            { auraMin: 2000, nombre: "Patrick Bateman 🕴️", img: "https://static.wikia.nocookie.net/villains/images/1/17/Patrick_Bateman.jpg" },
-            { auraMin: 10000, nombre: "Dios del Aura Pura 👑", img: "https://img.pikbest.com/png-images/8001515/golden-crown-vector-illustration-royalty-design-element-png-image_6370646.png!bw700" }
-        ]
+        // Configuración de rangos con emojis dinámicos
+        const nivelesConfig = [
+            { auraMin: 0, nombre: "NPC Beta", emoji: "💀" },
+            { auraMin: 100, nombre: "Sigma Male", emoji: "🗿" },
+            { auraMin: 500, nombre: "Gigachad", emoji: "💪" },
+            { auraMin: 2000, nombre: "Patrick Bateman", emoji: "🕴️" },
+            { auraMin: 10000, nombre: "Dios del Aura Pura", emoji: "👑" }
+        ];
 
-        // --- LÓGICA ---
-        
         btnFarmear.addEventListener("click", () => {
-            // Ganancia base (podemos hacerla variar más adelante)
             let ganado = Math.floor(Math.random() * 20) + 5;
             aura += ganado;
 
@@ -220,43 +216,35 @@
         });
 
         function actualizarJuego() {
-            // 1. Actualizar número de aura
             puntosAura.textContent = aura;
 
-            // 2. Determinar y actualizar rango e imagen
-            let nivelActualConfig = nivelesConfig[0]; // Por defecto el primero
+            let nivelActualConfig = nivelesConfig[0];
 
             for (let i = 0; i < nivelesConfig.length; i++) {
                 if (aura >= nivelesConfig[i].auraMin) {
                     nivelActualConfig = nivelesConfig[i];
                 } else {
-                    break; // Ya pasamos el rango actual, detener
+                    break;
                 }
             }
 
             rangoActual = nivelActualConfig.nombre;
             rangoEtiqueta.textContent = rangoActual;
-            
-            // Solo cambiar la imagen si es diferente a la actual para evitar parpadeo
-            if (imagenPersonaje.src.split('/').pop() !== nivelActualConfig.img.split('/').pop()) {
-                imagenPersonaje.src = nivelActualConfig.img;
-            }
+            imagenPersonaje.textContent = nivelActualConfig.emoji;
 
-            // 3. Actualizar estado de la tienda visualmente (solo desbloqueo simple)
+            // Desbloqueo visual de la tienda
             if(aura >= 1000) shopLentes.classList.add('unlocked');
             if(aura >= 5000) shopCorte.classList.add('unlocked');
             if(aura >= 10000) shopCadenita.classList.add('unlocked');
         }
 
         function animarBoton() {
-            // Pequeña animación al pulsar el botón
             btnFarmear.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 btnFarmear.style.transform = 'scale(1)';
             }, 100);
         }
 
-        // Inicializar al cargar
         actualizarJuego();
     </script>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Supervivencia Infinita</title>
+    <title>Free Fire - Supervivencia Infinita Pro</title>
     <style>
         * {
             box-sizing: border-box;
@@ -70,10 +70,10 @@
             font-weight: bold;
         }
 
-        /* ARENA CON SCROLL INFINITO */
+        /* ARENA DE JUEGO */
         .battle-arena {
             flex: 1;
-            min-height: 260px;
+            min-height: 320px;
             display: flex;
             background: linear-gradient(135deg, rgba(20, 25, 40, 0.95), rgba(10, 15, 25, 0.95));
             border: 2px solid #ffaa00;
@@ -86,24 +86,23 @@
             content: "";
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            height: 4px;
+            height: 6px;
             background: linear-gradient(90deg, #ff0055, #ffaa00, #00ffff);
             z-index: 20;
         }
 
-        /* MUNDO MÓVIL */
         #worldContainer {
             position: absolute;
-            bottom: 0;
+            bottom: 6px;
             left: 0;
-            width: 5000px;
+            width: 6000px;
             height: 100%;
             pointer-events: none;
         }
 
         .fighter {
             position: absolute;
-            bottom: 12px;
+            bottom: 6px;
             left: 50px;
             text-align: center;
             z-index: 10;
@@ -167,32 +166,29 @@
             white-space: nowrap;
         }
 
-        /* CAJAS Y OBSTÁCULOS EN EL MUNDO */
         .platform-box {
             position: absolute;
-            bottom: 12px;
+            bottom: 0px;
             background: linear-gradient(135deg, #8B4513, #A0522D);
             border: 2px solid #CD853F;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 14px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.5);
             z-index: 4;
             pointer-events: auto;
         }
 
-        /* ENEMIGOS EN EL MUNDO */
         .enemy-item {
             position: absolute;
-            bottom: 12px;
+            bottom: 0px;
             text-align: center;
             z-index: 8;
             pointer-events: auto;
         }
 
-        /* PROYECTIL DE VENENO */
         .venom-ball {
             position: absolute;
             width: 14px;
@@ -233,24 +229,53 @@
             align-items: center;
             gap: 6px;
         }
-        .joystick-group {
+
+        /* JOYSTICK CIRCULAR ESTILO FREE FIRE */
+        .joystick-base {
+            width: 90px;
+            height: 90px;
+            background: rgba(30, 30, 50, 0.6);
+            border: 2px solid rgba(255, 170, 0, 0.6);
+            border-radius: 50%;
+            position: relative;
             display: flex;
-            gap: 4px;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
-        .joy-btn {
-            width: 38px;
-            height: 38px;
-            background: #252538;
-            border: 1px solid #ffaa00;
-            color: #ffaa00;
-            font-size: 14px;
+        .joystick-knob {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffaa00, #ff4400);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            cursor: pointer;
+            pointer-events: none;
+        }
+
+        .jump-action-btn {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #00ffff, #0088cc);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #000;
             font-weight: bold;
-            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,255,255,0.4);
             cursor: pointer;
         }
-        .joy-btn:active { background: #ffaa00; color: #080810; }
+        .jump-action-btn span { font-size: 8px; color: #fff; margin-top: -2px; text-shadow: 0 1px 2px #000; }
+        .jump-action-btn:active { transform: scale(0.92); }
 
-        .hp-container { flex: 1; }
+        .hp-container { flex: 1; padding-left: 10px; }
         .hp-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
         .hp-bar-bg { width: 100%; background: #222; height: 7px; border-radius: 3px; overflow: hidden; }
         .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.2s ease; }
@@ -321,9 +346,8 @@
             <span>💎 ORO: <strong id="txtOro" style="color:#00ff66;">0</strong></span>
         </div>
 
-        <!-- ARENA DE JUEGO CON SCROLL -->
+        <!-- ARENA DE JUEGO -->
         <div class="battle-arena" id="arenaBox">
-            
             <div class="fighter" id="fighterP1">
                 <div class="fighter-model" id="modelP1">
                     <div class="body-container">
@@ -350,11 +374,16 @@
         <div class="controls-hud">
             
             <div class="mid-controls-row">
-                <div class="joystick-group">
-                    <button class="joy-btn" onmousedown="moverJugador(-1)" ontouchstart="moverJugador(-1)">◀</button>
-                    <button class="joy-btn" onmousedown="saltarJugador()" ontouchstart="saltarJugador()" style="border-color:#00ffff; color:#00ffff;">🔼</button>
-                    <button class="joy-btn" onmousedown="moverJugador(1)" ontouchstart="moverJugador(1)">▶</button>
+                <!-- JOYSTICK CIRCULAR -->
+                <div class="joystick-base" id="joystickBase">
+                    <div class="joystick-knob" id="joystickKnob"></div>
                 </div>
+
+                <!-- BOTÓN DE SALTO PROGRESIVO -->
+                <div class="jump-action-btn" ontouchstart="saltarJugador()" onmousedown="saltarJugador()">
+                    ⬆️<span>SALTAR</span>
+                </div>
+
                 <div class="hp-container">
                     <div class="hp-label">
                         <span>❤️ VIDA (HP)</span>
@@ -372,7 +401,7 @@
                         🔥<span id="txtBtn1">Fuego</span>
                     </button>
                     <button class="round-action-btn locked" id="btnAccion2" onclick="ejecutarAccion(2)">
-                        🐺<span id="txtBtn2">Hombre Lobo</span>
+                        🐺<span id="txtBtn2">Lobo</span>
                     </button>
                     <button class="round-action-btn locked" id="btnAccion3" onclick="ejecutarAccion(3)">
                         🤖<span id="txtBtn3">Mecha</span>
@@ -385,7 +414,7 @@
 
             <div class="info-bottom-bar">
                 <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-                <span id="chatLog">¡Avanza para desbloquear transformaciones!</span>
+                <span id="chatLog">¡Arrastra el joystick y presiona Saltar múltiple veces!</span>
             </div>
 
         </div>
@@ -396,11 +425,12 @@
         let vida = 100;
         let oro = 0;
         let distancia = 0;
-        let mundoX = 0; // Posición de avance del escenario
-        let posX1 = 50; // Posición fija visual del jugador en pantalla
-        let posY1 = 12;
+        let mundoX = 0;
+        let posX1 = 50;
+        let posY1 = 6;
         let saltando = false;
         let velocidadY = 0;
+        let impulsoSalto = 15; // Salto base acumulativo
         let transformacionActual = 'normal';
         let gameActive = true;
 
@@ -423,19 +453,63 @@
             osc.stop(audioCtx.currentTime + duracion);
         }
 
-        // Generar elementos aleatorios a lo largo del mundo (hasta 5000m)
+        // --- LÓGICA DEL JOYSTICK CIRCULAR TIPO FREE FIRE ---
+        const joyBase = document.getElementById('joystickBase');
+        const joyKnob = document.getElementById('joystickKnob');
+        let joyActive = false;
+        let direccionMovimiento = 0;
+
+        function actualizarJoystick(clientX) {
+            let rect = joyBase.getBoundingClientRect();
+            let centroX = rect.left + rect.width / 2;
+            let deltaX = clientX - centroX;
+            let radioMax = 30;
+
+            if (deltaX > radioMax) deltaX = radioMax;
+            if (deltaX < -radioMax) deltaX = -radioMax;
+
+            joyKnob.style.transform = `translate(${deltaX}px, 0px)`;
+            direccionMovimiento = deltaX / radioMax; // Valor entre -1 y 1
+        }
+
+        joyBase.addEventListener('pointerdown', (e) => {
+            joyActive = true;
+            actualizarJoystick(e.clientX);
+        });
+        window.addEventListener('pointermove', (e) => {
+            if (joyActive) actualizarJoystick(e.clientX);
+        });
+        window.addEventListener('pointerup', () => {
+            if (joyActive) {
+                joyActive = false;
+                direccionMovimiento = 0;
+                joyKnob.style.transform = `translate(0px, 0px)`;
+            }
+        });
+
+        // Bucle continuo de movimiento suave con el joystick
+        setInterval(() => {
+            if (Math.abs(direccionMovimiento) > 0.1 && gameActive) {
+                mundoX += direccionMovimiento * 8;
+                if (mundoX < 0) mundoX = 0;
+                if (mundoX > 5500) mundoX = 5500;
+
+                distancia = Math.floor(mundoX / 5);
+                document.getElementById("txtDistancia").textContent = distancia + "m";
+                document.getElementById("worldContainer").style.transform = `translateX(-${mundoX}px)`;
+                verificarDesbloqueos();
+            }
+        }, 30);
+
         function inicializarMundo() {
             for(let i = 1; i < 60; i++) {
-                let posX = i * 250 + Math.random() * 80;
-                
-                // Cajas y obstáculos
+                let posX = i * 220 + Math.random() * 60;
                 boxes.push({
                     x: posX,
                     w: 45,
-                    h: 30 + (i % 2 === 0 ? 20 : 0)
+                    h: 35 + (i % 3 === 0 ? 30 : 0) // Cajas de diferentes alturas
                 });
 
-                // Zombis o Momias cerca de los obstáculos
                 let tipos = [
                     { emoji: '🧟', tipo: 'normal', hp: 50, color: '#ff0055' },
                     { emoji: '🤮', tipo: 'toxico', hp: 75, color: '#00ff66' },
@@ -444,7 +518,7 @@
                 let elegido = tipos[Math.floor(Math.random() * tipos.length)];
                 
                 enemies.push({
-                    x: posX + 100,
+                    x: posX + 90,
                     hp: elegido.hp,
                     emoji: elegido.emoji,
                     tipo: elegido.tipo,
@@ -454,47 +528,43 @@
             renderizarMundo();
         }
 
-        function moverJugador(dir) {
-            if (!gameActive) return;
-            // Avanzar o retroceder en el mundo
-            mundoX += dir * 25;
-            if (mundoX < 0) mundoX = 0;
-            if (mundoX > 4500) mundoX = 4500;
-
-            distancia = Math.floor(mundoX / 5);
-            document.getElementById("txtDistancia").textContent = distancia + "m";
-            
-            // Desplazar el contenedor del mundo en pantalla
-            document.getElementById("worldContainer").style.transform = `translateX(-${mundoX}px)`;
-            reproducirSonido(320, 'sine', 0.02);
-
-            verificarDesbloqueos();
-        }
-
+        // --- SALTO PROGRESIVO ---
         function saltarJugador() {
-            if (saltando || !gameActive) return;
+            if (!gameActive) return;
+
+            // Cada toque consecutivo aumenta el impulso para saltar más alto
+            if (saltando) {
+                impulsoSalto = Math.min(26, impulsoSalto + 4);
+                velocidadY = impulsoSalto;
+                reproducirSonido(750, 'triangle', 0.15);
+                document.getElementById('chatLog').textContent = `🚀 ¡Salto propulsado más alto! (${impulsoSalto}H)`;
+                return;
+            }
+
             saltando = true;
-            velocidadY = 16;
+            impulsoSalto = 16;
+            velocidadY = impulsoSalto;
             reproducirSonido(500, 'triangle', 0.15);
 
             let saltoInterval = setInterval(() => {
                 posY1 += velocidadY;
-                velocidadY -= 2.2;
+                velocidadY -= 2.0; // Gravedad
 
-                // Colisión con cajas considerando la posición absoluta en el mundo
                 let jugadorMundoX = mundoX + posX1;
                 boxes.forEach(box => {
                     if (jugadorMundoX >= box.x - 15 && jugadorMundoX <= box.x + box.w && posY1 <= box.h + 5 && posY1 >= box.h - 8) {
                         posY1 = box.h;
                         saltando = false;
+                        impulsoSalto = 15;
                         velocidadY = 0;
                         clearInterval(saltoInterval);
                     }
                 });
 
-                if (posY1 <= 12) {
-                    posY1 = 12;
+                if (posY1 <= 6) {
+                    posY1 = 6;
                     saltando = false;
+                    impulsoSalto = 15;
                     clearInterval(saltoInterval);
                 }
                 document.getElementById("fighterP1").style.bottom = posY1 + "px";
@@ -502,25 +572,24 @@
         }
 
         function verificarDesbloqueos() {
-            // Desbloquear habilidades según la distancia recorrida
             if (distancia >= 100 && document.getElementById('btnAccion2').classList.contains('locked')) {
                 document.getElementById('btnAccion2').classList.remove('locked');
-                document.getElementById('chatLog').textContent = "🔓 ¡Habilidad desbloqueada: Transformación Hombre Lobo!";
+                document.getElementById('chatLog').textContent = "🔓 ¡Desbloqueado: Hombre Lobo!";
             }
             if (distancia >= 300 && document.getElementById('btnAccion3').classList.contains('locked')) {
                 document.getElementById('btnAccion3').classList.remove('locked');
-                document.getElementById('chatLog').textContent = "🔓 ¡Habilidad desbloqueada: Armadura Mecha!";
+                document.getElementById('chatLog').textContent = "🔓 ¡Desbloqueado: Armadura Mecha!";
             }
             if (distancia >= 600 && document.getElementById('btnAccion4').classList.contains('locked')) {
                 document.getElementById('btnAccion4').classList.remove('locked');
-                document.getElementById('chatLog').textContent = "🔓 ¡Habilidad desbloqueada: Poder Dragón!";
+                document.getElementById('chatLog').textContent = "🔓 ¡Desbloqueado: Poder Dragón!";
             }
         }
 
         function ejecutarAccion(tipoBtn) {
             if (!gameActive) return;
 
-            if (tipoBtn === 1) { // Disparo base
+            if (tipoBtn === 1) {
                 reproducirSonido(800, 'sawtooth', 0.08);
                 let arena = document.getElementById("arenaBox");
                 let bala = document.createElement("div");
@@ -530,39 +599,38 @@
                 arena.appendChild(bala);
                 setTimeout(() => bala.remove(), 150);
 
-                // Impactar enemigo cercano en el mundo
                 let jugadorMundoX = mundoX + posX1;
                 enemies.forEach(en => {
-                    if (Math.abs(en.x - jugadorMundoX) < 80) {
-                        en.hp -= (transformacionActual === 'dragon' ? 80 : 30);
+                    if (Math.abs(en.x - jugadorMundoX) < 90) {
+                        en.hp -= (transformacionActual === 'dragon' ? 90 : 35);
                         if (en.hp <= 0) {
                             oro += 50;
                             document.getElementById('txtOro').textContent = oro;
-                            en.x = -1000; // Desaparecer
+                            en.x = -1000;
                         }
                     }
                 });
                 renderizarMundo();
             } 
             else if (tipoBtn === 2 && !document.getElementById('btnAccion2').classList.contains('locked')) {
-                transformar('Hombre Lobo', '🐺', '#ff5500', 'Velocidad y garras letales');
+                transformar('Lobo', '🐺', '#ff5500');
             } 
             else if (tipoBtn === 3 && !document.getElementById('btnAccion3').classList.contains('locked')) {
-                transformar('Mecha', '🤖', '#00ffcc', 'Blindaje pesado contra veneno');
+                transformar('Mecha', '🤖', '#00ffcc');
             } 
             else if (tipoBtn === 4 && !document.getElementById('btnAccion4').classList.contains('locked')) {
-                transformar('Dragón', '🐉', '#ff0055', 'Poder supremo de fuego destructivo');
+                transformar('Dragón', '🐉', '#ff0055');
             }
         }
 
-        function transformar(nombre, icono, color, descripcion) {
+        function transformar(nombre, icono, color) {
             transformacionActual = nombre.toLowerCase();
             document.getElementById('headP1').textContent = icono;
             document.getElementById('skinNameP1').textContent = nombre;
             document.getElementById('torsoP1').style.background = color;
             document.querySelectorAll('#fighterP1 .arm').forEach(a => a.style.background = color);
             document.getElementById('lblEstadoTransformacion').textContent = nombre;
-            document.getElementById('chatLog').textContent = `✨ ¡Transformado en ${nombre}! (${descripcion})`;
+            document.getElementById('chatLog').textContent = `✨ ¡Transformación activa: ${nombre}!`;
             
             reproducirSonido(900, 'square', 0.3);
             let overlay = document.getElementById("efectoTransformacion");
@@ -571,7 +639,6 @@
         }
 
         function renderizarMundo() {
-            // Renderizar Cajas
             let obsArea = document.getElementById("obstaclesArea");
             obsArea.innerHTML = '';
             boxes.forEach(b => {
@@ -584,7 +651,6 @@
                 obsArea.appendChild(d);
             });
 
-            // Renderizar Enemigos
             let enArea = document.getElementById("enemiesArea");
             enArea.innerHTML = '';
             enemies.forEach(en => {
@@ -610,38 +676,29 @@
             });
         }
 
-        // Bucle de simulación para proyectiles de veneno y colisiones
         setInterval(() => {
             if (!gameActive) return;
-
             let jugadorMundoX = mundoX + posX1;
 
-            // Zombis y Momias escupen veneno si están cerca del jugador
             enemies.forEach(en => {
                 if (en.hp > 0 && (en.tipo === 'toxico' || en.tipo === 'momia')) {
                     if (Math.abs(en.x - jugadorMundoX) < 220 && Math.random() < 0.03) {
                         projectiles.push({ x: en.x, y: 30, vx: -3 });
-                        reproducirSonido(200, 'sawtooth', 0.1);
                     }
                 }
-
-                // Daño por contacto físico directo
-                if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 25 && posY1 <= 20) {
-                    let dañoReducido = transformacionActual === 'mecha' ? 1 : 3;
-                    vida = Math.max(0, vida - dañoReducido);
+                if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 25 && posY1 <= 15) {
+                    let daño = transformacionActual === 'mecha' ? 1 : 3;
+                    vida = Math.max(0, vida - daño);
                     document.getElementById('hpFill').style.width = vida + "%";
                     document.getElementById('hpText').textContent = vida + " HP";
                 }
             });
 
-            // Mover proyectiles de veneno
             let projArea = document.getElementById("projectilesArea");
             projArea.innerHTML = '';
             projectiles.forEach((p, index) => {
                 p.x += p.vx;
-                let distanciaAlJugador = Math.abs(p.x - jugadorMundoX);
-                
-                if (distanciaAlJugador < 20 && posY1 < 35) {
+                if (Math.abs(p.x - jugadorMundoX) < 20 && posY1 < 35) {
                     if (transformacionActual !== 'mecha') {
                         vida = Math.max(0, vida - 10);
                         document.getElementById('hpFill').style.width = vida + "%";
@@ -661,7 +718,6 @@
                     projArea.appendChild(ball);
                 }
             });
-
         }, 80);
 
         document.getElementById('hpFill').style.width = vida + "%";

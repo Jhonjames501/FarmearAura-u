@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batalla de Aura: Free Fire Edition</title>
+    <title>Batalla de Aura: Free Fire Plaza Edition</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -14,13 +14,13 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            background-color: #0c0c14;
+            background-color: #080810;
             color: #f0f0f0;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background-image: radial-gradient(circle at center, #1b1b2f 0%, #0c0c14 100%);
+            background-image: radial-gradient(circle at center, #16162c 0%, #080810 100%);
             padding-bottom: 30px;
         }
         .main-layout {
@@ -28,22 +28,22 @@
             flex-direction: column;
             gap: 10px;
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             padding: 12px;
         }
         .card {
-            background: #14141f;
+            background: #12121c;
             border: 2px solid #ffaa00;
             border-radius: 12px;
             padding: 12px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
         h2 { color: #ffaa00; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
         input {
             width: 100%;
             padding: 8px;
-            background: #1f1f2e;
+            background: #1c1c2b;
             border: 1px solid #444;
             color: #fff;
             border-radius: 6px;
@@ -74,7 +74,7 @@
         }
         .mode-btn {
             flex: 1;
-            background: #1a1a2e;
+            background: #171727;
             border: 1px solid #ffaa00;
             color: #ffaa00;
             padding: 6px;
@@ -83,83 +83,127 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .mode-btn.active { background: #ffaa00; color: #0c0c14; }
+        .mode-btn.active { background: #ffaa00; color: #080810; }
 
-        /* Estilo Arena Plaza Free Fire */
+        /* Plaza de Entrenamiento Estilo Free Fire (Más grande y real) */
         .battle-arena {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
-            background: linear-gradient(180deg, #22223b, #0f0f1a);
+            background: linear-gradient(135deg, #1b263b, #0d1b2a);
             border: 2px solid #00ffff;
             border-radius: 12px;
-            padding: 15px 10px;
+            padding: 20px 15px;
             margin-bottom: 8px;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2);
+            box-shadow: inset 0 0 25px rgba(0, 255, 255, 0.25), 0 0 15px rgba(0,255,255,0.1);
         }
-        .fighter {
-            text-align: center;
-            width: 45%;
-            transition: transform 0.15s ease;
-        }
-        .fighter-avatar {
-            font-size: 60px;
-            filter: drop-shadow(0 0 10px rgba(0,255,255,0.6));
-            margin-bottom: 4px;
-            display: inline-block;
-        }
-        .fighter-name { font-size: 10px; font-weight: bold; margin-bottom: 2px; }
-        .fighter-score { font-size: 22px; font-weight: bold; text-shadow: 0 0 8px currentColor; }
-        
-        .vs-badge {
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffaa00;
-            text-shadow: 0 0 10px #ff0055;
+        /* Efecto suelo de plaza */
+        .battle-arena::after {
+            content: "";
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #00ffff, #ff00ff, #ffaa00);
+            opacity: 0.8;
         }
 
-        /* Selector de personajes / Skins estilo FF */
+        .fighter {
+            text-align: center;
+            width: 42%;
+            position: relative;
+            transition: transform 0.1s ease;
+        }
+        
+        /* Personajes Reales en Miniatura (Sprites / Iconos de personajes de FF) */
+        .fighter-model {
+            width: 75px;
+            height: 95px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            margin: 0 auto 6px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            backdrop-filter: blur(2px);
+        }
+        .fighter-avatar {
+            font-size: 45px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+            transition: transform 0.2s;
+        }
+        .fighter-skin-name {
+            font-size: 7px;
+            color: #00ffff;
+            background: rgba(0,0,0,0.7);
+            padding: 1px 4px;
+            border-radius: 4px;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        .fighter-name { font-size: 10px; font-weight: bold; margin-bottom: 2px; }
+        .fighter-score { font-size: 24px; font-weight: bold; text-shadow: 0 0 10px currentColor; }
+        
+        .vs-badge {
+            font-size: 15px;
+            font-weight: bold;
+            color: #ffaa00;
+            text-shadow: 0 0 12px #ff0055;
+            animation: pulseVs 1.5s infinite alternate;
+        }
+        @keyframes pulseVs {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Selector de personajes / Skins */
         .selector-box {
             display: flex;
             justify-content: center;
             gap: 6px;
             margin-bottom: 8px;
-            background: #1a1a2e;
+            background: #171727;
             padding: 6px;
             border-radius: 8px;
             border: 1px solid #333;
         }
         .char-option {
-            font-size: 24px;
-            background: #22223b;
+            font-size: 22px;
+            background: #1f1f33;
             border: 1px solid #444;
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 6px;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        .char-option.activo { border-color: #00ff66; background: #163322; box-shadow: 0 0 8px #00ff66; }
+        .char-option.activo { border-color: #00ff66; background: #113322; box-shadow: 0 0 10px #00ff66; transform: scale(1.05); }
 
-        /* Animaciones de Emotes / Bailes */
-        @keyframes emoteBaile {
+        /* Animaciones de Emotes fluidas estilo plaza */
+        @keyframes emotePlaza {
             0% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-10px) rotate(-8deg) scale(1.1); filter: drop-shadow(0 0 15px #00ff66); }
-            50% { transform: translateY(0) rotate(0deg) scale(1); }
-            75% { transform: translateY(-10px) rotate(8deg) scale(1.1); filter: drop-shadow(0 0 15px #ffaa00); }
+            20% { transform: translateY(-12px) rotate(-10deg) scale(1.15); filter: drop-shadow(0 0 15px #00ff66); }
+            40% { transform: translateY(0) rotate(5deg) scale(1); }
+            60% { transform: translateY(-12px) rotate(10deg) scale(1.15); filter: drop-shadow(0 0 15px #ffaa00); }
+            80% { transform: translateY(0) rotate(-5deg) scale(1); }
             100% { transform: translateY(0) rotate(0deg) scale(1); }
         }
-        .animar-baile { animation: emoteBaile 0.4s ease-in-out; }
+        .animar-baile { animation: emotePlaza 0.45s ease-in-out; }
 
-        @keyframes emoteRival {
+        @keyframes emoteRivalAnim {
             0% { transform: translateX(0) scale(1); }
-            50% { transform: translateX(-15px) scale(1.15) rotate(-5deg); filter: drop-shadow(0 0 15px #ff0055); }
+            50% { transform: translateX(-15px) scale(1.15) rotate(-6deg); filter: drop-shadow(0 0 15px #ff0055); }
             100% { transform: translateX(0) scale(1); }
         }
-        .animar-rival { animation: emoteRival 0.3s ease-in-out; }
+        .animar-rival { animation: emoteRivalAnim 0.35s ease-in-out; }
 
         .energy-container {
-            background: #1a1a2e;
+            background: #171727;
             border: 1px solid #333;
             border-radius: 8px;
             padding: 6px;
@@ -191,7 +235,7 @@
             width: 100%;
             padding: 9px;
             background: linear-gradient(90deg, #ffaa00, #ff4400);
-            color: #0c0c14;
+            color: #080810;
             border: none;
             font-weight: bold;
             border-radius: 6px;
@@ -207,7 +251,7 @@
             display: flex;
             justify-content: space-between;
             gap: 4px;
-            background: #1a1a2e;
+            background: #171727;
             border: 1px dashed #555;
             padding: 6px;
             border-radius: 8px;
@@ -215,7 +259,7 @@
             margin-bottom: 6px;
         }
         .store-item { 
-            background: #22223b; 
+            background: #1f1f33; 
             padding: 6px 4px; 
             border-radius: 5px; 
             flex: 1; 
@@ -228,7 +272,7 @@
 
         /* Chat y Burlas */
         .chat-container {
-            background: #14141f;
+            background: #12121c;
             border: 1px solid #333;
             border-radius: 6px;
             padding: 6px;
@@ -236,7 +280,7 @@
         }
         .chat-burlas { display: flex; gap: 4px; margin-top: 4px; }
         .chat-btn {
-            background: #1f1f2e;
+            background: #1c1c2b;
             border: 1px solid #444;
             color: #ddd;
             font-size: 9px;
@@ -261,7 +305,7 @@
 
         <!-- PANEL ONLINE -->
         <div class="card" id="panelOnline" style="display: none;">
-            <h2>🌐 Sala Privada 1v1</h2>
+            <h2>🌐 Sala Privada Plaza 1v1</h2>
             <button class="btn btn-green" id="crearSalaBtn" style="margin-bottom:4px;">Generar Código Sala</button>
             <p id="myIdText" style="font-size: 11px; color: #00ff66; font-weight: bold; margin: 4px 0;">Código: ------</p>
             <input type="text" id="codigoRivalInput" placeholder="Código de la sala" maxlength="6">
@@ -269,24 +313,27 @@
             <p id="connectionStatus" style="font-size: 9px; color: #aaa; margin-top: 2px;">Estado: Desconectado</p>
         </div>
 
-        <!-- SELECCIÓN DE PERSONAJE / SKIN -->
+        <!-- SELECCIÓN DE SKIN / PERSONAJE REAL -->
         <div class="card">
-            <h2>Elige tu Skin / Emote</h2>
+            <h2>Elige tu Skin de Personaje</h2>
             <div class="selector-box">
-                <div class="char-option activo" onclick="cambiarGuerrero('🕺', this)">🕺</div>
-                <div class="char-option" onclick="cambiarGuerrero('🥷', this)">🥷</div>
-                <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', this)">🦹‍♂️</div>
-                <div class="char-option" onclick="cambiarGuerrero('🤖', this)">🤖</div>
+                <div class="char-option activo" onclick="cambiarGuerrero('🥷', 'Alok', this)">🥷</div>
+                <div class="char-option" onclick="cambiarGuerrero('🕵️‍♂️', 'Chrono', this)">🕵️‍♂️</div>
+                <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', 'Criminal', this)">🦹‍♂️</div>
+                <div class="char-option" onclick="cambiarGuerrero('🤖', 'Kenta', this)">🤖</div>
             </div>
         </div>
 
-        <!-- ARENA DE BATALLA PLAZA FREE FIRE -->
+        <!-- ARENA DE BATALLA REAL (PLAZA GRANDE) -->
         <div class="card" style="border-color: #00ffff;">
             
             <div class="battle-arena">
                 <!-- JUGADOR 1 -->
                 <div class="fighter" id="fighterP1">
-                    <div class="fighter-avatar" id="avatarP1">🕺</div>
+                    <div class="fighter-model">
+                        <div class="fighter-avatar" id="avatarP1">🥷</div>
+                        <div class="fighter-skin-name" id="skinNameP1">Alok</div>
+                    </div>
                     <div class="fighter-name" style="color: #00ff66;">TÚ (<span id="multiplicadorText">x1</span>)</div>
                     <div class="fighter-score" id="scoreP1" style="color: #00ff66;">0</div>
                 </div>
@@ -295,7 +342,10 @@
 
                 <!-- JUGADOR 2 / RIVAL -->
                 <div class="fighter" id="fighterP2">
-                    <div class="fighter-avatar" id="avatarP2">🤖</div>
+                    <div class="fighter-model">
+                        <div class="fighter-avatar" id="avatarP2">🤖</div>
+                        <div class="fighter-skin-name" id="skinNameP2">Bot FF</div>
+                    </div>
                     <div class="fighter-name" id="labelRival" style="color: #ff0055;">BOT RIVAL</div>
                     <div class="fighter-score" id="scoreP2" style="color: #ff0055;">0</div>
                 </div>
@@ -312,7 +362,7 @@
                 </div>
             </div>
 
-            <!-- BOTÓN PRINCIPAL DE FARMEO (LANZAR EMOTE / AURA) -->
+            <!-- BOTÓN PRINCIPAL DE FARMEO -->
             <button class="action-btn" id="btnFarmear">🔥 Framear Aura (Emote) 🔥</button>
 
             <!-- PODER ESPECIAL -->
@@ -333,7 +383,7 @@
                     <button class="chat-btn" onclick="enviarMensajeChat('¡Manco de sala! 🔥')">🔥 Manco</button>
                     <button class="chat-btn" onclick="enviarMensajeChat('¡GG facilito! ⚡')">⚡ GG</button>
                 </div>
-                <div id="chatLog">Entrenando en la plaza...</div>
+                <div id="chatLog">En la plaza de entrenamiento...</div>
             </div>
         </div>
 
@@ -345,7 +395,8 @@
         let estamina = 100;
         let multiplicador = 1;
         let estaCansado = false;
-        let avatarActual = '🕺';
+        let avatarActual = '🥷';
+        let skinNombreActual = 'Alok';
         let poderCargado = true;
         let peer, conn, botInterval;
 
@@ -372,6 +423,8 @@
                 document.getElementById('btnModoOnline').classList.remove('active');
                 document.getElementById('panelOnline').style.display = 'none';
                 document.getElementById('labelRival').textContent = "BOT RIVAL";
+                document.getElementById('skinNameP2').textContent = "Bot FF";
+                document.getElementById('avatarP2').textContent = "🤖";
                 iniciarBot();
             } else {
                 document.getElementById('btnModoOnline').classList.add('active');
@@ -382,11 +435,13 @@
             }
         }
 
-        function cambiarGuerrero(emoji, el) {
+        function cambiarGuerrero(emoji, nombreSkin, el) {
             document.querySelectorAll('.char-option').forEach(e => e.classList.remove('activo'));
             el.classList.add('activo');
             avatarActual = emoji;
+            skinNombreActual = nombreSkin;
             document.getElementById("avatarP1").textContent = emoji;
+            document.getElementById("skinNameP1").textContent = nombreSkin;
             reproducirSonido(600, 'sine', 0.1);
             sincronizarDatos();
         }
@@ -445,7 +500,7 @@
                         document.getElementById("scoreP2").textContent = score2;
                         let f2 = document.getElementById("fighterP2");
                         f2.classList.add("animar-rival");
-                        setTimeout(() => f2.classList.remove("animar-rival"), 300);
+                        setTimeout(() => f2.classList.remove("animar-rival"), 350);
                         verificarGanador();
                     }
                 }
@@ -462,7 +517,7 @@
 
             let f1 = document.getElementById("fighterP1");
             f1.classList.add("animar-baile");
-            setTimeout(() => f1.classList.remove("animar-baile"), 400);
+            setTimeout(() => f1.classList.remove("animar-baile"), 450);
 
             estamina -= 5;
             if (estamina <= 0) {
@@ -508,7 +563,7 @@
         document.getElementById("crearSalaBtn").addEventListener("click", () => {
             let codigo = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById("myIdText").textContent = "Código: " + codigo;
-            peer = new Peer("ffaura-" + codigo);
+            peer = new Peer("ffaura-plaza-" + codigo);
             peer.on('open', () => document.getElementById("connectionStatus").textContent = "Esperando rival en sala...");
             peer.on('connection', (c) => { conn = c; setupConnection(); });
         });
@@ -518,13 +573,13 @@
             if(codigoAmigo.length !== 6) { alert("Ingresa código de 6 dígitos"); return; }
             if(!peer) peer = new Peer();
             peer.on('open', () => {
-                conn = peer.connect("ffaura-" + codigoAmigo);
+                conn = peer.connect("ffaura-plaza-" + codigoAmigo);
                 setupConnection();
             });
         });
 
         function setupConnection() {
-            document.getElementById("connectionStatus").textContent = "¡Rival conectado en la sala!";
+            document.getElementById("connectionStatus").textContent = "¡Rival conectado en la plaza!";
             conn.on('open', () => sincronizarDatos());
             conn.on('data', (data) => {
                 if(data.tipo === 'chat') {
@@ -535,9 +590,12 @@
                     if(data.avatar) {
                         document.getElementById("avatarP2").textContent = data.avatar;
                     }
+                    if(data.skinNombre) {
+                        document.getElementById("skinNameP2").textContent = data.skinNombre;
+                    }
                     let f2 = document.getElementById("fighterP2");
                     f2.classList.add("animar-rival");
-                    setTimeout(() => f2.classList.remove("animar-rival"), 300);
+                    setTimeout(() => f2.classList.remove("animar-rival"), 350);
                     verificarGanador();
                 }
             });
@@ -545,7 +603,7 @@
 
         function sincronizarDatos() {
             if (conn && conn.open) {
-                conn.send({ score: score1, avatar: avatarActual });
+                conn.send({ score: score1, avatar: avatarActual, skinNombre: skinNombreActual });
             }
         }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmear Aura: Edición Definitiva</title>
+    <title>Farmear Aura: Edición Suprema Multijugador</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -131,7 +131,7 @@
 
         .action-btn {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             border: none;
             font-weight: bold;
             border-radius: 12px;
@@ -141,10 +141,26 @@
             background: linear-gradient(90deg, #ff0055, #7a00ff, #00ffcc);
             color: white;
             box-shadow: 0 4px 15px rgba(122, 0, 255, 0.4);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .action-btn:active { transform: scale(0.94); }
         .action-btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
+
+        /* Botón de Poder Especial */
+        .special-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(90deg, #d4af37, #ff8800);
+            color: #030303;
+            border: none;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .special-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
         /* Tienda de mejoras funcional */
         .store-box {
@@ -156,6 +172,7 @@
             padding: 6px;
             border-radius: 10px;
             font-size: 9px;
+            margin-bottom: 8px;
         }
         .store-item { 
             background: #222; 
@@ -168,7 +185,40 @@
             color: #ccc;
         }
         .store-item:hover { border-color: #d4af37; color: #fff; }
+
+        /* Chat Rápido multijugador */
+        .chat-container {
+            background: #151515;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 8px;
+        }
+        .chat-burlas {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .chat-btn {
+            background: #222;
+            border: 1px solid #444;
+            color: #ddd;
+            font-size: 9px;
+            padding: 4px;
+            border-radius: 4px;
+            flex: 1;
+            cursor: pointer;
+        }
+        .chat-btn:hover { background: #333; border-color: #ff0055; }
         
+        #chatLog {
+            font-size: 10px;
+            color: #ffcc00;
+            min-height: 14px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
         .multiplayer-status { font-size: 10px; color: #00ff66; margin-top: 5px; font-style: italic; }
 
         .aura-flotante {
@@ -189,7 +239,6 @@
 
     <div class="main-layout">
         
-        <!-- SECCIÓN 1: CONEXIÓN ONLINE -->
         <div class="card">
             <h2>🌐 Multijugador Online</h2>
             <button class="btn btn-green" id="crearSalaBtn">Generar mi Código</button>
@@ -202,7 +251,6 @@
             <p id="connectionStatus" style="font-size: 10px; color: #aaa; margin-top: 4px;">Estado: Desconectado</p>
         </div>
 
-        <!-- SECCIÓN 2: JUEGO CON TODAS LAS FUNCIONES -->
         <div class="card" style="border-color: #ff0055; position: relative;">
             <h2>Selecciona tu Avatar</h2>
             <div class="avatar-selector">
@@ -214,7 +262,6 @@
             
             <div class="npc-box" id="npcAvatar">🧟</div>
 
-            <!-- Barra de Estamina Real -->
             <div class="energy-container">
                 <div class="energy-label">
                     <span>⚡ ESTAMINA</span>
@@ -225,26 +272,35 @@
                 </div>
             </div>
 
-            <!-- Puntuaciones -->
             <div class="score-display">
                 <div class="score-number" id="scoreP1">0</div>
                 <div class="score-title">Tus Puntos (<span id="multiplicadorText">+1 por toque</span>)</div>
                 <hr style="border:0.5px solid #333; margin: 6px 0;">
                 <div style="font-size: 13px; color: #ff0055; font-weight: bold;" id="scoreP2">0</div>
-                <div class="score-title">Puntos del Rival</div>
+                <div class="score-title">Puntos del Rival <span id="rivalAvatarDisplay"></span></div>
             </div>
 
-            <!-- Botón de Farmear -->
             <button class="action-btn" id="btnFarmear">🔥 Farmear Aura 🔥</button>
 
-            <!-- Tienda Funcional -->
+            <button class="special-btn" id="btnPoder" onclick="usarPoderEspecial()">⚡ ¡Absorción Suprema (Carga)!</button>
+
             <div class="store-box">
                 <div class="store-item" onclick="comprarMejora(500, 2, 'Lentes')">👓 Lentes<br><b>500 pts (+2)</b></div>
                 <div class="store-item" onclick="comprarMejora(3000, 5, 'Corte')">✂️ Corte<br><b>3k pts (+5)</b></div>
                 <div class="store-item" onclick="comprarMejora(10000, 15, 'Gym')">🧬 Gym<br><b>10k pts (+15)</b></div>
             </div>
 
-            <div class="multiplayer-status" id="multiplayerStatus">¡Todo listo para la batalla real!</div>
+            <div class="chat-container">
+                <div style="font-size: 9px; color: #aaa;">💬 CHAT RÁPIDO PARA BURLAS:</div>
+                <div class="chat-burlas">
+                    <button class="chat-btn" onclick="enviarMensajeChat('¡No tienes aura! 🗿')">🗿 No aura</button>
+                    <button class="chat-btn" onclick="enviarMensajeChat('¡Demasiado fácil! 🔥')">🔥 Fácil</button>
+                    <button class="chat-btn" onclick="enviarMensajeChat('¡Ríndete ya! ⚡')">⚡ Ríndete</button>
+                </div>
+                <div id="chatLog">Mensajes del rival aparecerán aquí...</div>
+            </div>
+
+            <div class="multiplayer-status" id="multiplayerStatus">¡Listo para la batalla suprema!</div>
         </div>
 
     </div>
@@ -256,6 +312,8 @@
         let multiplicador = 1;
         let codigoPersonal = "";
         let estaCansado = false;
+        let avatarActual = '🧟';
+        let poderCargado = true;
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function reproducirSonido(frecuencia, tipo, duracion) {
@@ -275,8 +333,10 @@
         function cambiarAvatar(emoji, el) {
             document.querySelectorAll('.avatar-opcion').forEach(e => e.classList.remove('activo'));
             el.classList.add('activo');
+            avatarActual = emoji;
             document.getElementById("npcAvatar").textContent = emoji;
             reproducirSonido(600, 'sine', 0.1);
+            sincronizarDatos();
         }
 
         function comprarMejora(costo, multValor, nombre) {
@@ -287,10 +347,44 @@
                 document.getElementById("multiplicadorText").textContent = `+${multiplicador} por toque`;
                 reproducirSonido(880, 'triangle', 0.3);
                 alert(`¡Has comprado ${nombre}! Tus puntos por toque subieron a +${multiplicador}`);
-                if (conn && conn.open) conn.send({score: score1});
+                sincronizarDatos();
             } else {
                 reproducirSonido(150, 'sawtooth', 0.2);
                 alert("¡Te faltan puntos de aura para esta mejora!");
+            }
+        }
+
+        function usarPoderEspecial() {
+            if (!poderCargado) return;
+            score1 += 25 * multiplicador;
+            document.getElementById("scoreP1").textContent = score1;
+            reproducirSonido(900, 'square', 0.4);
+            alert("¡Absorción Suprema activada! +25 golpes de golpe instantáneos.");
+            
+            poderCargado = false;
+            let btnPoder = document.getElementById("btnPoder");
+            btnPoder.disabled = true;
+            
+            let tiempoRestante = 12;
+            let intervalo = setInterval(() => {
+                btnPoder.textContent = `⏳ Recargando Poder (${tiempoRestante}s)...`;
+                tiempoRestante--;
+                if (tiempoRestante < 0) {
+                    clearInterval(intervalo);
+                    poderCargado = true;
+                    btnPoder.disabled = false;
+                    btnPoder.textContent = "⚡ ¡Absorción Suprema (Lista)!";
+                }
+            }, 1000);
+
+            sincronizarDatos();
+            verificarGanador();
+        }
+
+        function enviarMensajeChat(texto) {
+            document.getElementById("chatLog").textContent = "Tú: " + texto;
+            if (conn && conn.open) {
+                conn.send({ tipo: 'chat', contenido: texto });
             }
         }
 
@@ -331,17 +425,30 @@
                 document.getElementById("connectionStatus").textContent = "Estado: ¡Conectado con éxito!";
                 document.getElementById("multiplayerStatus").textContent = "¡Partida en curso!";
                 document.getElementById("npcAvatar").classList.add("animar-vibracion");
+                sincronizarDatos();
             });
             conn.on('data', (data) => {
-                if(data.score !== undefined) {
+                if (data.tipo === 'chat') {
+                    document.getElementById("chatLog").textContent = "Rival: " + data.contenido;
+                    reproducirSonido(500, 'sine', 0.15);
+                } else if (data.score !== undefined) {
                     score2 = data.score;
                     document.getElementById("scoreP2").textContent = score2;
+                    if(data.avatar) {
+                        document.getElementById("rivalAvatarDisplay").textContent = `[${data.avatar}]`;
+                    }
                     let npc = document.getElementById("npcAvatar");
                     npc.classList.add("animar-golpe");
                     setTimeout(() => npc.classList.remove("animar-golpe"), 200);
                     verificarGanador();
                 }
             });
+        }
+
+        function sincronizarDatos() {
+            if (conn && conn.open) {
+                conn.send({ score: score1, avatar: avatarActual });
+            }
         }
 
         const btnFarmear = document.getElementById("btnFarmear");
@@ -361,7 +468,6 @@
 
             crearTextoFlotante(e, `+${multiplicador} AURA`);
 
-            // Gastar estamina
             estamina -= 4;
             if (estamina <= 0) {
                 estamina = 0;
@@ -379,9 +485,7 @@
             document.getElementById("energyFill").style.width = estamina + "%";
             document.getElementById("energyText").textContent = estamina + "%";
 
-            if (conn && conn.open) {
-                conn.send({score: score1});
-            }
+            sincronizarDatos();
             verificarGanador();
         });
 
@@ -397,11 +501,11 @@
         }
 
         function verificarGanador() {
-            if (score1 >= 100) {
+            if (score1 >= 150) {
                 reproducirSonido(700, 'sine', 0.5);
-                alert("¡Has ganado la batalla de aura con gloria!");
+                alert("¡Has ganado la batalla suprema de aura!");
                 reiniciar();
-            } else if (score2 >= 100) {
+            } else if (score2 >= 150) {
                 reproducirSonido(120, 'sawtooth', 0.6);
                 alert("¡Tu rival te ha aplastado en aura!");
                 reiniciar();

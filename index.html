@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Supervivencia Infinita Pro</title>
+    <title>Free Fire - Supervivencia Infinita Pro con Música</title>
     <style>
         * {
             box-sizing: border-box;
@@ -95,7 +95,7 @@
             position: absolute;
             bottom: 6px;
             left: 0;
-            width: 50000px; /* Mapa masivo infinito */
+            width: 50000px;
             height: 100%;
             pointer-events: none;
         }
@@ -230,7 +230,6 @@
             gap: 6px;
         }
 
-        /* JOYSTICK CIRCULAR IZQUIERDA */
         .joystick-base {
             width: 85px;
             height: 85px;
@@ -261,7 +260,6 @@
         .hp-bar-bg { width: 100%; background: #222; height: 7px; border-radius: 3px; overflow: hidden; }
         .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.2s ease; }
 
-        /* PANEL DERECHO CON BOTÓN DE SALTO Y ACCIONES */
         .right-controls-panel {
             display: flex;
             align-items: center;
@@ -354,7 +352,6 @@
             <span>💎 ORO: <strong id="txtOro" style="color:#00ff66;">0</strong></span>
         </div>
 
-        <!-- ARENA DE JUEGO -->
         <div class="battle-arena" id="arenaBox">
             <div class="fighter" id="fighterP1">
                 <div class="fighter-model" id="modelP1">
@@ -370,7 +367,6 @@
                 </div>
             </div>
 
-            <!-- MUNDO DESLIZABLE INFINITO -->
             <div id="worldContainer">
                 <div id="obstaclesArea"></div>
                 <div id="enemiesArea"></div>
@@ -378,11 +374,9 @@
             </div>
         </div>
 
-        <!-- CONTROLES (2 MANOS) -->
         <div class="controls-hud">
             
             <div class="mid-controls-row">
-                <!-- 1. JOYSTICK IZQUIERDA -->
                 <div class="joystick-base" id="joystickBase">
                     <div class="joystick-knob" id="joystickKnob"></div>
                 </div>
@@ -397,7 +391,6 @@
                     </div>
                 </div>
 
-                <!-- 2. BOTÓN DE SALTO A LA DERECHA -->
                 <div class="right-controls-panel">
                     <div class="jump-action-btn" ontouchstart="saltarJugador()" onmousedown="saltarJugador()">
                         ⬆️<span>SALTAR</span>
@@ -424,7 +417,7 @@
 
             <div class="info-bottom-bar">
                 <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-                <span id="chatLog">¡Joystick izq, Salto y Disparo der!</span>
+                <span id="chatLog">¡Música de supervivencia activa!</span>
             </div>
 
         </div>
@@ -449,6 +442,7 @@
         let projectiles = [];
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
         function reproducirSonido(frecuencia, tipo, duracion) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             let osc = audioCtx.createOscillator();
@@ -462,6 +456,55 @@
             osc.start();
             osc.stop(audioCtx.currentTime + duracion);
         }
+
+        // --- BGM: MÚSICA DE FONDO DE SUPERVIVENCIA (LOOP CONSTANTE) ---
+        function iniciarMusicaSupervivencia() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            // Secuencia de notas con tensión épica de supervivencia (Bassline + Arpegio)
+            const notasBajo = [110, 110, 98, 98, 82.41, 82.41, 73.42, 73.42]; // La, Sol, Mi, Re
+            const notasMelodia = [220, 329.63, 440, 329.63, 246.94, 392, 493.88, 392];
+            let paso = 0;
+
+            setInterval(() => {
+                if (!gameActive) return;
+
+                // Nota de bajo constante (Tensión)
+                let oscBajo = audioCtx.createOscillator();
+                let gainBajo = audioCtx.createGain();
+                oscBajo.type = 'sawtooth';
+                oscBajo.frequency.value = notasBajo[paso % notasBajo.length];
+                gainBajo.gain.setValueAtTime(0.025, audioCtx.currentTime);
+                gainBajo.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.28);
+                oscBajo.connect(gainBajo);
+                gainBajo.connect(audioCtx.destination);
+                oscBajo.start();
+                oscBajo.stop(audioCtx.currentTime + 0.28);
+
+                // Melodía rítmica de fondo
+                if (paso % 2 === 0) {
+                    let oscMel = audioCtx.createOscillator();
+                    let gainMel = audioCtx.createGain();
+                    oscMel.type = 'triangle';
+                    oscMel.frequency.value = notasMelodia[(paso / 2) % notasMelodia.length];
+                    gainMel.gain.setValueAtTime(0.015, audioCtx.currentTime);
+                    gainMel.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                    oscMel.connect(gainMel);
+                    gainMel.connect(audioCtx.destination);
+                    oscMel.start();
+                    oscMel.stop(audioCtx.currentTime + 0.25);
+                }
+
+                paso++;
+            }, 300); // Ritmo constante de supervivencia
+        }
+
+        // Activar música al primer toque en la pantalla (requisito de navegadores móviles)
+        window.addEventListener('pointerdown', () => {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
 
         // --- JOYSTICK IZQUIERDA ---
         const joyBase = document.getElementById('joystickBase');
@@ -497,7 +540,6 @@
             }
         });
 
-        // Bucle de movimiento infinito del mapa
         setInterval(() => {
             if (Math.abs(direccionMovimiento) > 0.1 && gameActive) {
                 mundoX += direccionMovimiento * 9;
@@ -511,7 +553,6 @@
         }, 30);
 
         function inicializarMundo() {
-            // Generación masiva infinita de obstáculos y zombis de forma procedural
             for(let i = 1; i < 300; i++) {
                 let posX = i * 200 + Math.random() * 50;
                 boxes.push({
@@ -539,7 +580,6 @@
             renderizarMundo();
         }
 
-        // --- SALTO PROGRESIVO ---
         function saltarJugador() {
             if (!gameActive) return;
 
@@ -547,7 +587,7 @@
                 impulsoSalto = Math.min(26, impulsoSalto + 4);
                 velocidadY = impulsoSalto;
                 reproducirSonido(750, 'triangle', 0.15);
-                document.getElementById('chatLog').textContent = `🚀 ¡Salto propulsado más alto! (${impulsoSalto}H)`;
+                document.getElementById('chatLog').textContent = `🚀 ¡Salto propulsado! (${impulsoSalto}H)`;
                 return;
             }
 
@@ -662,26 +702,22 @@
             });
         }
 
-        // Bucle de movimiento inteligente de los zombis y ataques
         setInterval(() => {
             if (!gameActive) return;
             let jugadorMundoX = mundoX + posX1;
 
             enemies.forEach(en => {
                 if (en.hp > 0) {
-                    // Los zombis avanzan persiguiendo al jugador por el mapa
                     if (en.x > jugadorMundoX + 30) {
-                        en.x -= en.velocidad; // Avanzan hacia la izquierda
+                        en.x -= en.velocidad;
                     } else if (en.x < jugadorMundoX - 30) {
-                        en.x += (en.velocidad * 0.5); // Se acercan si pasas de largo
+                        en.x += (en.velocidad * 0.5);
                     }
 
-                    // Disparo de veneno a distancia
                     if (Math.abs(en.x - jugadorMundoX) < 220 && Math.random() < 0.025) {
                         projectiles.push({ x: en.x, y: 30, vx: -3.5 });
                     }
 
-                    // Daño por contacto directo si te alcanzan
                     if (Math.abs(en.x - jugadorMundoX) < 22 && posY1 <= 15) {
                         let daño = transformacionActual === 'mecha' ? 1 : 2;
                         vida = Math.max(0, vida - daño);
@@ -691,7 +727,6 @@
                 }
             });
 
-            // Actualizar posiciones visuales de zombis en tiempo real
             let enArea = document.getElementById("enemiesArea");
             enArea.innerHTML = '';
             enemies.forEach(en => {
@@ -716,7 +751,6 @@
                 }
             });
 
-            // Balas de veneno
             let projArea = document.getElementById("projectilesArea");
             projArea.innerHTML = '';
             projectiles.forEach((p, index) => {
@@ -745,6 +779,7 @@
 
         document.getElementById('hpFill').style.width = vida + "%";
         inicializarMundo();
+        iniciarMusicaSupervivencia(); // Arranca la música de fondo al iniciar
     </script>
 </body>
 </html>

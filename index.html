@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Supervivencia Infinita Pro con Música</title>
+    <title>Free Fire - Supervivencia Definitiva</title>
     <style>
         * {
             box-sizing: border-box;
@@ -62,12 +62,26 @@
         .top-hud-stats {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             background: #12121c;
             border: 1px solid #444;
             border-radius: 8px;
             padding: 6px 10px;
             font-size: 10px;
             font-weight: bold;
+        }
+
+        .volume-control-box {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 8px;
+            color: #ffaa00;
+        }
+        .volume-control-box input {
+            width: 60px;
+            accent-color: #ffaa00;
+            cursor: pointer;
         }
 
         /* ARENA DE JUEGO */
@@ -349,6 +363,10 @@
         
         <div class="top-hud-stats">
             <span>🗺️ DISTANCIA: <strong id="txtDistancia" style="color:#00ffff;">0m</strong></span>
+            <div class="volume-control-box">
+                <span>🔊 VOL:</span>
+                <input type="range" id="volRange" min="0" max="1" step="0.05" value="0.8" oninput="cambiarVolumen(this.value)">
+            </div>
             <span>💎 ORO: <strong id="txtOro" style="color:#00ff66;">0</strong></span>
         </div>
 
@@ -417,7 +435,7 @@
 
             <div class="info-bottom-bar">
                 <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-                <span id="chatLog">¡Música de supervivencia activa!</span>
+                <span id="chatLog">¡Salto en movimiento y volumen ajustado!</span>
             </div>
 
         </div>
@@ -441,65 +459,71 @@
         let enemies = [];
         let projectiles = [];
 
+        // --- SISTEMA DE AUDIO POTENCIADO Y REGULABLE ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function reproducirSonido(frecuencia, tipo, duracion) {
+        const masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.8; // Volumen inicial alto y claro
+        masterGain.connect(audioCtx.destination);
+
+        function cambiarVolumen(valor) {
+            masterGain.gain.value = parseFloat(valor);
+        }
+
+        function reproducirSonido(frecuencia, tipo, duracion, volumenExtra = 1.0) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = tipo;
             osc.frequency.value = frecuencia;
-            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            
+            // Ganancia interna multiplicada para que suene fuerte y claro
+            gain.gain.setValueAtTime(0.18 * volumenExtra, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duracion);
+            
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            gain.connect(masterGain);
             osc.start();
             osc.stop(audioCtx.currentTime + duracion);
         }
 
-        // --- BGM: MÚSICA DE FONDO DE SUPERVIVENCIA (LOOP CONSTANTE) ---
+        // --- MÚSICA DE FONDO DE SUPERVIVENCIA ---
         function iniciarMusicaSupervivencia() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
 
-            // Secuencia de notas con tensión épica de supervivencia (Bassline + Arpegio)
-            const notasBajo = [110, 110, 98, 98, 82.41, 82.41, 73.42, 73.42]; // La, Sol, Mi, Re
+            const notasBajo = [110, 110, 98, 98, 82.41, 82.41, 73.42, 73.42];
             const notasMelodia = [220, 329.63, 440, 329.63, 246.94, 392, 493.88, 392];
             let paso = 0;
 
             setInterval(() => {
                 if (!gameActive) return;
 
-                // Nota de bajo constante (Tensión)
                 let oscBajo = audioCtx.createOscillator();
                 let gainBajo = audioCtx.createGain();
                 oscBajo.type = 'sawtooth';
                 oscBajo.frequency.value = notasBajo[paso % notasBajo.length];
-                gainBajo.gain.setValueAtTime(0.025, audioCtx.currentTime);
-                gainBajo.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.28);
+                gainBajo.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gainBajo.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.28);
                 oscBajo.connect(gainBajo);
-                gainBajo.connect(audioCtx.destination);
+                gainBajo.connect(masterGain);
                 oscBajo.start();
                 oscBajo.stop(audioCtx.currentTime + 0.28);
 
-                // Melodía rítmica de fondo
                 if (paso % 2 === 0) {
                     let oscMel = audioCtx.createOscillator();
                     let gainMel = audioCtx.createGain();
                     oscMel.type = 'triangle';
                     oscMel.frequency.value = notasMelodia[(paso / 2) % notasMelodia.length];
-                    gainMel.gain.setValueAtTime(0.015, audioCtx.currentTime);
-                    gainMel.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                    gainMel.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                    gainMel.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.25);
                     oscMel.connect(gainMel);
-                    gainMel.connect(audioCtx.destination);
+                    gainMel.connect(masterGain);
                     oscMel.start();
                     oscMel.stop(audioCtx.currentTime + 0.25);
                 }
-
                 paso++;
-            }, 300); // Ritmo constante de supervivencia
+            }, 300);
         }
 
-        // Activar música al primer toque en la pantalla (requisito de navegadores móviles)
         window.addEventListener('pointerdown', () => {
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
@@ -540,15 +564,23 @@
             }
         });
 
+        // Bucle principal de movimiento del mapa y avance en salto
         setInterval(() => {
-            if (Math.abs(direccionMovimiento) > 0.1 && gameActive) {
-                mundoX += direccionMovimiento * 9;
-                if (mundoX < 0) mundoX = 0;
+            if (gameActive) {
+                // Si el jugador está moviendo el joystick o está en pleno salto con inercia
+                if (Math.abs(direccionMovimiento) > 0.1 || saltando) {
+                    let velocidadBase = Math.abs(direccionMovimiento) > 0.1 ? direccionMovimiento * 9 : (window.inerciaSaltoX || 0);
+                    
+                    if (Math.abs(velocidadBase) > 0.5) {
+                        mundoX += velocidadBase;
+                        if (mundoX < 0) mundoX = 0;
 
-                distancia = Math.floor(mundoX / 5);
-                document.getElementById("txtDistancia").textContent = distancia + "m";
-                document.getElementById("worldContainer").style.transform = `translateX(-${mundoX}px)`;
-                verificarDesbloqueos();
+                        distancia = Math.floor(mundoX / 5);
+                        document.getElementById("txtDistancia").textContent = distancia + "m";
+                        document.getElementById("worldContainer").style.transform = `translateX(-${mundoX}px)`;
+                        verificarDesbloqueos();
+                    }
+                }
             }
         }, 30);
 
@@ -580,21 +612,26 @@
             renderizarMundo();
         }
 
+        // --- SALTO CON INERCIA HACIA ADELANTE ---
         function saltarJugador() {
             if (!gameActive) return;
 
             if (saltando) {
                 impulsoSalto = Math.min(26, impulsoSalto + 4);
                 velocidadY = impulsoSalto;
-                reproducirSonido(750, 'triangle', 0.15);
-                document.getElementById('chatLog').textContent = `🚀 ¡Salto propulsado! (${impulsoSalto}H)`;
+                reproducirSonido(750, 'triangle', 0.15, 1.2);
+                document.getElementById('chatLog').textContent = `🚀 ¡Salto propulsado en el aire!`;
                 return;
             }
 
             saltando = true;
             impulsoSalto = 16;
             velocidadY = impulsoSalto;
-            reproducirSonido(500, 'triangle', 0.15);
+            
+            // Captura la dirección exacta del joystick al momento de saltar para avanzar mientras estás en el aire
+            window.inerciaSaltoX = Math.abs(direccionMovimiento) > 0.1 ? direccionMovimiento * 10 : 6;
+            
+            reproducirSonido(500, 'triangle', 0.15, 1.2);
 
             let saltoInterval = setInterval(() => {
                 posY1 += velocidadY;
@@ -607,6 +644,7 @@
                         saltando = false;
                         impulsoSalto = 16;
                         velocidadY = 0;
+                        window.inerciaSaltoX = 0;
                         clearInterval(saltoInterval);
                     }
                 });
@@ -615,6 +653,7 @@
                     posY1 = 6;
                     saltando = false;
                     impulsoSalto = 16;
+                    window.inerciaSaltoX = 0;
                     clearInterval(saltoInterval);
                 }
                 document.getElementById("fighterP1").style.bottom = posY1 + "px";
@@ -640,7 +679,7 @@
             if (!gameActive) return;
 
             if (tipoBtn === 1) {
-                reproducirSonido(800, 'sawtooth', 0.08);
+                reproducirSonido(800, 'sawtooth', 0.08, 1.5);
                 let arena = document.getElementById("arenaBox");
                 let bala = document.createElement("div");
                 bala.className = "bullet-effect";
@@ -682,7 +721,7 @@
             document.getElementById('lblEstadoTransformacion').textContent = nombre;
             document.getElementById('chatLog').textContent = `✨ ¡Transformación activa: ${nombre}!`;
             
-            reproducirSonido(900, 'square', 0.3);
+            reproducirSonido(900, 'square', 0.3, 1.5);
             let overlay = document.getElementById("efectoTransformacion");
             overlay.classList.add("transformado-activo");
             setTimeout(() => overlay.classList.remove("transformado-activo"), 400);
@@ -779,7 +818,7 @@
 
         document.getElementById('hpFill').style.width = vida + "%";
         inicializarMundo();
-        iniciarMusicaSupervivencia(); // Arranca la música de fondo al iniciar
+        iniciarMusicaSupervivencia();
     </script>
 </body>
 </html>

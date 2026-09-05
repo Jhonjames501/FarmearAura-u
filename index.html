@@ -380,6 +380,16 @@
         let poderCargado = true;
         let peer, conn, botInterval;
 
+        // Configuración robusta de STUN/TURN para evitar bloqueos por compartir internet
+        const peerOptions = {
+            config: {
+                'iceServers': [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:global.stun.twilio.com:3478' }
+                ]
+            }
+        };
+
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function reproducirSonido(frecuencia, tipo, duracion) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -539,13 +549,13 @@
             document.getElementById("multiplicadorText").textContent = "x1";
         }
 
-        // Multijugador Online corregido para compartir internet
+        // Multijugador Online con servidores STUN integrados
         document.getElementById("crearSalaBtn").addEventListener("click", () => {
             let codigo = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById("myIdText").textContent = "Código: " + codigo;
             
             if(peer) peer.destroy();
-            peer = new Peer("ffsala-" + codigo);
+            peer = new Peer("ffsala-" + codigo, peerOptions);
 
             peer.on('open', () => document.getElementById("connectionStatus").textContent = "Esperando rival en sala...");
             peer.on('connection', (c) => { 
@@ -563,7 +573,7 @@
             
             document.getElementById("connectionStatus").textContent = "Conectando con el host...";
             if(peer) peer.destroy();
-            peer = new Peer();
+            peer = new Peer(undefined, peerOptions);
 
             peer.on('open', () => {
                 conn = peer.connect("ffsala-" + codigoAmigo);

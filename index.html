@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmear Aura: Battle Royale & 1v1</title>
+    <title>Farmear Aura: Multijugador Online</title>
+    <!-- Librería PeerJS para conexión directa entre celulares -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -20,515 +22,212 @@
             align-items: center;
             min-height: 100vh;
             background-image: radial-gradient(circle at center, #151515 0%, #030303 100%);
-            overflow-x: hidden;
             padding-bottom: 30px;
         }
         .main-layout {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
             max-width: 420px;
-            padding: 12px;
+            padding: 15px;
         }
-
-        /* Selector de Modo de Juego */
-        .mode-selector {
-            display: flex;
-            gap: 5px;
+        .card {
             background: #111;
-            padding: 5px;
-            border-radius: 10px;
-            border: 1px solid #333;
+            border: 2px solid #d4af37;
+            border-radius: 14px;
+            padding: 15px;
+            text-align: center;
         }
-        .mode-btn {
-            flex: 1;
-            padding: 8px;
+        h2 { color: #d4af37; font-size: 16px; margin-bottom: 10px; }
+        input {
+            width: 100%;
+            padding: 12px;
             background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #d4af37;
+            color: #030303;
             border: none;
-            color: #aaa;
             font-weight: bold;
-            font-size: 10px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
+            font-size: 13px;
         }
-        .mode-btn.active {
-            background: #d4af37;
-            color: #030303;
-        }
-
-        /* Cabecera del Personaje Principal / Rival */
-        .character-display {
-            background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
-            border: 2px solid #d4af37;
-            border-radius: 16px;
-            height: 130px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-        }
-        .avatar-container {
-            font-size: 55px;
-            animation: floatCharacter 2s ease-in-out infinite;
-        }
-        @keyframes floatCharacter {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0px); }
-        }
-        .rank-tag {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: #d4af37;
-            color: #030303;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-size: 9px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        /* Paneles de Puntuación Duplicados para 1v1 */
-        .battle-arena {
+        .btn-green { background: #00ff66; }
+        .btn-pink { background: #ff0055; color: white; }
+        
+        /* Zona de Juego Online */
+        .online-arena {
             display: none;
             flex-direction: column;
-            gap: 10px;
-            background: #090909;
-            border: 2px dashed #ff0055;
-            border-radius: 14px;
-            padding: 10px;
+            gap: 15px;
         }
-        .player-box {
-            background: #121212;
-            border-radius: 10px;
-            padding: 8px;
+        .score-box {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            border: 1px solid #333;
-        }
-        .p1-side { border-color: #00ff66; }
-        .p2-side { border-color: #ff0055; }
-
-        /* Panel Normal de Puntos */
-        .stats-panel {
-            background: #111;
-            border: 2px solid #444;
-            border-radius: 14px;
-            padding: 10px;
-            text-align: center;
-        }
-        .aura-counter {
-            font-size: 36px;
-            font-weight: bold;
-            color: #00ff66;
-            text-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
-        }
-        .aps-text {
-            font-size: 9px;
-            color: #d4af37;
-        }
-
-        /* Botones de Acción */
-        .action-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(90deg, #ff0055, #7a00ff, #00ffcc);
-            background-size: 200% 100%;
-            animation: gradientAnimation 4s linear infinite;
-            border: none;
-            color: white;
-            font-weight: bold;
-            font-size: 15px;
-            border-radius: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .action-btn:active { transform: scale(0.96); }
-
-        /* Botones Partidos para 1v1 */
-        .dual-buttons {
-            display: none;
-            gap: 10px;
-            width: 100%;
-        }
-        .btn-p1 {
-            flex: 1;
-            padding: 25px 10px;
-            background: #00ff66;
-            border: none;
-            color: #030303;
-            font-weight: bold;
-            font-size: 14px;
-            border-radius: 12px;
-            text-transform: uppercase;
-        }
-        .btn-p2 {
-            flex: 1;
-            padding: 25px 10px;
-            background: #ff0055;
-            border: none;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            border-radius: 12px;
-            text-transform: uppercase;
-        }
-
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Tienda */
-        .shop-panel {
-            background: #121212;
-            border: 1px dashed #d4af37;
-            border-radius: 14px;
-            padding: 8px;
-        }
-        .shop-title {
-            color: #d4af37;
-            font-size: 10px;
-            text-align: center;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-        .shop-items {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-        }
-        .shop-item {
             background: #1a1a1a;
-            border-radius: 6px;
-            padding: 6px;
-            width: 32%;
-            text-align: center;
-            font-size: 8px;
-            border: 1px solid #444;
-            cursor: not-allowed;
-            opacity: 0.3;
-        }
-        .shop-item.available {
-            opacity: 1;
-            border-color: #00ff66;
-            background: #112211;
-            cursor: pointer;
-        }
-        .shop-item.bought {
-            opacity: 0.8;
-            border-color: #d4af37;
-            background: #221d0a;
-        }
-
-        .sigma-quote {
-            background: #0a0a0a;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
-            font-size: 9px;
-            color: #aaa;
-            font-style: italic;
-        }
-
-        .floating-text {
-            position: absolute;
-            color: #00ff66;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: bold;
-            font-size: 14px;
-            pointer-events: none;
-            animation: floatUp 0.8s ease-out forwards;
         }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-35px); }
+        .tap-btn {
+            width: 100%;
+            padding: 40px 0;
+            background: linear-gradient(90deg, #ff0055, #7a00ff, #00ffcc);
+            border: none;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 16px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(122, 0, 255, 0.4);
         }
+        .tap-btn:active { transform: scale(0.96); }
+        .status-text { font-size: 11px; color: #aaa; text-align: center; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div class="main-layout">
         
-        <!-- SELECTOR DE MODO -->
-        <div class="mode-selector">
-            <button class="mode-btn active" id="modeSoloBtn" onclick="cambiarModo('solo')">Modo Rival CPU</button>
-            <button class="mode-btn" id="modePvpBtn" onclick="cambiarModo('pvp')">Multijugador 1v1</button>
+        <!-- PANTALLA DE CONEXIÓN -->
+        <div class="card" id="lobbyScreen">
+            <h2>🌐 MULTIJUGADOR ONLINE</h2>
+            <p style="font-size: 11px; color: #ccc; margin-bottom: 15px;">Crea una sala o conéctate al código de tu amigo para batallar a distancia.</p>
+            
+            <button class="btn btn-green" id="crearSalaBtn">Crear Sala (Anfitrión)</button>
+            <p class="status-text" id="myIdText">Tu ID de Sala: Generando...</p>
+            
+            <hr style="border: 0.5px solid #333; margin: 15px 0;">
+            
+            <input type="text" id="codigoRivalInput" placeholder="Pega el código de tu amigo aquí">
+            <button class="btn btn-pink" id="unirseSalaBtn">Unirse a la Sala</button>
         </div>
 
-        <!-- PERSONAJE / RIVAL CPU INFO -->
-        <div class="character-display" id="displayContenedor">
-            <div class="rank-tag" id="rangoEtiqueta">NPC Beta vs Rival Bot 🤖</div>
-            <div class="avatar-container" id="imagenPersonaje">🧟</div>
-        </div>
-
-        <!-- ARENA MULTIJUGADOR 1V1 (Oculta por defecto) -->
-        <div class="battle-arena" id="battleArena">
-            <div style="text-align:center; font-size:10px; color:#ff0055; font-weight:bold;">⚔️ DUELO LOCAL 1v1 ⚔️</div>
-            <div class="player-box p1-side">
-                <span>Jugador 1 (Tú):</span>
-                <span id="p1Score" style="color:#00ff66; font-size:18px; font-weight:bold;">0</span>
-            </div>
-            <div class="player-box p2-side">
-                <span>Jugador 2 (Rival):</span>
-                <span id="p2Score" style="color:#ff0055; font-size:18px; font-weight:bold;">0</span>
-            </div>
-        </div>
-
-        <!-- PUNTOS Y APS (Modo Solitario/Rival) -->
-        <div class="stats-panel" id="statsPanelSolo">
-            <div class="aura-counter" id="puntosAura">500</div>
-            <div class="aps-text" id="apsTexto">Generando: +0 Aura/seg | Rival Bot: <span id="rivalAura">0</span> Aura</div>
-        </div>
-
-        <!-- BOTONES DE ACCIÓN -->
-        <button class="action-btn" id="btnFarmear">🔥 FARMEAR AURA 🔥</button>
-        
-        <!-- BOTONES 1V1 (Ocultos por defecto) -->
-        <div class="dual-buttons" id="dualButtons">
-            <button class="btn-p1" id="btnP1">¡JUGADOR 1 TOCA!</button>
-            <button class="btn-p2" id="btnP2">¡JUGADOR 2 TOCA!</button>
-        </div>
-
-        <!-- TIENDA -->
-        <div class="shop-panel" id="shopPanel">
-            <h3 class="shop-title">Tienda de Mejoras</h3>
-            <div class="shop-items">
-                <div class="shop-item" id="itemLentes">
-                    <div style="font-size:14px;">🕶️</div>
-                    <p><b>Lentes</b></p>
-                    <p style="color:#d4af37;" id="precioLentes">500 Aura</p>
-                </div>
-                <div class="shop-item" id="itemCorte">
-                    <div style="font-size:14px;">✂️</div>
-                    <p><b>Fade Pro</b></p>
-                    <p style="color:#d4af37;" id="precioCorte">2,000 Aura</p>
-                </div>
-                <div class="shop-item" id="itemOro">
-                    <div style="font-size:14px;">⛓️</div>
-                    <p><b>Cadenita</b></p>
-                    <p style="color:#d4af37;" id="precioOro">10,000 Aura</p>
+        <!-- PANTALLA DE BATALLA EN LÍNEA -->
+        <div class="online-arena" id="gameScreenOnline" style="display:none;">
+            <div class="card">
+                <h2>⚔️ DUELO EN LÍNEA ⚔️</h2>
+                <div class="score-box">
+                    <span>Tú: <b id="myScore" style="color:#00ff66;">0</b></span>
+                    <span>Rival: <b id="rivalScore" style="color:#ff0055;">0</b></span>
                 </div>
             </div>
-        </div>
 
-        <!-- FRASES -->
-        <div class="sigma-quote" id="fraseSigma">
-            "El rival bot está farmeando en silencio... ¡No te dejes ganar!"
+            <button class="tap-btn" id="btnFarmearOnline">🔥 ¡TOCA RÁPIDO! 🔥</button>
+            <div class="status-text" id="connectionStatus">Conectado con éxito</div>
         </div>
 
     </div>
 
     <script>
-        let modoJuego = "solo"; // "solo" (con rival bot) o "pvp" (1v1 local)
+        let peer;
+        let conn;
+        let myScore = 0;
+        let rivalScore = 0;
+        let roomId = "";
 
-        // Modo Solitario
-        let aura = 500;
-        let powerClick = 1;
-        let auraPorSegundo = 0;
-        let mejorasCompradas = { lentes: false, corte: false, oro: false };
+        const lobbyScreen = document.getElementById("lobbyScreen");
+        const gameScreenOnline = document.getElementById("gameScreenOnline");
+        const myIdText = document.getElementById("myIdText");
+        const codigoRivalInput = document.getElementById("codigoRivalInput");
         
-        // Rival Bot
-        let botAura = 0;
-        let botVelocidad = 3; // Aura por segundo que sube el bot
+        const crearSalaBtn = document.getElementById("crearSalaBtn");
+        const unirseSalaBtn = document.getElementById("unirseSalaBtn");
+        const btnFarmearOnline = document.getElementById("btnFarmearOnline");
+        const myScoreEl = document.getElementById("myScore");
+        const rivalScoreEl = document.getElementById("rivalScore");
+        const connectionStatus = document.getElementById("connectionStatus");
 
-        // Modo PVP 1v1
-        let scoreP1 = 0;
-        let scoreP2 = 0;
+        // Inicializar PeerJS (crea un ID único para este dispositivo)
+        peer = new Peer();
 
-        const btnFarmear = document.getElementById("btnFarmear");
-        const puntosAura = document.getElementById("puntosAura");
-        const rangoEtiqueta = document.getElementById("rangoEtiqueta");
-        const imagenPersonaje = document.getElementById("imagenPersonaje");
-        const apsTexto = document.getElementById("apsTexto");
-        const fraseSigma = document.getElementById("fraseSigma");
-        
-        const battleArena = document.getElementById("battleArena");
-        const statsPanelSolo = document.getElementById("statsPanelSolo");
-        const dualButtons = document.getElementById("dualButtons");
-        const shopPanel = document.getElementById("shopPanel");
-        const modeSoloBtn = document.getElementById("modeSoloBtn");
-        const modePvpBtn = document.getElementById("modePvpBtn");
+        peer.on('open', (id) => {
+            roomId = id;
+            // Mostramos los últimos 5 caracteres del ID para que sea fácil de compartir
+            myIdText.textContent = "Tu Código de Sala: " + id;
+        });
 
-        const itemLentes = document.getElementById("itemLentes");
-        const itemCorte = document.getElementById("itemCorte");
-        const itemOro = document.getElementById("itemOro");
+        // 1. Crear Sala (Anfitrión)
+        crearSalaBtn.addEventListener("click", () => {
+            connectionStatus.textContent = "Esperando a que el rival se conecte...";
+            peer.on('connection', (connection) => {
+                conn = connection;
+                setupConnection();
+                lobbyScreen.style.display = "none";
+                gameScreenOnline.style.display = "flex";
+                alert("¡Un rival se ha conectado a tu sala!");
+            });
+        });
 
-        const nivelesConfig = [
-            { auraMin: 0, nombre: "NPC Beta", emoji: "🧟" },
-            { auraMin: 200, nombre: "Sigma Male", emoji: "🗿" },
-            { auraMin: 800, nombre: "Gigachad 💪", emoji: "🦾" },
-            { auraMin: 3000, nombre: "Patrick Bateman", emoji: "🕴️" },
-            { auraMin: 15000, nombre: "Dios del Aura", emoji: "👑" }
-        ];
+        // 2. Unirse a una Sala (Invitado)
+        unirseSalaBtn.addEventListener("click", () => {
+            let codeToJoin = codigoRivalInput.value.trim();
+            if (!codeToJoin) {
+                alert("Por favor ingresa el código de la sala de tu amigo.");
+                return;
+            }
+            conn = peer.connect(codeToJoin);
+            setupConnection();
+            lobbyScreen.style.display = "none";
+            gameScreenOnline.style.display = "flex";
+            connectionStatus.textContent = "Conectado al anfitrión con éxito.";
+        });
 
-        // Cambiar entre Modo Rival CPU y Multijugador 1v1
-        function cambiarModo(modo) {
-            modoJuego = modo;
-            if (modo === "solo") {
-                modeSoloBtn.className = "mode-btn active";
-                modePvpBtn.className = "mode-btn";
-                statsPanelSolo.style.display = "block";
-                btnFarmear.style.display = "block";
-                battleArena.style.display = "none";
-                dualButtons.style.display = "none";
-                shopPanel.style.display = "block";
-                rangoEtiqueta.textContent = "Modo Rival CPU Active";
-            } else {
-                modePvpBtn.className = "mode-btn active";
-                modeSoloBtn.className = "mode-btn";
-                statsPanelSolo.style.display = "none";
-                btnFarmear.style.display = "none";
-                battleArena.style.display = "flex";
-                dualButtons.style.display = "flex";
-                shopPanel.style.display = "none";
-                rangoEtiqueta.textContent = "⚔️ Multijugador Local 1v1 ⚔️";
-                imagenPersonaje.textContent = "⚡";
+        // Configurar eventos de transmisión de datos entre los dos teléfonos
+        function setupConnection() {
+            conn.on('data', (data) => {
+                // Cuando el otro jugador toca, actualizamos su puntaje en nuestra pantalla
+                rivalScore = data;
+                rivalScoreEl.textContent = rivalScore;
+                verificarFinJuego();
+            });
+
+            conn.on('open', () => {
+                connectionStatus.textContent = "¡Conexión establecida en tiempo real!";
+            });
+        }
+
+        // Al hacer clic para farmear puntos
+        btnFarmearOnline.addEventListener("click", () => {
+            myScore += 1;
+            myScoreEl.textContent = myScore;
+            
+            // Enviamos nuestro nuevo puntaje al otro teléfono al instante
+            if (conn && conn.open) {
+                conn.send(myScore);
+            }
+            verificarFinJuego();
+        });
+
+        function verificarFinJuego() {
+            if (myScore >= 50) {
+                alert("¡Has ganado la batalla online!");
+                reiniciarJuego();
+            } else if (rivalScore >= 50) {
+                alert("¡El rival te ha ganado!");
+                reiniciarJuego();
             }
         }
 
-        // Bucle Principal de Juego (IA Rival y Auto-Farm)
-        setInterval(() => {
-            if (modoJuego === "solo") {
-                if (auraPorSegundo > 0) aura += auraPorSegundo;
-                // El bot rival sube aura automáticamente
-                botAura += botVelocidad;
-                actualizarJuegoSolo();
-            }
-        }, 1000);
-
-        // Acciones Clic Modo Solo
-        btnFarmear.addEventListener("click", (e) => {
-            if (modoJuego === "solo") {
-                let ganado = Math.floor(Math.random() * 8) + powerClick;
-                aura += ganado;
-                actualizarJuegoSolo();
-                crearTextoFlotante(e, `+${ganado}`, btnFarmear);
-            }
-        });
-
-        // Acciones Multijugador 1v1 con botones independientes
-        document.getElementById("btnP1").addEventListener("click", (e) => {
-            scoreP1 += 1;
-            document.getElementById("p1Score").textContent = scoreP1;
-            crearTextoFlotante(e, "+1", document.getElementById("btnP1"));
-            verificarGanadorPvp("Jugador 1");
-        });
-
-        document.getElementById("btnP2").addEventListener("click", (e) => {
-            scoreP2 += 1;
-            document.getElementById("p2Score").textContent = scoreP2;
-            crearTextoFlotante(e, "+1", document.getElementById("btnP2"));
-            verificarGanadorPvp("Jugador 2");
-        });
-
-        function verificarGanadorPvp(jugador) {
-            if (scoreP1 >= 100) {
-                alert("¡Jugador 1 gana la batalla de aura!");
-                reiniciarPvp();
-            } else if (scoreP2 >= 100) {
-                alert("¡Jugador 2 gana la batalla de aura!");
-                reiniciarPvp();
-            }
+        function reiniciarJuego() {
+            myScore = 0;
+            rivalScore = 0;
+            myScoreEl.textContent = 0;
+            rivalScoreEl.textContent = 0;
         }
-
-        function reiniciarPvp() {
-            scoreP1 = 0; scoreP2 = 0;
-            document.getElementById("p1Score").textContent = 0;
-            document.getElementById("p2Score").textContent = 0;
-        }
-
-        // Tienda Modo Solitario
-        itemLentes.addEventListener("click", () => {
-            if (!mejorasCompradas.lentes && aura >= 500) {
-                aura -= 500;
-                mejorasCompradas.lentes = true;
-                powerClick += 3;
-                auraPorSegundo += 2;
-                botVelocidad += 1; // El bot también se vuelve más rápido
-                fraseSigma.textContent = "🕶️ Lentes comprados. El bot se pone nervioso.";
-                actualizarJuegoSolo();
-            }
-        });
-
-        itemCorte.addEventListener("click", () => {
-            if (!mejorasCompradas.corte && aura >= 2000) {
-                aura -= 2000;
-                mejorasCompradas.corte = true;
-                powerClick += 8;
-                auraPorSegundo += 10;
-                botVelocidad += 4;
-                fraseSigma.textContent = "✂️ Fade Pro activo. ¡Vas ganando ventaja!";
-                actualizarJuegoSolo();
-            }
-        });
-
-        itemOro.addEventListener("click", () => {
-            if (!mejorasCompradas.oro && aura >= 10000) {
-                aura -= 10000;
-                mejorasCompradas.oro = true;
-                powerClick += 25;
-                auraPorSegundo += 50;
-                botVelocidad += 15;
-                fraseSigma.textContent = "⛓️ Cadenita de oro. Dominio total sobre el bot.";
-                actualizarJuegoSolo();
-            }
-        });
-
-        function actualizarJuegoSolo() {
-            puntosAura.textContent = Math.floor(aura);
-            apsTexto.innerHTML = `Generando: +${auraPorSegundo} Aura/seg | Rival Bot: <span style="color:#ff0055">${Math.floor(botAura)}</span>`;
-
-            // Si el bot te supera
-            if (botAura > aura && Math.random() < 0.1) {
-                fraseSigma.textContent = "⚠️ ¡Cuidado! El rival bot te está superando en aura.";
-            }
-
-            // Tienda visual
-            if (mejorasCompradas.lentes) {
-                itemLentes.className = "shop-item bought";
-                document.getElementById("precioLentes").textContent = "✓";
-            } else if (aura >= 500) { itemLentes.className = "shop-item available"; } else { itemLentes.className = "shop-item"; }
-
-            if (mejorasCompradas.corte) {
-                itemCorte.className = "shop-item bought";
-                document.getElementById("precioCorte").textContent = "✓";
-            } else if (aura >= 2000) { itemCorte.className = "shop-item available"; } else { itemCorte.className = "shop-item"; }
-
-            if (mejorasCompradas.oro) {
-                itemOro.className = "shop-item bought";
-                document.getElementById("precioOro").textContent = "✓";
-            } else if (aura >= 10000) { itemOro.className = "shop-item available"; } else { itemOro.className = "shop-item"; }
-
-            let nivelActualConfig = nivelesConfig[0];
-            for (let i = 0; i < nivelesConfig.length; i++) {
-                if (aura >= nivelesConfig[i].auraMin) nivelActualConfig = nivelesConfig[i];
-                else break;
-            }
-            if(modoJuego === "solo") {
-                imagenPersonaje.textContent = nivelActualConfig.emoji;
-            }
-        }
-
-        function crearTextoFlotante(e, texto, elementoOrigen) {
-            let el = document.createElement("div");
-            el.className = "floating-text";
-            el.textContent = texto;
-            let rect = elementoOrigen.getBoundingClientRect();
-            el.style.left = (rect.left + rect.width / 2 + (Math.random() * 20 - 10)) + "px";
-            el.style.top = rect.top + "px";
-            document.body.appendChild(el);
-            setTimeout(() => { el.remove(); }, 800);
-        }
-
-        actualizarJuegoSolo();
     </script>
 
 </body>

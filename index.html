@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Batalla de Aura: Free Fire HUD</title>
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <title>Sobrevive a la Horda: Free Fire Survival</title>
     <style>
         * {
             box-sizing: border-box;
@@ -43,18 +42,16 @@
             100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
 
-        #efectoHielo {
+        #efectoDaño {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(0,255,255,0.2) 0%, rgba(0,100,255,0.6) 100%);
-            border: 6px solid #00ffff;
-            box-shadow: inset 0 0 50px #00ffff;
+            background: radial-gradient(circle, rgba(255,0,0,0) 50%, rgba(255,0,0,0.5) 100%);
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
             z-index: 999;
         }
-        .congelado { opacity: 1 !important; }
+        .recibiendo-daño { opacity: 1 !important; }
 
         #efectoGloo {
             position: fixed;
@@ -87,81 +84,64 @@
         /* BARRA SUPERIOR */
         .top-hud {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            justify-content: space-between;
+            align-items: center;
             background: rgba(18, 18, 28, 0.95);
             border: 1px solid #ffaa00;
             border-radius: 10px;
-            padding: 6px;
+            padding: 8px 12px;
             backdrop-filter: blur(5px);
         }
-        .menu-modes {
+        .hud-stats {
             display: flex;
-            gap: 4px;
-        }
-        .mode-btn {
-            flex: 1;
-            background: #171727;
-            border: 1px solid #ffaa00;
-            color: #ffaa00;
-            padding: 6px;
-            font-size: 10px;
-            border-radius: 6px;
-            cursor: pointer;
+            gap: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
-        .mode-btn.active { background: #ffaa00; color: #080810; }
+        .hud-stats span span { color: #00ff66; }
 
-        .selector-box-mini {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-        .char-option {
-            font-size: 18px;
-            background: #1f1f33;
-            border: 1px solid #444;
-            padding: 3px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .char-option.activo { border-color: #00ff66; background: #113322; box-shadow: 0 0 8px #00ff66; }
-
-        /* ARENA DE BATALLA */
+        /* ARENA DE SUPERVIVENCIA */
         .battle-arena {
             flex: 1;
-            min-height: 180px;
+            min-height: 200px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, rgba(27, 38, 59, 0.95), rgba(13, 27, 42, 0.95));
-            border: 2px solid #00ffff;
+            background: linear-gradient(135deg, rgba(20, 25, 40, 0.95), rgba(10, 15, 25, 0.95));
+            border: 2px solid #ff0055;
             border-radius: 12px;
             padding: 12px;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(0, 255, 255, 0.25);
+            box-shadow: inset 0 0 30px rgba(255, 0, 85, 0.2);
         }
         .battle-arena::after {
             content: "";
             position: absolute;
             bottom: 0; left: 0; right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #00ffff, #ff00ff, #ffaa00);
+            background: linear-gradient(90deg, #ff0055, #ffaa00, #00ffff);
         }
 
         .fighter {
             position: absolute;
             bottom: 12px;
             text-align: center;
-            transition: left 0.1s linear, right 0.1s linear;
+            transition: left 0.1s linear;
         }
-        #fighterP1 { left: 35px; }
-        #fighterP2 { right: 35px; }
+        #fighterP1 { left: 20px; }
+        
+        /* ENEMIGOS MÚLTIPLES EN PANTALLA */
+        .enemy-container {
+            position: absolute;
+            bottom: 12px;
+            text-align: center;
+            transition: left 0.05s linear;
+        }
 
         .fighter-model {
-            width: 55px;
-            height: 85px;
+            width: 50px;
+            height: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -177,7 +157,7 @@
             flex-direction: column;
             align-items: center;
         }
-        .head { font-size: 22px; line-height: 22px; z-index: 2; filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); }
+        .head { font-size: 20px; line-height: 20px; z-index: 2; filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); }
         .torso {
             width: 18px;
             height: 18px;
@@ -218,19 +198,6 @@
         .leg.left::after { right: -1px; }
         .leg.right::after { left: -1px; }
 
-        @keyframes caminarPernasIzq {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(-20deg); }
-        }
-        @keyframes caminarPernasDer {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(20deg); }
-        }
-        .caminando #legLeftP1 { animation: caminarPernasIzq 0.25s infinite alternate ease-in-out; }
-        .caminando #legRightP1 { animation: caminarPernasDer 0.25s infinite alternate ease-in-out; }
-        .caminando-rival #legLeftP2 { animation: caminarPernasIzq 0.25s infinite alternate ease-in-out; }
-        .caminando-rival #legRightP2 { animation: caminarPernasDer 0.25s infinite alternate ease-in-out; }
-
         .fighter-skin-name {
             font-size: 7px;
             color: #00ffff;
@@ -241,7 +208,21 @@
             text-transform: uppercase;
             white-space: nowrap;
         }
-        .fighter-score { font-size: 15px; font-weight: bold; text-shadow: 0 0 8px currentColor; }
+
+        /* EFECTO DE DISPARO BALA */
+        .bullet-effect {
+            position: absolute;
+            height: 3px;
+            background: #ffff00;
+            box-shadow: 0 0 8px #ffaa00;
+            z-index: 10;
+            pointer-events: none;
+            animation: dispararBala 0.15s linear forwards;
+        }
+        @keyframes dispararBala {
+            0% { width: 0px; opacity: 1; }
+            100% { width: 120px; opacity: 0; }
+        }
 
         /* PANEL DE CONTROLES INFERIOR */
         .controls-hud {
@@ -265,26 +246,26 @@
             gap: 5px;
         }
         .joy-btn {
-            width: 44px;
-            height: 40px;
+            width: 42px;
+            height: 38px;
             background: #252538;
             border: 1px solid #ffaa00;
             color: #ffaa00;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
         }
         .joy-btn:active { background: #ffaa00; color: #080810; }
 
-        .energy-container {
+        .hp-container {
             flex: 1;
         }
-        .energy-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
-        .energy-bar-bg { width: 100%; background: #222; height: 7px; border-radius: 3px; overflow: hidden; }
-        .energy-bar-fill { width: 100%; background: linear-gradient(90deg, #ffaa00, #00ff66); height: 100%; }
+        .hp-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .hp-bar-bg { width: 100%; background: #222; height: 7px; border-radius: 3px; overflow: hidden; }
+        .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.2s ease; }
 
-        /* RECUADRO TRANSLÚCIDO PARA LOS ATAQUES (ESTILO FREE FIRE HUD) */
+        /* RECUADRO TRANSLÚCIDO PARA LOS ATAQUES (HUD CLÁSICO) */
         .attacks-box-hud {
             background: rgba(20, 20, 35, 0.55);
             backdrop-filter: blur(8px);
@@ -322,12 +303,12 @@
         .round-action-btn:active { transform: scale(0.92); }
         .round-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        #btnFarmearRedondo { background: linear-gradient(135deg, rgba(255,0,85,0.85), rgba(255,170,0,0.85)); border-color: #ffaa00; }
-        #btnPoderRedondo { background: linear-gradient(135deg, rgba(255,170,0,0.85), rgba(255,68,0,0.85)); border-color: #ffaa00; font-size: 16px; }
-        #btnAtaqueRedondo { background: linear-gradient(135deg, rgba(0,255,255,0.85), rgba(0,85,255,0.85)); border-color: #00ffff; }
+        #btnDisparar { background: linear-gradient(135deg, rgba(255,0,85,0.85), rgba(255,170,0,0.85)); border-color: #ffaa00; }
+        #btnEspecial { background: linear-gradient(135deg, rgba(255,170,0,0.85), rgba(255,68,0,0.85)); border-color: #ffaa00; font-size: 16px; }
+        #btnBotiquin { background: linear-gradient(135deg, rgba(0,255,102,0.85), rgba(0,150,80,0.85)); border-color: #00ff66; }
         #btnGlooRedondo { background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(136,204,255,0.85)); border-color: #ffffff; }
 
-        /* Tienda y Chat */
+        /* Tienda */
         .store-bar {
             display: flex;
             gap: 5px;
@@ -346,75 +327,18 @@
         }
         .store-item:hover { border-color: #ffaa00; color: #fff; }
 
-        .chat-burlas { display: flex; gap: 5px; }
-        .chat-btn {
-            background: #1c1c2b;
-            border: 1px solid #444;
-            color: #ddd;
-            font-size: 8px;
-            padding: 5px;
-            border-radius: 5px;
-            flex: 1;
-            cursor: pointer;
-            text-align: center;
-        }
         #chatLog { font-size: 8px; color: #00ffcc; font-style: italic; text-align: center; }
 
-        /* Panel Online */
-        #panelOnline {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: #12121c;
-            border: 2px solid #ffaa00;
-            padding: 18px;
-            border-radius: 12px;
-            z-index: 1000;
-            width: 90%;
-            max-width: 320px;
-            text-align: center;
-            box-shadow: 0 0 35px rgba(0,0,0,0.9);
-            display: none;
-        }
-        #panelOnline h2 { color: #ffaa00; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; }
-        #panelOnline input {
-            width: 100%;
-            padding: 7px;
-            background: #1c1c2b;
-            border: 1px solid #444;
-            color: #fff;
-            border-radius: 5px;
-            font-size: 13px;
-            margin-bottom: 6px;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-        .btn {
-            width: 100%;
-            padding: 7px;
-            background: #ffaa00;
-            color: #030303;
-            border: none;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 9px;
-            margin-bottom: 5px;
-        }
-        .btn-green { background: #00ff66; }
-        .btn-pink { background: #ff0055; color: white; }
-
-        #alertaBooyah {
+        #alertaOleada {
             position: fixed;
             top: 35%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
             background: rgba(0,0,0,0.95);
-            border: 3px solid #ffaa00;
-            color: #ffaa00;
-            padding: 15px 25px;
-            font-size: 15px;
+            border: 3px solid #ff0055;
+            color: #ff0055;
+            padding: 12px 20px;
+            font-size: 14px;
             font-weight: bold;
             border-radius: 12px;
             z-index: 2000;
@@ -423,42 +347,31 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
         }
-        .mostrar-booyah { transform: translate(-50%, -50%) scale(1) !important; }
+        .mostrar-alerta { transform: translate(-50%, -50%) scale(1) !important; }
     </style>
 </head>
 <body>
 
     <div class="particles-container" id="particlesContainer"></div>
-    <div id="efectoHielo"></div>
+    <div id="efectoDaño"></div>
     <div id="efectoGloo"></div>
-    <div id="alertaBooyah">🔥 ¡ÚLTIMA RONDA DE AURA! 🔥</div>
+    <div id="alertaOleada">🧟 ¡OLEADA 2 ENTRANTE! 🧟</div>
 
-    <div id="panelOnline">
-        <h2>🌐 Sala Privada Plaza 1v1</h2>
-        <button class="btn btn-green" id="crearSalaBtn">Generar Código Sala</button>
-        <p id="myIdText" style="font-size: 10px; color: #00ff66; font-weight: bold; margin: 4px 0;">Código: ------</p>
-        <input type="text" id="codigoRivalInput" placeholder="Código de sala" maxlength="6">
-        <button class="btn btn-pink" id="unirseSalaBtn">Entrar a Sala</button>
-        <p id="connectionStatus" style="font-size: 8px; color: #aaa; margin-top: 3px;">Estado: Desconectado</p>
-        <button class="btn" style="background:#444; color:#fff; margin-top:6px;" onclick="cerrarPanelOnline()">Cerrar</button>
-    </div>
-
+    <!-- CONTENEDOR PRINCIPAL -->
     <div class="app-container">
         
+        <!-- PARTE SUPERIOR: Estadísticas de Supervivencia -->
         <div class="top-hud">
-            <div class="menu-modes">
-                <button class="mode-btn active" id="btnModoCPU" onclick="cambiarModo('cpu')">MODO VS BOT</button>
-                <button class="mode-btn" id="btnModoOnline" onclick="cambiarModo('online')">MULTIJUGADOR 1V1</button>
-            </div>
-            <div class="selector-box-mini" style="margin-top: 4px;">
-                <div class="char-option activo" onclick="cambiarGuerrero('🥷', 'Alok', '#ffaa00', this)">🥷</div>
-                <div class="char-option" onclick="cambiarGuerrero('🕵️‍♂️', 'Chrono', '#00ffff', this)">🕵️‍♂️</div>
-                <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', 'Criminal', '#ff0055', this)">🦹‍♂️</div>
-                <div class="char-option" onclick="cambiarGuerrero('🤖', 'Kenta', '#00ff66', this)">🤖</div>
+            <div class="hud-stats">
+                <span>🛡️ OLEADA: <span id="txtOleada">1</span></span>
+                <span>💎 ORO: <span id="txtOro">0</span></span>
+                <span>💀 BAJAS: <span id="txtBajas">0</span></span>
             </div>
         </div>
 
+        <!-- CENTRO: Arena de Supervivencia -->
         <div class="battle-arena" id="arenaBox">
+            <!-- JUGADOR -->
             <div class="fighter" id="fighterP1">
                 <div class="fighter-model" id="modelP1">
                     <div class="body-container">
@@ -468,62 +381,48 @@
                             <div class="arm right"></div>
                         </div>
                         <div class="legs">
-                            <div class="leg left" id="legLeftP1"></div>
-                            <div class="leg right" id="legRightP1"></div>
+                            <div class="leg left"></div>
+                            <div class="leg right"></div>
                         </div>
                     </div>
                     <div class="fighter-skin-name" id="skinNameP1">Alok</div>
                 </div>
-                <div class="fighter-score" id="scoreP1" style="color: #00ff66;">0</div>
             </div>
 
-            <div class="fighter" id="fighterP2">
-                <div class="fighter-model" id="modelP2">
-                    <div class="body-container">
-                        <div class="head" id="headP2">🤖</div>
-                        <div class="torso" id="torsoP2" style="background: #00ff66;">
-                            <div class="arm left"></div>
-                            <div class="arm right"></div>
-                        </div>
-                        <div class="legs">
-                            <div class="leg left" id="legLeftP2"></div>
-                            <div class="leg right" id="legRightP2"></div>
-                        </div>
-                    </div>
-                    <div class="fighter-skin-name" id="skinNameP2">Bot FF</div>
-                </div>
-                <div class="fighter-score" id="scoreP2" style="color: #ff0055;">0</div>
-            </div>
+            <!-- CONTENEDOR DE ENEMIGOS ACTIVOS -->
+            <div id="enemiesArea"></div>
         </div>
 
+        <!-- CONTROLES E INTERFAZ INFERIOR -->
         <div class="controls-hud">
             
             <div class="mid-controls-row">
                 <div class="joystick-group">
-                    <button class="joy-btn" onmousedown="moverAvatar(-1)" ontouchstart="moverAvatar(-1)">◀</button>
-                    <button class="joy-btn" onmousedown="moverAvatar(1)" ontouchstart="moverAvatar(1)">▶</button>
+                    <button class="joy-btn" onmousedown="moverJugador(-1)" ontouchstart="moverJugador(-1)">◀</button>
+                    <button class="joy-btn" onmousedown="moverJugador(1)" ontouchstart="moverJugador(1)">▶</button>
                 </div>
-                <div class="energy-container">
-                    <div class="energy-label">
-                        <span>⚡ ESTAMINA</span>
-                        <span id="energyText">100%</span>
+                <div class="hp-container">
+                    <div class="hp-label">
+                        <span>❤️ VIDA (HP)</span>
+                        <span id="hpText">100 HP</span>
                     </div>
-                    <div class="energy-bar-bg">
-                        <div class="energy-bar-fill" id="energyFill"></div>
+                    <div class="hp-bar-bg">
+                        <div class="hp-bar-fill" id="hpFill"></div>
                     </div>
                 </div>
             </div>
 
+            <!-- RECUADRO TRANSLÚCIDO PARA LOS ATAQUES (ESTILO FREE FIRE HUD) -->
             <div class="attacks-box-hud">
                 <div class="actions-grid">
-                    <button class="round-action-btn" id="btnFarmearRedondo" title="Farmear">
-                        🔥<span>Aura</span>
+                    <button class="round-action-btn" id="btnDisparar" onclick="dispararArma()" title="Disparar">
+                        🎯<span>Disparo</span>
                     </button>
-                    <button class="round-action-btn" id="btnPoderRedondo" onclick="usarPoderEspecial()" title="Baile">
-                        ⚡<span>Baile</span>
+                    <button class="round-action-btn" id="btnEspecial" onclick="usarHabilidadEspecial()" title="Habilidad">
+                        ⚡<span>Aura</span>
                     </button>
-                    <button class="round-action-btn" id="btnAtaqueRedondo" onclick="lanzarAtaqueRival()" title="Hielo">
-                        🧊<span>Hielo</span>
+                    <button class="round-action-btn" id="btnBotiquin" onclick="usarBotiquin()" title="Botiquín">
+                        💉<span>Curar</span>
                     </button>
                     <button class="round-action-btn" id="btnGlooRedondo" onclick="activarParedGloo()" title="Pared Gloo">
                         🛡️<span>Gloo</span>
@@ -531,50 +430,29 @@
                 </div>
             </div>
 
+            <!-- Tienda de Armas y Mejoras -->
             <div class="store-bar">
-                <div class="store-item" onclick="comprarMejora(500, 2, 'Criminal', '#ff0055')">🎭 Crim (500)</div>
-                <div class="store-item" onclick="comprarMejora(3000, 5, 'MP40 Max', '#00ffff')">⚡ MP40 (3k)</div>
-                <div class="store-item" onclick="comprarMejora(10000, 15, 'Angelical', '#ffffff')">🪽 Botas (10k)</div>
+                <div class="store-item" onclick="comprarArma(100, 2, 'MP40 Max', '#00ffff')">⚡ MP40 (100G)</div>
+                <div class="store-item" onclick="comprarArma(300, 4, 'Scar Titan', '#ff0055')">🔥 SCAR (300G)</div>
+                <div class="store-item" onclick="comprarArma(600, 8, 'M1887 Dragón', '#ffffff')">🐉 M1887 (600G)</div>
             </div>
 
-            <div id="chatLog">¡Listo para la batalla!</div>
-            
-            <div class="chat-burlas">
-                <button class="chat-btn" onclick="enviarMensajeChat('¡Ya aguanta JAJJAJJA! 🗿')">🗿 Ya aguanta</button>
-                <button class="chat-btn" onclick="enviarMensajeChat('¡Manco de sala! 🔥')">🔥 Manco</button>
-                <button class="chat-btn" onclick="enviarMensajeChat('¡GG facilito! ⚡')">⚡ GG</button>
-            </div>
+            <div id="chatLog">¡Sobrevive a las oleadas de enemigos!</div>
 
         </div>
 
     </div>
 
     <script>
-        let modoJuego = 'cpu';
-        let score1 = 0, score2 = 0;
-        let estamina = 100;
-        let multiplicador = 1;
-        let estaCansado = false;
-        let avatarActual = '🥷';
-        let skinNombreActual = 'Alok';
-        let colorSkinActual = '#ffaa00';
-        let poderCargado = true;
-        let ataqueCargado = true;
-        let escudoActivo = false;
-        let alertaMostrada = false;
-        
+        let vida = 100;
+        let oro = 0;
+        let bajas = 0;
+        let oleada = 1;
+        let dañoArma = 1;
         let posX1 = 30;
-        let posX2 = 30;
-        let peer, conn, botInterval;
-
-        const peerOptions = {
-            config: {
-                'iceServers': [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:global.stun.twilio.com:3478' }
-                ]
-            }
-        };
+        let escudoActivo = false;
+        let enemies = [];
+        let gameActive = true;
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function reproducirSonido(frecuencia, tipo, duracion) {
@@ -591,44 +469,164 @@
             osc.stop(audioCtx.currentTime + duracion);
         }
 
-        function moverAvatar(direccion) {
-            posX1 = Math.max(10, Math.min(180, posX1 + (direccion * 15)));
-            let f1 = document.getElementById("fighterP1");
-            f1.style.left = posX1 + "px";
-            
-            let model = document.getElementById("modelP1");
-            model.classList.add("caminando");
-            reproducirSonido(400, 'sine', 0.05);
-
-            setTimeout(() => {
-                model.classList.remove("caminando");
-            }, 300);
-
-            sincronizarDatos();
+        function moverJugador(direccion) {
+            posX1 = Math.max(10, Math.min(150, posX1 + (direccion * 12));
+            document.getElementById("fighterP1").style.left = posX1 + "px";
+            reproducirSonido(400, 'sine', 0.04);
         }
 
-        // Partículas flotantes
+        // Partículas flotantes de fondo
         setInterval(() => {
             let container = document.getElementById("particlesContainer");
-            if(container.childElementCount > 12) return;
+            if(container.childElementCount > 10) return;
             let p = document.createElement("div");
             p.className = "particle";
-            let iconos = ['🔥', '⚡', '💎', '🧊', '🎭', '⭐'];
+            let iconos = ['🔥', '⚡', '💥', '💀'];
             p.textContent = iconos[Math.floor(Math.random() * iconos.length)];
             p.style.left = Math.random() * 100 + "vw";
-            p.style.animationDuration = (3 + Math.random() * 3) + "s";
+            p.style.animationDuration = (3 + Math.random() * 2) + "s";
             container.appendChild(p);
-            setTimeout(() => p.remove(), 5000);
-        }, 800);
+            setTimeout(() => p.remove(), 4000);
+        }, 1000);
 
-        function mostrarEfectoHieloVisual() {
-            if(escudoActivo) {
-                document.getElementById("chatLog").textContent = "¡Tu Pared Gloo bloqueó el Globo de Hielo!";
+        function dispararArma() {
+            if (!gameActive) return;
+            reproducirSonido(800, 'sawtooth', 0.08);
+
+            // Crear efecto de bala visual saliendo del jugador
+            let arena = document.getElementById("arenaBox");
+            let bala = document.createElement("div");
+            bala.className = "bullet-effect";
+            bala.style.left = (posX1 + 40) + "px";
+            bala.style.bottom = "40px";
+            arena.appendChild(bala);
+            setTimeout(() => bala.remove(), 150);
+
+            // Impactar al enemigo más cercano que esté en rango
+            if (enemies.length > 0) {
+                // Ordenar enemigos por cercanía
+                let target = enemies[0];
+                target.hp -= dañoArma;
+                
+                if (target.hp <= 0) {
+                    eliminarEnemigo(target);
+                } else {
+                    actualizarRenderEnemigos();
+                }
+            }
+        }
+
+        function spawnEnemigos() {
+            if (!gameActive) return;
+            let cantidad = 2 + oleada;
+            enemies = [];
+            for (let i = 0; i < cantidad; i++) {
+                let enemigoX = 320 + (i * 65);
+                enemies.push({
+                    id: Math.random(),
+                    x: enemigoX,
+                    hp: 2 * oleada,
+                    maxHp: 2 * oleada,
+                    tipo: oleada >= 3 ? '🤖' : '🧟'
+                });
+            }
+            actualizarRenderEnemigos();
+        }
+
+        function actualizarRenderEnemigos() {
+            let area = document.getElementById("enemiesArea");
+            area.innerHTML = '';
+            enemies.forEach(en => {
+                let div = document.createElement("div");
+                div.className = "enemy-container";
+                div.style.left = en.x + "px";
+                div.innerHTML = `
+                    <div class="fighter-model">
+                        <div class="body-container">
+                            <div class="head">${en.tipo}</div>
+                            <div class="torso" style="background: #ff0055;">
+                                <div class="arm left" style="background:#ff0055;"></div>
+                                <div class="arm right" style="background:#ff0055;"></div>
+                            </div>
+                            <div class="legs"><div class="leg left"></div><div class="leg right"></div></div>
+                        </div>
+                        <div class="fighter-skin-name" style="color:#ff0055;">HP: ${en.hp}</div>
+                    </div>
+                `;
+                area.appendChild(div);
+            });
+        }
+
+        // Bucle Principal de Movimiento de Enemigos y Supervivencia
+        setInterval(() => {
+            if (!gameActive) return;
+
+            if (enemies.length === 0) {
+                oleada++;
+                document.getElementById("txtOleada").textContent = oleada;
+                let alerta = document.getElementById("alertaOleada");
+                alerta.innerHTML = `🔥 ¡OLEADA ${oleada} INICIADA! 🔥`;
+                alerta.classList.add("mostrar-alerta");
+                setTimeout(() => alerta.classList.remove("mostrar-alerta"), 2000);
+                spawnEnemigos();
+            }
+
+            // Mover enemigos hacia la izquierda (hacia el jugador)
+            enemies.forEach(en => {
+                en.x -= 2 + (oleada * 0.3);
+                // Si el enemigo toca al jugador
+                if (en.x <= posX1 + 25) {
+                    recibirDaño(10);
+                    en.x += 60; // Empujar hacia atrás al golpear
+                }
+            });
+
+            actualizarRenderEnemigos();
+        }, 100);
+
+        function recibirDaño(cantidad) {
+            if (escudoActivo) {
+                document.getElementById("chatLog").textContent = "🛡️ ¡Pared Gloo bloqueó el ataque enemigo!";
                 return;
             }
-            let overlay = document.getElementById("efectoHielo");
-            overlay.classList.add("congelado");
-            setTimeout(() => overlay.classList.remove("congelado"), 600);
+            vida = Math.max(0, vida - cantidad);
+            document.getElementById("hpFill").style.width = vida + "%";
+            document.getElementById("hpText").textContent = vida + " HP";
+
+            let overlay = document.getElementById("efectoDaño");
+            overlay.classList.add("recibiendo-daño");
+            setTimeout(() => overlay.classList.remove("recibiendo-daño"), 200);
+            reproducirSonido(120, 'sawtooth', 0.2);
+
+            if (vida <= 0) {
+                gameActive = false;
+                alert("💀 ¡TE ELIMINARON! Fin de la partida en Oleada " + oleada);
+                location.reload();
+            }
+        }
+
+        function eliminarEnemigo(en) {
+            enemies = enemies.filter(e => e.id !== en.id);
+            bajas++;
+            oro += 25 * oleada;
+            document.getElementById("txtBajas").textContent = bajas;
+            document.getElementById("txtOro").textContent = oro;
+            reproducirSonido(600, 'sine', 0.15);
+            actualizarRenderEnemigos();
+        }
+
+        function usarBotiquin() {
+            if (oro >= 50 && vida < 100) {
+                oro -= 50;
+                vida = Math.min(100, vida + 40);
+                document.getElementById("txtOro").textContent = oro;
+                document.getElementById("hpFill").style.width = vida + "%";
+                document.getElementById("hpText").textContent = vida + " HP";
+                reproducirSonido(700, 'triangle', 0.3);
+                document.getElementById("chatLog").textContent = "💉 ¡Botiquín usado con éxito (+40 HP)!";
+            } else {
+                document.getElementById("chatLog").textContent = "¡Necesitas 50 de oro o estar herido!";
+            }
         }
 
         function activarParedGloo() {
@@ -636,7 +634,7 @@
             let escudoOverlay = document.getElementById("efectoGloo");
             escudoOverlay.classList.add("escudo-activo");
             reproducirSonido(700, 'triangle', 0.3);
-            document.getElementById("chatLog").textContent = "🛡️ ¡Pared Gloo colocada! Inmune al siguiente ataque.";
+            document.getElementById("chatLog").textContent = "🛡️ ¡Pared Gloo desplegada! Inmune por 5 segundos.";
             
             let btnGloo = document.getElementById("btnGlooRedondo");
             btnGloo.disabled = true;
@@ -644,9 +642,9 @@
             setTimeout(() => {
                 escudoActivo = false;
                 escudoOverlay.classList.remove("escudo-activo");
-            }, 4000);
+            }, 5000);
 
-            let tiempo = 10;
+            let tiempo = 8;
             let span = btnGloo.querySelector('span');
             let intervalo = setInterval(() => {
                 span.textContent = `${tiempo}s`;
@@ -659,290 +657,34 @@
             }, 1000);
         }
 
-        function cambiarModo(modo) {
-            modoJuego = modo;
-            reiniciarPartida();
-            if(modo === 'cpu') {
-                document.getElementById('btnModoCPU').classList.add('active');
-                document.getElementById('btnModoOnline').classList.remove('active');
-                document.getElementById('panelOnline').style.display = 'none';
-                document.getElementById('headP2').textContent = "🤖";
-                document.getElementById('skinNameP2').textContent = "Bot FF";
-                document.getElementById('torsoP2').style.background = "#00ff66";
-                document.querySelectorAll('#fighterP2 .arm').forEach(a => a.style.background = "#00ff66");
-                iniciarBot();
-            } else {
-                document.getElementById('btnModoOnline').classList.add('active');
-                document.getElementById('btnModoCPU').classList.remove('active');
-                document.getElementById('panelOnline').style.display = 'block';
-                if(botInterval) clearInterval(botInterval);
+        function usarHabilidadEspecial() {
+            reproducirSonido(900, 'square', 0.3);
+            // Eliminar al enemigo más cercano automáticamente con la habilidad
+            if (enemies.length > 0) {
+                eliminarEnemigo(enemies[0]);
+                document.getElementById("chatLog").textContent = "⚡ ¡Habilidad Alok activada! Enemigo abatido.";
             }
         }
 
-        function cerrarPanelOnline() {
-            document.getElementById('panelOnline').style.display = 'none';
-        }
-
-        function cambiarGuerrero(emoji, nombreSkin, colorHex, el) {
-            document.querySelectorAll('.char-option').forEach(e => e.classList.remove('activo'));
-            el.classList.add('activo');
-            avatarActual = emoji;
-            skinNombreActual = nombreSkin;
-            colorSkinActual = colorHex;
-            
-            document.getElementById("headP1").textContent = emoji;
-            document.getElementById("skinNameP1").textContent = nombreSkin;
-            document.getElementById("torsoP1").style.background = colorHex;
-            document.querySelectorAll('#fighterP1 .arm').forEach(a => a.style.background = colorHex);
-            
-            reproducirSonido(600, 'sine', 0.1);
-            sincronizarDatos();
-        }
-
-        function comprarMejora(costo, multValor, nombre, colorHex) {
-            if (score1 >= costo) {
-                score1 -= costo;
-                multiplicador = multValor;
-                skinNombreActual = nombre;
-                colorSkinActual = colorHex;
-                
-                document.getElementById("scoreP1").textContent = score1;
+        function comprarArma(costo, dañoNuevo, nombre, colorHex) {
+            if (oro >= costo) {
+                oro -= costo;
+                dañoArma = dañoNuevo;
+                document.getElementById("txtOro").textContent = oro;
                 document.getElementById("skinNameP1").textContent = nombre;
                 document.getElementById("torsoP1").style.background = colorHex;
                 document.querySelectorAll('#fighterP1 .arm').forEach(a => a.style.background = colorHex);
 
-                reproducirSonido(880, 'triangle', 0.3);
-                document.getElementById("chatLog").textContent = `¡Equipado ${nombre} (x${multiplicador})!`;
-                sincronizarDatos();
+                reproducirSonido(950, 'triangle', 0.3);
+                document.getElementById("chatLog").textContent = `¡Arma comprada: ${nombre} (Daño x${dañoNuevo})!`;
             } else {
                 reproducirSonido(150, 'sawtooth', 0.2);
-                document.getElementById("chatLog").textContent = "¡Faltan puntos de aura!";
+                document.getElementById("chatLog").textContent = "¡Oro insuficiente para esta arma!";
             }
         }
 
-        function usarPoderEspecial() {
-            if (!poderCargado) return;
-            score1 += 25 * multiplicador;
-            document.getElementById("scoreP1").textContent = score1;
-            reproducirSonido(900, 'square', 0.4);
-            
-            poderCargado = false;
-            let btnPoder = document.getElementById("btnPoderRedondo");
-            btnPoder.disabled = true;
-            let span = btnPoder.querySelector('span');
-            let tiempo = 8;
-            let intervalo = setInterval(() => {
-                span.textContent = `${tiempo}s`;
-                tiempo--;
-                if(tiempo < 0) {
-                    clearInterval(intervalo);
-                    poderCargado = true;
-                    btnPoder.disabled = false;
-                    span.textContent = "Baile";
-                }
-            }, 1000);
-            sincronizarDatos();
-            verificarGanador();
-        }
-
-        function lanzarAtaqueRival() {
-            if (!ataqueCargado) return;
-            reproducirSonido(200, 'sawtooth', 0.4);
-            
-            let f2 = document.getElementById("fighterP2");
-            f2.classList.add("recibir-impacto");
-            setTimeout(() => f2.classList.remove("recibir-impacto"), 400);
-
-            ataqueCargado = false;
-            let btnAtaque = document.getElementById("btnAtaqueRedondo");
-            btnAtaque.disabled = true;
-            let span = btnAtaque.querySelector('span');
-
-            if (conn && conn.open) {
-                conn.send({ tipo: 'ataque', valor: 10 });
-            } else if (modoJuego === 'cpu') {
-                score2 = Math.max(0, score2 - 10);
-                document.getElementById("scoreP2").textContent = score2;
-                document.getElementById("chatLog").textContent = "¡Lanzaste Globo de Hielo al Bot!";
-            }
-
-            let tiempo = 6;
-            let intervalo = setInterval(() => {
-                span.textContent = `${tiempo}s`;
-                tiempo--;
-                if(tiempo < 0) {
-                    clearInterval(intervalo);
-                    ataqueCargado = true;
-                    btnAtaque.disabled = false;
-                    span.textContent = "Hielo";
-                }
-            }, 1000);
-        }
-
-        function enviarMensajeChat(texto) {
-            document.getElementById("chatLog").textContent = "Tú: " + texto;
-            if (conn && conn.open) conn.send({ tipo: 'chat', contenido: texto });
-        }
-
-        function iniciarBot() {
-            if(botInterval) clearInterval(botInterval);
-            botInterval = setInterval(() => {
-                if(modoJuego === 'cpu' && score1 < 150 && score2 < 150) {
-                    if(Math.random() > 0.4) {
-                        score2 += 1;
-                        document.getElementById("scoreP2").textContent = score2;
-                        
-                        posX2 = Math.max(10, Math.min(180, posX2 + (Math.random() > 0.5 ? 10 : -10)));
-                        document.getElementById("fighterP2").style.right = posX2 + "px";
-                        
-                        let modelP2 = document.getElementById("modelP2");
-                        modelP2.classList.add("caminando-rival");
-                        setTimeout(() => modelP2.classList.remove("caminando-rival"), 300);
-
-                        verificarGanador();
-                    }
-                }
-            }, 700);
-        }
-
-        const btnFarmear = document.getElementById("btnFarmearRedondo");
-        btnFarmear.addEventListener("click", () => {
-            if (estaCansado) return;
-
-            score1 += multiplicador;
-            document.getElementById("scoreP1").textContent = score1;
-            reproducirSonido(350 + (multiplicador * 15), 'square', 0.08);
-
-            estamina -= 5;
-            if (estamina <= 0) {
-                estamina = 0;
-                estaCansado = true;
-                btnFarmear.disabled = true;
-                btnFarmear.querySelector('span').textContent = "💤";
-                setTimeout(() => {
-                    estamina = 100;
-                    estaCansado = false;
-                    btnFarmear.disabled = false;
-                    btnFarmear.querySelector('span').textContent = "Aura";
-                }, 2000);
-            }
-            document.getElementById("energyFill").style.width = estamina + "%";
-            document.getElementById("energyText").textContent = estamina + "%";
-
-            sincronizarDatos();
-            verificarGanador();
-        });
-
-        function verificarGanador() {
-            if(score1 >= 120 && !alertaMostrada) {
-                alertaMostrada = true;
-                let alerta = document.getElementById("alertaBooyah");
-                alerta.classList.add("mostrar-booyah");
-                setTimeout(() => alerta.classList.remove("mostrar-booyah"), 2500);
-            }
-
-            if (score1 >= 150) {
-                reproducirSonido(800, 'sine', 0.5);
-                alert("¡Ganaste la batalla de aura!");
-                reiniciarPartida();
-            } else if (score2 >= 150) {
-                reproducirSonido(120, 'sawtooth', 0.6);
-                alert("¡El rival te ganó el duelo de emotes!");
-                reiniciarPartida();
-            }
-        }
-
-        function reiniciarPartida() {
-            score1 = 0; score2 = 0;
-            alertaMostrada = false;
-            document.getElementById("scoreP1").textContent = 0;
-            document.getElementById("scoreP2").textContent = 0;
-            estamina = 100; multiplicador = 1;
-            posX1 = 30; posX2 = 30;
-            document.getElementById("fighterP1").style.left = posX1 + "px";
-            document.getElementById("fighterP2").style.right = posX2 + "px";
-        }
-
-        document.getElementById("crearSalaBtn").addEventListener("click", () => {
-            let codigo = Math.floor(100000 + Math.random() * 900000).toString();
-            document.getElementById("myIdText").textContent = "Código: " + codigo;
-            
-            if(peer) peer.destroy();
-            peer = new Peer("ffsala-" + codigo, peerOptions);
-
-            peer.on('open', () => document.getElementById("connectionStatus").textContent = "Esperando rival en sala...");
-            peer.on('connection', (c) => { 
-                conn = c; 
-                setupConnection(); 
-            });
-            peer.on('error', () => document.getElementById("connectionStatus").textContent = "Error de red.");
-        });
-
-        document.getElementById("unirseSalaBtn").addEventListener("click", () => {
-            let codigoAmigo = document.getElementById("codigoRivalInput").value.trim();
-            if(codigoAmigo.length !== 6) { alert("Ingresa código de 6 dígitos"); return; }
-            
-            document.getElementById("connectionStatus").textContent = "Conectando...";
-            if(peer) peer.destroy();
-            peer = new Peer(undefined, peerOptions);
-
-            peer.on('open', () => {
-                conn = peer.connect("ffsala-" + codigoAmigo);
-                setupConnection();
-            });
-            peer.on('error', () => document.getElementById("connectionStatus").textContent = "No se pudo conectar.");
-        });
-
-        function setupConnection() {
-            document.getElementById("connectionStatus").textContent = "¡Rival conectado!";
-            document.getElementById("chatLog").textContent = "¡Partida 1v1 iniciada!";
-            document.getElementById("panelOnline").style.display = 'none';
-            
-            conn.on('open', () => sincronizarDatos());
-            conn.on('data', (data) => {
-                if(data.tipo === 'chat') {
-                    document.getElementById("chatLog").textContent = "Rival: " + data.contenido;
-                } else if(data.tipo === 'ataque') {
-                    if(!escudoActivo) {
-                        score1 = Math.max(0, score1 - data.valor);
-                        document.getElementById("scoreP1").textContent = score1;
-                        mostrarEfectoHieloVisual();
-                        reproducirSonido(150, 'sawtooth', 0.5);
-                    } else {
-                        document.getElementById("chatLog").textContent = "¡Tu Pared Gloo bloqueó el ataque del rival!";
-                    }
-                } else if(data.score !== undefined) {
-                    score2 = data.score;
-                    document.getElementById("scoreP2").textContent = score2;
-                    if(data.avatar) document.getElementById("headP2").textContent = data.avatar;
-                    if(data.skinNombre) document.getElementById("skinNameP2").textContent = data.skinNombre;
-                    if(data.colorSkin) {
-                        document.getElementById("torsoP2").style.background = data.colorSkin;
-                        document.querySelectorAll('#fighterP2 .arm').forEach(a => a.style.background = data.colorSkin);
-                    }
-                    if(data.posX !== undefined) {
-                        posX2 = data.posX;
-                        document.getElementById("fighterP2").style.right = posX2 + "px";
-                        let modelP2 = document.getElementById("modelP2");
-                        modelP2.classList.add("caminando-rival");
-                        setTimeout(() => modelP2.classList.remove("caminando-rival"), 300);
-                    }
-                    verificarGanador();
-                }
-            });
-        }
-
-        function sincronizarDatos() {
-            if (conn && conn.open) {
-                conn.send({ 
-                    score: score1, 
-                    avatar: avatarActual, 
-                    skinNombre: skinNombreActual, 
-                    colorSkin: colorSkinActual,
-                    posX: posX1
-                });
-            }
-        }
+        // Inicializar primera oleada
+        spawnEnemigos();
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Batalla de Aura: Free Fire HUD Inmersivo</title>
+    <title>Batalla de Aura: Free Fire HUD</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -18,13 +18,14 @@
             height: 100vh;
             background-color: #05050a;
             color: #f0f0f0;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
             user-select: none;
         }
 
         .particles-container {
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 1;
@@ -68,25 +69,25 @@
         }
         .escudo-activo { opacity: 1 !important; }
 
-        /* --- PANTALLA COMPLETA HUD TIPO FREE FIRE --- */
-        .fullscreen-hud {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+        /* CONTENEDOR PRINCIPAL */
+        .app-container {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            gap: 6px;
             padding: 8px;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
             z-index: 5;
-            pointer-events: none;
+            padding-bottom: 30px;
         }
-        .hud-element { pointer-events: auto; }
 
-        /* BARRA SUPERIOR: Modos y Selector minimizable o compacto */
+        /* BARRA SUPERIOR */
         .top-hud {
             display: flex;
             flex-direction: column;
             gap: 4px;
-            background: rgba(18, 18, 28, 0.85);
+            background: rgba(18, 18, 28, 0.9);
             border: 1px solid #ffaa00;
             border-radius: 8px;
             padding: 6px;
@@ -101,8 +102,8 @@
             background: #171727;
             border: 1px solid #ffaa00;
             color: #ffaa00;
-            padding: 4px;
-            font-size: 9px;
+            padding: 6px;
+            font-size: 10px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
@@ -112,54 +113,52 @@
         .selector-box-mini {
             display: flex;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
         }
         .char-option {
-            font-size: 16px;
+            font-size: 18px;
             background: #1f1f33;
             border: 1px solid #444;
-            padding: 2px 6px;
+            padding: 3px 8px;
             border-radius: 4px;
             cursor: pointer;
         }
         .char-option.activo { border-color: #00ff66; background: #113322; box-shadow: 0 0 8px #00ff66; }
 
-        /* --- ARENA DE BATALLA GIGANTE (OCUPA EL CENTRO) --- */
+        /* ARENA DE BATALLA VISIBLE */
         .battle-arena {
-            flex: 1;
+            height: 140px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, rgba(27, 38, 59, 0.9), rgba(13, 27, 42, 0.9));
+            background: linear-gradient(135deg, rgba(27, 38, 59, 0.95), rgba(13, 27, 42, 0.95));
             border: 2px solid #00ffff;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 10px;
-            margin: 6px 0;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 35px rgba(0, 255, 255, 0.3), 0 0 15px rgba(0,255,255,0.2);
+            box-shadow: inset 0 0 25px rgba(0, 255, 255, 0.2);
         }
         .battle-arena::after {
             content: "";
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            height: 6px;
+            height: 4px;
             background: linear-gradient(90deg, #00ffff, #ff00ff, #ffaa00);
-            opacity: 0.9;
         }
 
         .fighter {
             position: absolute;
-            bottom: 15px;
+            bottom: 10px;
             text-align: center;
             transition: left 0.1s linear, right 0.1s linear;
         }
-        #fighterP1 { left: 40px; }
-        #fighterP2 { right: 40px; }
+        #fighterP1 { left: 35px; }
+        #fighterP2 { right: 35px; }
 
         .fighter-model {
-            width: 65px;
-            height: 95px;
+            width: 55px;
+            height: 85px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -169,37 +168,37 @@
 
         .body-container {
             position: relative;
-            width: 32px;
-            height: 65px;
+            width: 28px;
+            height: 55px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .head { font-size: 22px; line-height: 22px; z-index: 2; filter: drop-shadow(0 0 4px rgba(255,255,255,0.6)); }
+        .head { font-size: 20px; line-height: 20px; z-index: 2; filter: drop-shadow(0 0 4px rgba(255,255,255,0.6)); }
         .torso {
-            width: 20px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             background: #ffaa00;
-            border-radius: 4px;
+            border-radius: 3px;
             position: relative;
             margin-top: -2px;
             z-index: 2;
         }
         .arm {
             position: absolute;
-            width: 5px;
-            height: 18px;
+            width: 4px;
+            height: 14px;
             background: #ffaa00;
             border-radius: 2px;
-            top: 2px;
+            top: 1px;
         }
-        .arm.left { left: -7px; transform-origin: top center; transform: rotate(10deg); }
-        .arm.right { right: -7px; transform-origin: top center; transform: rotate(-10deg); }
+        .arm.left { left: -6px; transform-origin: top center; transform: rotate(10deg); }
+        .arm.right { right: -6px; transform-origin: top center; transform: rotate(-10deg); }
 
-        .legs { display: flex; gap: 4px; margin-top: 1px; z-index: 1; }
+        .legs { display: flex; gap: 3px; margin-top: 1px; z-index: 1; }
         .leg {
-            width: 5px;
-            height: 18px;
+            width: 4px;
+            height: 14px;
             background: #33334d;
             border-radius: 2px;
             position: relative;
@@ -208,21 +207,21 @@
             content: '';
             position: absolute;
             bottom: -2px;
-            width: 8px;
-            height: 3px;
+            width: 6px;
+            height: 2px;
             background: #111;
             border-radius: 2px;
         }
-        .leg.left::after { right: -2px; }
-        .leg.right::after { left: -2px; }
+        .leg.left::after { right: -1px; }
+        .leg.right::after { left: -1px; }
 
         @keyframes caminarPernasIzq {
             0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(-25deg); }
+            50% { transform: rotate(-20deg); }
         }
         @keyframes caminarPernasDer {
             0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(25deg); }
+            50% { transform: rotate(20deg); }
         }
         .caminando #legLeftP1 { animation: caminarPernasIzq 0.25s infinite alternate ease-in-out; }
         .caminando #legRightP1 { animation: caminarPernasDer 0.25s infinite alternate ease-in-out; }
@@ -239,104 +238,115 @@
             text-transform: uppercase;
             white-space: nowrap;
         }
-        .fighter-score { font-size: 16px; font-weight: bold; text-shadow: 0 0 10px currentColor; }
+        .fighter-score { font-size: 14px; font-weight: bold; text-shadow: 0 0 8px currentColor; }
 
-        /* --- HUD INFERIOR: DISTRIBUCIÓN ESTILO JUEGO DE CELULAR --- */
+        /* PANEL DE CONTROLES INFERIOR ORDENADO */
         .controls-hud {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            width: 100%;
-            gap: 10px;
-        }
-
-        /* Lado Izquierdo: Joystick de Movimiento */
-        .joystick-group {
-            display: flex;
-            gap: 6px;
-            background: rgba(18, 18, 28, 0.85);
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(18, 18, 28, 0.9);
             border: 1px solid #444;
             padding: 8px;
-            border-radius: 12px;
-            backdrop-filter: blur(4px);
+            border-radius: 10px;
+        }
+
+        /* Fila de Movimiento y Energía */
+        .mid-controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .joystick-group {
+            display: flex;
+            gap: 4px;
         }
         .joy-btn {
-            width: 50px;
-            height: 45px;
-            background: rgba(37, 37, 56, 0.9);
-            border: 2px solid #ffaa00;
+            width: 42px;
+            height: 38px;
+            background: #252538;
+            border: 1px solid #ffaa00;
             color: #ffaa00;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .joy-btn:active { background: #ffaa00; color: #080810; transform: scale(0.95); }
+        .joy-btn:active { background: #ffaa00; color: #080810; }
 
-        /* Centro inferior: Barra de Energía y Chat rápido */
-        .center-group {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            background: rgba(18, 18, 28, 0.85);
-            border: 1px solid #444;
-            padding: 6px;
-            border-radius: 10px;
-            backdrop-filter: blur(4px);
-        }
         .energy-container {
-            width: 100%;
+            flex: 1;
         }
         .energy-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
-        .energy-bar-bg { width: 100%; background: #222; height: 5px; border-radius: 3px; overflow: hidden; }
+        .energy-bar-bg { width: 100%; background: #222; height: 6px; border-radius: 3px; overflow: hidden; }
         .energy-bar-fill { width: 100%; background: linear-gradient(90deg, #ffaa00, #00ff66); height: 100%; }
 
-        .chat-burlas { display: flex; gap: 3px; }
+        /* SECCIÓN DE ATAQUES: BOTONES REDONDOS POR UN LADO */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            justify-items: center;
+        }
+        .round-action-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            font-size: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            transition: transform 0.1s;
+        }
+        .round-action-btn span { font-size: 8px; font-weight: bold; margin-top: -2px; color: #fff; text-shadow: 0 1px 2px #000; }
+        .round-action-btn:active { transform: scale(0.92); }
+        .round-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* Colores de ataques redondos */
+        #btnFarmearRedondo { background: linear-gradient(135deg, #ff0055, #ffaa00); border-color: #ffaa00; }
+        #btnPoderRedondo { background: linear-gradient(135deg, #ffaa00, #ff4400); border-color: #ffaa00; font-size: 16px; }
+        #btnAtaqueRedondo { background: linear-gradient(135deg, #00ffff, #0055ff); border-color: #00ffff; }
+        #btnGlooRedondo { background: linear-gradient(135deg, #ffffff, #88ccff); border-color: #ffffff; }
+
+        /* Tienda y Chat Compactos */
+        .store-bar {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+        .store-item { 
+            background: #1f1f33; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 8px; 
+            text-align: center; 
+            border: 1px solid #333; 
+            cursor: pointer;
+            color: #ccc;
+            flex: 1;
+        }
+        .store-item:hover { border-color: #ffaa00; color: #fff; }
+
+        .chat-burlas { display: flex; gap: 4px; }
         .chat-btn {
             background: #1c1c2b;
             border: 1px solid #444;
             color: #ddd;
             font-size: 8px;
-            padding: 3px;
-            border-radius: 3px;
+            padding: 4px;
+            border-radius: 4px;
             flex: 1;
             cursor: pointer;
             text-align: center;
         }
-        #chatLog { font-size: 8px; color: #00ffcc; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #chatLog { font-size: 8px; color: #00ffcc; font-style: italic; text-align: center; }
 
-        /* Lado Derecho: Botones Redondos de Ataques y Habilidades */
-        .action-buttons-group {
-            display: grid;
-            grid-template-columns: repeat(2, 50px);
-            grid-template-rows: repeat(2, 50px);
-            gap: 8px;
-        }
-        .round-action-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            transition: transform 0.1s;
-        }
-        .round-action-btn:active { transform: scale(0.9); }
-        .round-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-        /* Colores específicos para botones redondos */
-        #btnFarmearRedondo { background: linear-gradient(135deg, #ff0055, #ffaa00); border-color: #ffaa00; }
-        #btnPoderRedondo { background: linear-gradient(135deg, #ffaa00, #ff4400); border-color: #ffaa00; font-size: 14px; }
-        #btnAtaqueRedondo { background: linear-gradient(135deg, #00ffff, #0055ff); border-color: #00ffff; }
-        #btnGlooRedondo { background: linear-gradient(135deg, #ffffff, #88ccff); border-color: #ffffff; }
-
-        /* Panel Online Ocultable */
+        /* Panel Online */
         #panelOnline {
             position: fixed;
             top: 50%; left: 50%;
@@ -381,38 +391,16 @@
         .btn-green { background: #00ff66; }
         .btn-pink { background: #ff0055; color: white; }
 
-        /* Tienda compacta flotante opcional o integrada */
-        .store-bar {
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-            background: rgba(18, 18, 28, 0.85);
-            padding: 4px;
-            border-radius: 6px;
-            border: 1px dashed #555;
-        }
-        .store-item { 
-            background: #1f1f33; 
-            padding: 3px 6px; 
-            border-radius: 4px; 
-            font-size: 7px; 
-            text-align: center; 
-            border: 1px solid #333; 
-            cursor: pointer;
-            color: #ccc;
-        }
-        .store-item:hover { border-color: #ffaa00; color: #fff; }
-
         #alertaBooyah {
             position: fixed;
-            top: 30%;
+            top: 35%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             border: 3px solid #ffaa00;
             color: #ffaa00;
-            padding: 15px 30px;
-            font-size: 16px;
+            padding: 15px 25px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 12px;
             z-index: 2000;
@@ -431,44 +419,32 @@
     <div id="efectoGloo"></div>
     <div id="alertaBooyah">🔥 ¡ÚLTIMA RONDA DE AURA! 🔥</div>
 
-    <!-- PANEL ONLINE FLOTANTE -->
     <div id="panelOnline">
         <h2>🌐 Sala Privada Plaza 1v1</h2>
         <button class="btn btn-green" id="crearSalaBtn">Generar Código Sala</button>
         <p id="myIdText" style="font-size: 10px; color: #00ff66; font-weight: bold; margin: 4px 0;">Código: ------</p>
-        <input type="text" id="codigoRivalInput" placeholder="Código de la sala" maxlength="6">
+        <input type="text" id="codigoRivalInput" placeholder="Código de sala" maxlength="6">
         <button class="btn btn-pink" id="unirseSalaBtn">Entrar a Sala</button>
         <p id="connectionStatus" style="font-size: 8px; color: #aaa; margin-top: 2px;">Estado: Desconectado</p>
         <button class="btn" style="background:#444; color:#fff; margin-top:6px;" onclick="cerrarPanelOnline()">Cerrar</button>
     </div>
 
-    <!-- HUD TOTAL PANTALLA COMPLETA -->
-    <div class="fullscreen-hud">
+    <div class="app-container">
         
-        <!-- PARTE SUPERIOR: Modos, skins y tienda rápida -->
-        <div class="top-hud hud-element">
+        <div class="top-hud">
             <div class="menu-modes">
                 <button class="mode-btn active" id="btnModoCPU" onclick="cambiarModo('cpu')">MODO VS BOT</button>
                 <button class="mode-btn" id="btnModoOnline" onclick="cambiarModo('online')">MULTIJUGADOR 1V1</button>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
-                <div class="selector-box-mini">
-                    <div class="char-option activo" onclick="cambiarGuerrero('🥷', 'Alok', '#ffaa00', this)">🥷</div>
-                    <div class="char-option" onclick="cambiarGuerrero('🕵️‍♂️', 'Chrono', '#00ffff', this)">🕵️‍♂️</div>
-                    <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', 'Criminal', '#ff0055', this)">🦹‍♂️</div>
-                    <div class="char-option" onclick="cambiarGuerrero('🤖', 'Kenta', '#00ff66', this)">🤖</div>
-                </div>
-                <div class="store-bar">
-                    <div class="store-item" onclick="comprarMejora(500, 2, 'Criminal', '#ff0055')">🎭 Crim (500)</div>
-                    <div class="store-item" onclick="comprarMejora(3000, 5, 'MP40 Max', '#00ffff')">⚡ MP40 (3k)</div>
-                    <div class="store-item" onclick="comprarMejora(10000, 15, 'Angelical', '#ffffff')">🪽 Botas (10k)</div>
-                </div>
+            <div class="selector-box-mini" style="margin-top: 4px;">
+                <div class="char-option activo" onclick="cambiarGuerrero('🥷', 'Alok', '#ffaa00', this)">🥷</div>
+                <div class="char-option" onclick="cambiarGuerrero('🕵️‍♂️', 'Chrono', '#00ffff', this)">🕵️‍♂️</div>
+                <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', 'Criminal', '#ff0055', this)">🦹‍♂️</div>
+                <div class="char-option" onclick="cambiarGuerrero('🤖', 'Kenta', '#00ff66', this)">🤖</div>
             </div>
         </div>
 
-        <!-- CENTRO: Arena de Batalla con Monigotes -->
-        <div class="battle-arena hud-element" id="arenaBox">
-            <!-- JUGADOR 1 -->
+        <div class="battle-arena" id="arenaBox">
             <div class="fighter" id="fighterP1">
                 <div class="fighter-model" id="modelP1">
                     <div class="body-container">
@@ -487,7 +463,6 @@
                 <div class="fighter-score" id="scoreP1" style="color: #00ff66;">0</div>
             </div>
 
-            <!-- JUGADOR 2 / BOT -->
             <div class="fighter" id="fighterP2">
                 <div class="fighter-model" id="modelP2">
                     <div class="body-container">
@@ -507,40 +482,51 @@
             </div>
         </div>
 
-        <!-- PARTE INFERIOR: Distribución Tipo Consola de Celular -->
-        <div class="controls-hud hud-element">
+        <div class="controls-hud">
             
-            <!-- Izquierda: Joystick de Movimiento -->
-            <div class="joystick-group">
-                <button class="joy-btn" onmousedown="moverAvatar(-1)" ontouchstart="moverAvatar(-1)">◀</button>
-                <button class="joy-btn" onmousedown="moverAvatar(1)" ontouchstart="moverAvatar(1)">▶</button>
-            </div>
-
-            <!-- Centro: Energía, Chat y Burlas -->
-            <div class="center-group">
+            <div class="mid-controls-row">
+                <div class="joystick-group">
+                    <button class="joy-btn" onmousedown="moverAvatar(-1)" ontouchstart="moverAvatar(-1)">◀</button>
+                    <button class="joy-btn" onmousedown="moverAvatar(1)" ontouchstart="moverAvatar(1)">▶</button>
+                </div>
                 <div class="energy-container">
                     <div class="energy-label">
-                        <span>⚡ ESTAMINA EMOTE</span>
+                        <span>⚡ ESTAMINA</span>
                         <span id="energyText">100%</span>
                     </div>
                     <div class="energy-bar-bg">
                         <div class="energy-bar-fill" id="energyFill"></div>
                     </div>
                 </div>
-                <div id="chatLog">¡Listo para la batalla!</div>
-                <div class="chat-burlas">
-                    <button class="chat-btn" onclick="enviarMensajeChat('¡Ya aguanta JAJJAJJA! 🗿')">🗿 Ya aguanta</button>
-                    <button class="chat-btn" onclick="enviarMensajeChat('¡Manco de sala! 🔥')">🔥 Manco</button>
-                    <button class="chat-btn" onclick="enviarMensajeChat('¡GG facilito! ⚡')">⚡ GG</button>
-                </div>
             </div>
 
-            <!-- Derecha: Botones Redondos de Ataques y Habilidades -->
-            <div class="action-buttons-group">
-                <button class="round-action-btn" id="btnFarmearRedondo" title="Farmear Aura">🔥</button>
-                <button class="round-action-btn" id="btnPoderRedondo" onclick="usarPoderEspecial()" title="Baile Épico">⚡</button>
-                <button class="round-action-btn" id="btnAtaqueRedondo" onclick="lanzarAtaqueRival()" title="Globo Hielo">🧊</button>
-                <button class="round-action-btn" id="btnGlooRedondo" onclick="activarParedGloo()" title="Pared Gloo">🛡️</button>
+            <div class="actions-grid">
+                <button class="round-action-btn" id="btnFarmearRedondo" title="Farmear">
+                    🔥<span>Aura</span>
+                </button>
+                <button class="round-action-btn" id="btnPoderRedondo" onclick="usarPoderEspecial()" title="Baile">
+                    ⚡<span>Baile</span>
+                </button>
+                <button class="round-action-btn" id="btnAtaqueRedondo" onclick="lanzarAtaqueRival()" title="Hielo">
+                    🧊<span>Hielo</span>
+                </button>
+                <button class="round-action-btn" id="btnGlooRedondo" onclick="activarParedGloo()" title="Pared Gloo">
+                    🛡️<span>Gloo</span>
+                </button>
+            </div>
+
+            <div class="store-bar">
+                <div class="store-item" onclick="comprarMejora(500, 2, 'Criminal', '#ff0055')">🎭 Crim (500)</div>
+                <div class="store-item" onclick="comprarMejora(3000, 5, 'MP40 Max', '#00ffff')">⚡ MP40 (3k)</div>
+                <div class="store-item" onclick="comprarMejora(10000, 15, 'Angelical', '#ffffff')">🪽 Botas (10k)</div>
+            </div>
+
+            <div id="chatLog">¡Listo para la batalla!</div>
+            
+            <div class="chat-burlas">
+                <button class="chat-btn" onclick="enviarMensajeChat('¡Ya aguanta JAJJAJJA! 🗿')">🗿 Ya aguanta</button>
+                <button class="chat-btn" onclick="enviarMensajeChat('¡Manco de sala! 🔥')">🔥 Manco</button>
+                <button class="chat-btn" onclick="enviarMensajeChat('¡GG facilito! ⚡')">⚡ GG</button>
             </div>
 
         </div>
@@ -590,7 +576,7 @@
         }
 
         function moverAvatar(direccion) {
-            posX1 = Math.max(10, Math.min(220, posX1 + (direccion * 15)));
+            posX1 = Math.max(10, Math.min(180, posX1 + (direccion * 15)));
             let f1 = document.getElementById("fighterP1");
             f1.style.left = posX1 + "px";
             
@@ -605,10 +591,10 @@
             sincronizarDatos();
         }
 
-        // Partículas flotantes de fondo
+        // Partículas flotantes
         setInterval(() => {
             let container = document.getElementById("particlesContainer");
-            if(container.childElementCount > 15) return;
+            if(container.childElementCount > 12) return;
             let p = document.createElement("div");
             p.className = "particle";
             let iconos = ['🔥', '⚡', '💎', '🧊', '🎭', '⭐'];
@@ -617,7 +603,7 @@
             p.style.animationDuration = (3 + Math.random() * 3) + "s";
             container.appendChild(p);
             setTimeout(() => p.remove(), 5000);
-        }, 600);
+        }, 800);
 
         function mostrarEfectoHieloVisual() {
             if(escudoActivo) {
@@ -626,12 +612,7 @@
             }
             let overlay = document.getElementById("efectoHielo");
             overlay.classList.add("congelado");
-            let fighterBox = document.getElementById("fighterP1");
-            fighterBox.classList.add("recibir-impacto");
-            setTimeout(() => {
-                overlay.classList.remove("congelado");
-                fighterBox.classList.remove("recibir-impacto");
-            }, 600);
+            setTimeout(() => overlay.classList.remove("congelado"), 600);
         }
 
         function activarParedGloo() {
@@ -649,14 +630,15 @@
                 escudoOverlay.classList.remove("escudo-activo");
             }, 4000);
 
-            let tiempo = 12;
+            let tiempo = 10;
+            let span = btnGloo.querySelector('span');
             let intervalo = setInterval(() => {
-                btnGloo.textContent = `⏳${tiempo}`;
+                span.textContent = `${tiempo}s`;
                 tiempo--;
                 if(tiempo < 0) {
                     clearInterval(intervalo);
                     btnGloo.disabled = false;
-                    btnGloo.textContent = "🛡️";
+                    span.textContent = "Gloo";
                 }
             }, 1000);
         }
@@ -731,15 +713,16 @@
             poderCargado = false;
             let btnPoder = document.getElementById("btnPoderRedondo");
             btnPoder.disabled = true;
-            let tiempo = 10;
+            let span = btnPoder.querySelector('span');
+            let tiempo = 8;
             let intervalo = setInterval(() => {
-                btnPoder.textContent = `⏳${tiempo}`;
+                span.textContent = `${tiempo}s`;
                 tiempo--;
                 if(tiempo < 0) {
                     clearInterval(intervalo);
                     poderCargado = true;
                     btnPoder.disabled = false;
-                    btnPoder.textContent = "⚡";
+                    span.textContent = "Baile";
                 }
             }, 1000);
             sincronizarDatos();
@@ -757,6 +740,7 @@
             ataqueCargado = false;
             let btnAtaque = document.getElementById("btnAtaqueRedondo");
             btnAtaque.disabled = true;
+            let span = btnAtaque.querySelector('span');
 
             if (conn && conn.open) {
                 conn.send({ tipo: 'ataque', valor: 10 });
@@ -766,15 +750,15 @@
                 document.getElementById("chatLog").textContent = "¡Lanzaste Globo de Hielo al Bot!";
             }
 
-            let tiempo = 8;
+            let tiempo = 6;
             let intervalo = setInterval(() => {
-                btnAtaque.textContent = `⏳${tiempo}`;
+                span.textContent = `${tiempo}s`;
                 tiempo--;
                 if(tiempo < 0) {
                     clearInterval(intervalo);
                     ataqueCargado = true;
                     btnAtaque.disabled = false;
-                    btnAtaque.textContent = "🧊";
+                    span.textContent = "Hielo";
                 }
             }, 1000);
         }
@@ -792,7 +776,7 @@
                         score2 += 1;
                         document.getElementById("scoreP2").textContent = score2;
                         
-                        posX2 = Math.max(10, Math.min(220, posX2 + (Math.random() > 0.5 ? 10 : -10)));
+                        posX2 = Math.max(10, Math.min(180, posX2 + (Math.random() > 0.5 ? 10 : -10)));
                         document.getElementById("fighterP2").style.right = posX2 + "px";
                         
                         let modelP2 = document.getElementById("modelP2");
@@ -813,21 +797,17 @@
             document.getElementById("scoreP1").textContent = score1;
             reproducirSonido(350 + (multiplicador * 15), 'square', 0.08);
 
-            let f1 = document.getElementById("fighterP1");
-            f1.classList.add("animar-baile");
-            setTimeout(() => f1.classList.remove("animar-baile"), 400);
-
             estamina -= 5;
             if (estamina <= 0) {
                 estamina = 0;
                 estaCansado = true;
                 btnFarmear.disabled = true;
-                btnFarmear.textContent = "💤";
+                btnFarmear.querySelector('span').textContent = "💤";
                 setTimeout(() => {
                     estamina = 100;
                     estaCansado = false;
                     btnFarmear.disabled = false;
-                    btnFarmear.textContent = "🔥";
+                    btnFarmear.querySelector('span').textContent = "Aura";
                 }, 2000);
             }
             document.getElementById("energyFill").style.width = estamina + "%";
@@ -879,9 +859,7 @@
                 conn = c; 
                 setupConnection(); 
             });
-            peer.on('error', (err) => {
-                document.getElementById("connectionStatus").textContent = "Error de red.";
-            });
+            peer.on('error', () => document.getElementById("connectionStatus").textContent = "Error de red.");
         });
 
         document.getElementById("unirseSalaBtn").addEventListener("click", () => {
@@ -896,9 +874,7 @@
                 conn = peer.connect("ffsala-" + codigoAmigo);
                 setupConnection();
             });
-            peer.on('error', (err) => {
-                document.getElementById("connectionStatus").textContent = "No se pudo conectar.";
-            });
+            peer.on('error', () => document.getElementById("connectionStatus").textContent = "No se pudo conectar.");
         });
 
         function setupConnection() {

@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire - Niveles y Lobby</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
+    <title>Free Fire 2D - Horizontal 60FPS</title>
     <style>
         * {
             box-sizing: border-box;
@@ -33,16 +33,14 @@
         }
         .recibiendo-daño { opacity: 1 !important; }
 
+        /* CONTENEDOR PRINCIPAL apaisado (landscape) */
         .app-container {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            gap: 4px;
-            padding: 4px;
-            width: 100%;
-            max-width: 500px;
+            width: 100vw;
             height: 100vh;
-            margin: 0 auto;
+            padding: 5px 10px;
             position: relative;
         }
 
@@ -50,75 +48,74 @@
         #screenLobby, #screenLevels {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(8, 8, 16, 0.96);
+            background: rgba(8, 8, 16, 0.98);
             z-index: 100;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
             text-align: center;
         }
         .oculto { display: none !important; }
 
         .lobby-title {
-            font-size: 24px;
+            font-size: 20px;
             color: #ffaa00;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             text-shadow: 0 0 10px rgba(255,170,0,0.5);
         }
         .lobby-subtitle {
-            font-size: 11px;
+            font-size: 10px;
             color: #00ffff;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
         .main-btn {
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             color: #fff;
-            padding: 12px 30px;
-            font-size: 16px;
+            padding: 8px 25px;
+            font-size: 14px;
             font-weight: bold;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(255,170,0,0.4);
-            margin-top: 10px;
         }
         .main-btn:active { transform: scale(0.95); }
 
         .levels-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            max-height: 60vh;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            max-height: 55vh;
             overflow-y: auto;
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
+            width: 90%;
+            padding: 5px;
         }
         .level-card {
             background: #141420;
             border: 2px solid #444;
-            border-radius: 8px;
-            padding: 12px 0;
-            font-size: 14px;
+            border-radius: 6px;
+            padding: 8px 0;
+            font-size: 12px;
             font-weight: bold;
             color: #00ff66;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         .level-card:active { background: #00ff66; color: #000; }
 
+        /* HUD SUPERIOR */
         .top-hud-stats {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #12121c;
             border: 1px solid #444;
-            border-radius: 6px;
-            padding: 4px 8px;
+            border-radius: 4px;
+            padding: 3px 10px;
             font-size: 10px;
             font-weight: bold;
+            height: 28px;
         }
 
         .volume-control-box {
@@ -129,44 +126,47 @@
             color: #ffaa00;
         }
         .volume-control-box input {
-            width: 45px;
+            width: 60px;
             accent-color: #ffaa00;
             cursor: pointer;
         }
 
+        /* ÁREA DE JUEGO (PANTALLA HORIZONTAL) */
         .battle-arena {
             flex: 1;
             display: flex;
             background: linear-gradient(135deg, rgba(20, 25, 40, 1), rgba(10, 15, 25, 1));
             border: 2px solid #ffaa00;
-            border-radius: 10px;
+            border-radius: 6px;
             position: relative;
             overflow: hidden;
+            margin: 4px 0;
         }
 
         canvas { display: block; width: 100%; height: 100%; }
 
+        /* CONTROLES INFERIORES EN MODO HORIZONTAL */
         .controls-hud {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            background: rgba(18, 18, 28, 0.95);
-            border: 1px solid #444;
-            padding: 6px;
-            border-radius: 10px;
-        }
-
-        .mid-controls-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 6px;
+            background: rgba(18, 18, 28, 0.95);
+            border: 1px solid #444;
+            padding: 5px 10px;
+            border-radius: 6px;
+            height: 55px;
         }
 
-        /* JOYSTICK MÁS GRANDE */
+        .control-group-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* JOYSTICK GRANDE */
         .joystick-base {
-            width: 95px;
-            height: 95px;
+            width: 80px;
+            height: 80px;
             background: rgba(30, 30, 50, 0.6);
             border: 2px solid rgba(255, 170, 0, 0.6);
             border-radius: 50%;
@@ -175,10 +175,11 @@
             align-items: center;
             justify-content: center;
             touch-action: none;
+            margin-top: -15px;
         }
         .joystick-knob {
-            width: 44px;
-            height: 44px;
+            width: 38px;
+            height: 38px;
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             border-radius: 50%;
@@ -187,61 +188,37 @@
             pointer-events: none;
         }
 
-        .hp-container { flex: 1; padding: 0 4px; }
+        /* BARRA DE VIDA CENTRAL */
+        .hp-container { width: 180px; }
         .hp-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
         .hp-bar-bg { width: 100%; background: #222; height: 6px; border-radius: 3px; overflow: hidden; }
         .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.1s ease; }
 
-        .jump-action-btn {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #00ffff, #0088cc);
-            border: 2px solid #fff;
-            border-radius: 50%;
+        /* BOTONES DE HABILIDADES Y ACCIONES */
+        .control-group-right {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            color: #000;
-            font-weight: bold;
-            box-shadow: 0 3px 10px rgba(0,255,255,0.4);
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .jump-action-btn span { font-size: 7px; color: #fff; margin-top: -2px; }
-
-        .attacks-box-hud {
-            background: rgba(20, 20, 35, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            padding: 4px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            gap: 8px;
         }
 
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            justify-items: center;
-            width: 100%;
+        .actions-mini-grid {
+            display: flex;
+            gap: 5px;
         }
         .round-action-btn {
-            width: 44px;
-            height: 44px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.8);
-            font-size: 14px;
+            font-size: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
         }
-        .round-action-btn span { font-size: 7px; font-weight: bold; margin-top: -1px; color: #fff; }
+        .round-action-btn span { font-size: 6px; font-weight: bold; color: #fff; }
         .locked { opacity: 0.3; filter: grayscale(100%); cursor: not-allowed; }
 
         #btnAccion1 { background: linear-gradient(135deg, rgba(255,0,85,0.85), rgba(255,170,0,0.85)); border-color: #ffaa00; }
@@ -249,33 +226,48 @@
         #btnAccion3 { background: linear-gradient(135deg, rgba(0,255,102,0.85), rgba(0,150,80,0.85)); border-color: #00ff66; }
         #btnAccion4 { background: linear-gradient(135deg, rgba(138,43,226,0.85), rgba(255,0,255,0.85)); border-color: #ff00ff; }
 
+        .jump-action-btn {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #00ffff, #0088cc);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(0,255,255,0.4);
+            cursor: pointer;
+        }
+        .jump-action-btn span { font-size: 6px; color: #fff; }
+
         .info-bottom-bar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-size: 8px;
-            background: #141420;
-            padding: 3px 6px;
-            border-radius: 4px;
-            border: 1px solid #333;
+            font-size: 7px;
+            color: #888;
+            padding: 0 4px;
         }
-        #chatLog { font-size: 8px; color: #00ffcc; font-style: italic; text-align: center; }
+        #chatLog { color: #00ffcc; font-style: italic; }
     </style>
 </head>
 <body>
 
     <!-- LOBBY INICIAL -->
     <div id="screenLobby">
-        <h1 class="lobby-title">FREE FIRE 2D</h1>
-        <p class="lobby-subtitle">Edición Cero Lag - Motor 60FPS</p>
-        <button class="main-btn" onclick="irASeleccionNiveles()">JUGAR</button>
+        <h1 class="lobby-title">FREE FIRE 2D - MODO HORIZONTAL</h1>
+        <p class="lobby-subtitle">Gira tu celular para jugar a pantalla completa | 60 FPS</p>
+        <button class="main-btn" onclick="irASeleccionNiveles()">JUGAR PARTIDA</button>
     </div>
 
     <!-- PANTALLA DE NIVELES (1 AL 20) -->
     <div id="screenLevels" class="oculto">
-        <h2 class="lobby-title" style="font-size: 18px;">SELECCIONA UN NIVEL</h2>
+        <h2 class="lobby-title" style="font-size: 16px;">SELECCIONA NIVEL (1 - 20)</h2>
         <div class="levels-grid" id="levelsGridContainer"></div>
-        <button class="main-btn" style="padding: 8px 20px; font-size: 12px; margin-top: 15px;" onclick="volverAlLobby()">Volver</button>
+        <button class="main-btn" style="padding: 6px 20px; font-size: 11px; margin-top: 10px;" onclick="volverAlLobby()">Volver</button>
     </div>
 
     <div id="efectoDaño"></div>
@@ -284,6 +276,7 @@
         
         <div class="top-hud-stats">
             <span>🗺️ <strong id="txtNivelInfo" style="color:#ffaa00;">NIVEL 1</strong></span>
+            <span style="color:#00ffff;" id="txtObstaculoInfo">Obstáculo: Cajas Clásicas</span>
             <div class="volume-control-box">
                 <span>🔊 VOL:</span>
                 <input type="range" id="volRange" min="0" max="1" step="0.05" value="0.8" oninput="cambiarVolumen(this.value)">
@@ -297,7 +290,7 @@
 
         <div class="controls-hud">
             
-            <div class="mid-controls-row">
+            <div class="control-group-left">
                 <div class="joystick-base" id="joystickBase">
                     <div class="joystick-knob" id="joystickKnob"></div>
                 </div>
@@ -311,28 +304,26 @@
                         <div class="hp-bar-fill" id="hpFill"></div>
                     </div>
                 </div>
-
-                <div class="right-controls-panel">
-                    <div class="jump-action-btn" ontouchstart="saltarJugador()" onmousedown="saltarJugador()">
-                        ⬆️<span id="txtBtnSalto">SALTAR</span>
-                    </div>
-                </div>
             </div>
 
-            <div class="attacks-box-hud">
-                <div class="actions-grid">
+            <div class="control-group-right">
+                <div class="actions-mini-grid">
                     <button class="round-action-btn" id="btnAccion1" onclick="ejecutarAccion(1)">🔥<span>Fuego</span></button>
                     <button class="round-action-btn locked" id="btnAccion2" onclick="ejecutarAccion(2)">🐺<span>Lobo</span></button>
                     <button class="round-action-btn locked" id="btnAccion3" onclick="ejecutarAccion(3)">🤖<span>Mecha</span></button>
                     <button class="round-action-btn" id="btnAccion4" onclick="ejecutarAccion(4)">🦅<span>Volar</span></button>
                 </div>
+
+                <div class="jump-action-btn" ontouchstart="saltarJugador()" onmousedown="saltarJugador()">
+                    ⬆️<span id="txtBtnSalto">SALTAR</span>
+                </div>
             </div>
 
-            <div class="info-bottom-bar">
-                <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-                <span id="chatLog">¡Sobrevive a las hordas zombis!</span>
-            </div>
+        </div>
 
+        <div class="info-bottom-bar">
+            <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
+            <span id="chatLog">¡Sobrevive a las hordas zombis!</span>
         </div>
 
     </div>
@@ -353,7 +344,7 @@
         let distancia = 0;
         let nivelActual = 1;
         let mundoX = 0;
-        let jugadorX = 80;
+        let jugadorX = 100;
         let jugadorY = 0;
         let velocidadY = 0;
         let saltando = false;
@@ -363,13 +354,13 @@
         let skinActual = { nombre: 'Alok', emoji: '🥷', color: '#ffaa00' };
         let gameActive = false;
 
-        let boxes = [];
+        let obstacles = [];
         let coins = [];
         let enemies = [];
         let projectiles = [];
         let bullets = [];
 
-        // --- SISTEMA DE AUDIO Y MÚSICA RESTAURADOS ---
+        // --- SISTEMA DE AUDIO Y MÚSICA ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const masterGain = audioCtx.createGain();
         masterGain.gain.value = 0.8;
@@ -391,7 +382,7 @@
             osc.stop(audioCtx.currentTime + dur);
         }
 
-        // Bucle de música de supervivencia de fondo
+        // Música de supervivencia de fondo
         const notasBajo = [110, 110, 98, 98, 82.41, 82.41, 73.42, 73.42];
         let pasoMusica = 0;
         setInterval(() => {
@@ -413,7 +404,17 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }, { once: true });
 
-        // --- CREAR NIVELES DEL 1 AL 20 EN HTML ---
+        // --- CONSTRUCTOR DE NIVELES (1 AL 20) ---
+        const nombresObstaculos = [
+            "1. Cajas de Madera Básicas", "2. Barreras Eléctricas", "3. Pinchos en el Suelo",
+            "4. Muros de Concreto", "5. Minas Terrestres Activas", "6. Pilares de Hielo Resbaloso",
+            "7. Contenedores Industriales", "8. Barriles Radioactivos", "9. Torretas Láser Bajas",
+            "10. Obstáculos Dobles en Altura", "11. Bloques de Piedra Antigua", "12. Campo de Púas Venenosas",
+            "13. Barreras Metálicas Móviles", "14. Casetas de Fuego Ardiente", "15. Torres de Vigilancia",
+            "16. Escombros Volcánicos", "17. Muros de Energía Azul", "18. Cajas Explosivas Ocultas",
+            "19. Laberinto de Acero", "20. Zona Cero: Obstáculos Combinados"
+        ];
+
         function construirMenuNiveles() {
             let container = document.getElementById('levelsGridContainer');
             container.innerHTML = '';
@@ -441,20 +442,20 @@
             nivelActual = num;
             document.getElementById('screenLevels').classList.add('oculto');
             document.getElementById('txtNivelInfo').textContent = `NIVEL ${nivelActual}`;
+            document.getElementById('txtObstaculoInfo').textContent = `Obstáculo: ${nombresObstaculos[nivelActual - 1]}`;
             
-            // Reiniciar variables de juego
             vida = 100;
             document.getElementById('hpFill').style.width = '100%';
             document.getElementById('hpText').textContent = '100 HP';
             mundoX = 0;
             jugadorY = 0;
-            boxes = [];
+            obstacles = [];
             coins = [];
             enemies = [];
             projectiles = [];
             bullets = [];
 
-            generarMundoParaNivel(nivelActual);
+            generarObstaculosY Mundo(nivelActual);
             gameActive = true;
         }
 
@@ -468,7 +469,7 @@
             let rect = joyBase.getBoundingClientRect();
             let centroX = rect.left + rect.width / 2;
             let deltaX = clientX - centroX;
-            let radioMax = 35; // Rango más amplio para el joystick grande
+            let radioMax = 30;
             if (deltaX > radioMax) deltaX = radioMax;
             if (deltaX < -radioMax) deltaX = -radioMax;
             joyKnob.style.transform = `translate(${deltaX}px, 0px)`;
@@ -479,31 +480,50 @@
         window.addEventListener('pointermove', (e) => { if (joyActive) actualizarJoystick(e.clientX); });
         window.addEventListener('pointerup', () => { joyActive = false; direccionMovimiento = 0; joyKnob.style.transform = `translate(0px, 0px)`; });
 
-        // --- GENERADOR DE MUNDO SEGÚN EL NIVEL ---
-        function generarMundoParaNivel(nivel) {
-            let cantidadZombis = 30 + (nivel * 15);
-            for (let i = 1; i < cantidadZombis; i++) {
-                let posX = i * 200 + Math.random() * 30;
-                let alturaCaja = (i % 2 === 0) ? 0 : (40 + Math.random() * 60);
+        // --- GENERADOR DE OBSTÁCULOS ÚNICOS PARA CADA NIVEL ---
+        function generarObstaculosY Mundo(nivel) {
+            let cantidad = 25 + (nivel * 3);
+            for (let i = 1; i < cantidad; i++) {
+                let posX = i * 220 + Math.random() * 40;
+                let tipoObs = nivel; // Cada nivel usa su temática de obstáculo principal
+                let alturaObs = 0;
+                let anchoObs = 45;
+                let iconoObs = '📦';
+                let colorObs = '#A0522D';
 
-                boxes.push({ x: posX, y: alturaCaja, w: 45, h: 30 });
-                coins.push({ x: posX + 20, y: alturaCaja > 0 ? alturaCaja + 45 : 35 + Math.random() * 70, recolectada: false });
+                if (tipoObs === 1) { alturaObs = (i % 2 === 0) ? 0 : 45; iconoObs = '📦'; }
+                else if (tipoObs === 2) { alturaObs = 0; iconoObs = '⚡'; colorObs = '#00ffff'; }
+                else if (tipoObs === 3) { alturaObs = 0; iconoObs = '🔺'; colorObs = '#ff0055'; }
+                else if (tipoObs === 4) { alturaObs = (i % 3 === 0) ? 50 : 0; iconoObs = '🧱'; colorObs = '#777'; }
+                else if (tipoObs === 5) { alturaObs = 0; iconoObs = '💣'; colorObs = '#ff4400'; }
+                else if (tipoObs === 6) { alturaObs = 30; iconoObs = '🧊'; colorObs = '#00ccff'; }
+                else if (tipoObs === 7) { alturaObs = 60; iconoObs = '🛢️'; colorObs = '#ffaa00'; }
+                else if (tipoObs === 8) { alturaObs = 0; iconoObs = '☢️'; colorObs = '#00ff66'; }
+                else if (tipoObs === 9) { alturaObs = 20; iconoObs = '🔋'; colorObs = '#ff00ff'; }
+                else if (tipoObs === 10) { alturaObs = 55; iconoObs = '🚧'; colorObs = '#ffaa00'; }
+                else if (tipoObs >= 11 && tipoObs <= 20) {
+                    alturaObs = (i % 2 === 0) ? 40 * (nivel % 3) : 0;
+                    iconoObs = ['⛩️', '🗡️', '🛡️', '🔥', '⚠️', '🌋', '🔮', '💥', '🧱', '☠️'][nivel - 11];
+                }
 
-                let tipos = [
-                    { emoji: '🧟', hp: 40 + (nivel * 5), color: '#ff0055', vel: 0.7 + (nivel * 0.02) },
-                    { emoji: '🤮', hp: 60 + (nivel * 5), color: '#00ff66', vel: 0.5 + (nivel * 0.02) },
-                    { emoji: '🏺', hp: 80 + (nivel * 10), color: '#ffaa00', vel: 0.6 + (nivel * 0.02) }
+                obstacles.push({ x: posX, y: alturaObs, w: anchoObs, h: 32, icono: iconoObs, color: colorObs });
+                coins.push({ x: posX + 25, y: alturaObs > 0 ? alturaObs + 45 : 35 + Math.random() * 60, recolectada: false });
+
+                let tiposZombis = [
+                    { emoji: '🧟', hp: 40 + (nivel * 6), color: '#ff0055', vel: 0.6 + (nivel * 0.02) },
+                    { emoji: '🤮', hp: 55 + (nivel * 6), color: '#00ff66', vel: 0.5 + (nivel * 0.02) },
+                    { emoji: '🏺', hp: 75 + (nivel * 8), color: '#ffaa00', vel: 0.55 + (nivel * 0.02) }
                 ];
-                let elegido = tipos[Math.floor(Math.random() * tipos.length)];
+                let zombiElegido = tiposZombis[Math.floor(Math.random() * tiposZombis.length)];
 
                 enemies.push({
-                    x: posX + 130 + Math.random() * 40,
+                    x: posX + 140 + Math.random() * 50,
                     y: 0,
-                    hp: elegido.hp,
-                    maxHp: elegido.hp,
-                    emoji: elegido.emoji,
-                    color: elegido.color,
-                    vel: elegido.vel
+                    hp: zombiElegido.hp,
+                    maxHp: zombiElegido.hp,
+                    emoji: zombiElegido.emoji,
+                    color: zombiElegido.color,
+                    vel: zombiElegido.vel
                 });
             }
         }
@@ -516,39 +536,39 @@
                 return;
             }
             if (saltando) {
-                impulsoSalto = Math.min(24, impulsoSalto + 4);
+                impulsoSalto = Math.min(22, impulsoSalto + 3);
                 velocidadY = impulsoSalto;
                 reproducirSonido(750, 'triangle', 0.1);
                 return;
             }
             saltando = true;
-            impulsoSalto = 14;
+            impulsoSalto = 13;
             velocidadY = impulsoSalto;
             reproducirSonido(500, 'triangle', 0.1);
         }
 
         function ejecutarAccion(btn) {
             if (!gameActive) return;
-            if (btn === 1) {
+            if (btn === 1) { // Fuego
                 reproducirSonido(800, 'sawtooth', 0.08);
                 bullets.push({ x: mundoX + jugadorX + 40, y: jugadorY + 30 });
                 let jugadorMundoX = mundoX + jugadorX;
                 enemies.forEach(en => {
-                    if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 100) {
-                        en.hp -= 35;
+                    if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 110) {
+                        en.hp -= 40;
                         if (en.hp <= 0) {
                             oro += 50;
                             document.getElementById('txtOro').textContent = oro;
                         }
                     }
                 });
-            } else if (btn === 2 && !document.getElementById('btnAccion2').classList.contains('locked')) {
+            } else if (btn === 2 && !document.getElementById('btnAccion2').classList.contains('locked')) { // Lobo
                 skinActual = { nombre: 'Lobo', emoji: '🐺', color: '#ff5500' };
                 document.getElementById('lblEstadoTransformacion').textContent = 'Lobo';
-            } else if (btn === 3 && !document.getElementById('btnAccion3').classList.contains('locked')) {
+            } else if (btn === 3 && !document.getElementById('btnAccion3').classList.contains('locked')) { // Mecha
                 skinActual = { nombre: 'Mecha', emoji: '🤖', color: '#00ffcc' };
                 document.getElementById('lblEstadoTransformacion').textContent = 'Mecha';
-            } else if (btn === 4) {
+            } else if (btn === 4) { // Volar
                 activarVuelo();
             }
         }
@@ -590,13 +610,13 @@
 
             if (saltando || volando) {
                 if (volando) {
-                    if (jugadorY < canvas.height - 120) jugadorY += 3;
+                    if (jugadorY < canvas.height - 110) jugadorY += 3;
                 } else {
                     jugadorY += velocidadY;
-                    velocidadY -= 1.2;
+                    velocidadY -= 1.1;
 
                     let jugadorMundoX = mundoX + jugadorX;
-                    boxes.forEach(b => {
+                    obstacles.forEach(b => {
                         if (b.y === 0 && jugadorMundoX >= b.x - 15 && jugadorMundoX <= b.x + b.w && jugadorY <= b.h + 5 && jugadorY >= b.h - 10) {
                             jugadorY = b.h;
                             saltando = false;
@@ -642,8 +662,8 @@
                         }
                     }
 
-                    if (Math.abs(en.x - jugadorMundoX) < 200 && Math.random() < 0.012) {
-                        projectiles.push({ x: en.x, y: 30, vx: -3 });
+                    if (Math.abs(en.x - jugadorMundoX) < 220 && Math.random() < 0.012) {
+                        projectiles.push({ x: en.x, y: 30, vx: -3.5 });
                     }
                 }
             });
@@ -652,7 +672,7 @@
                 p.x += p.vx;
                 if (Math.abs(p.x - jugadorMundoX) < 18 && jugadorY < 30 && !volando) {
                     if (skinActual.nombre !== 'Mecha') {
-                        vida = Math.max(0, vida - (8 + nivelActual));
+                        vida = Math.max(0, vida - (7 + nivelActual));
                         document.getElementById('hpFill').style.width = vida + '%';
                         document.getElementById('hpText').textContent = vida + ' HP';
                         let ov = document.getElementById('efectoDaño');
@@ -670,15 +690,15 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             ctx.fillStyle = '#ffaa00';
-            ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
+            ctx.fillRect(0, canvas.height - 8, canvas.width, 8);
 
-            boxes.forEach(b => {
+            obstacles.forEach(b => {
                 let screenX = b.x - mundoX;
                 if (screenX > -60 && screenX < canvas.width + 60) {
-                    ctx.fillStyle = '#A0522D';
-                    ctx.fillRect(screenX, canvas.height - 40 - b.y, b.w, b.h);
+                    ctx.fillStyle = b.color;
+                    ctx.fillRect(screenX, canvas.height - 38 - b.y, b.w, b.h);
                     ctx.font = '14px sans-serif';
-                    ctx.fillText('📦', screenX + 12, canvas.height - 18 - b.y);
+                    ctx.fillText(b.icono, screenX + 10, canvas.height - 16 - b.y);
                 }
             });
 
@@ -687,14 +707,14 @@
                     let screenX = c.x - mundoX;
                     if (screenX > -30 && screenX < canvas.width + 30) {
                         ctx.beginPath();
-                        ctx.arc(screenX, canvas.height - 20 - c.y, 9, 0, Math.PI * 2);
+                        ctx.arc(screenX, canvas.height - 18 - c.y, 8, 0, Math.PI * 2);
                         ctx.fillStyle = '#ffff00';
                         ctx.fill();
                         ctx.lineWidth = 2;
                         ctx.strokeStyle = '#fff';
                         ctx.stroke();
-                        ctx.font = '9px sans-serif';
-                        ctx.fillText('🪙', screenX - 5, canvas.height - 17 - c.y);
+                        ctx.font = '8px sans-serif';
+                        ctx.fillText('🪙', screenX - 4, canvas.height - 15 - c.y);
                     }
                 }
             });
@@ -704,10 +724,10 @@
                     let screenX = en.x - mundoX;
                     if (screenX > -50 && screenX < canvas.width + 50) {
                         ctx.font = '20px sans-serif';
-                        ctx.fillText(en.emoji, screenX, canvas.height - 25);
+                        ctx.fillText(en.emoji, screenX, canvas.height - 22);
                         ctx.fillStyle = en.color;
                         ctx.font = '8px Courier New';
-                        ctx.fillText(`HP:${en.hp}`, screenX - 5, canvas.height - 10);
+                        ctx.fillText(`HP:${en.hp}`, screenX - 4, canvas.height - 8);
                     }
                 }
             });
@@ -716,26 +736,26 @@
             projectiles.forEach(p => {
                 let screenX = p.x - mundoX;
                 ctx.beginPath();
-                ctx.arc(screenX, canvas.height - 35, 6, 0, Math.PI * 2);
+                ctx.arc(screenX, canvas.height - 30, 5, 0, Math.PI * 2);
                 ctx.fill();
             });
 
             ctx.fillStyle = '#ffff00';
             bullets.forEach((b, idx) => {
-                b.x += 15;
+                b.x += 16;
                 let screenX = b.x - mundoX;
-                ctx.fillRect(screenX, canvas.height - 40 - jugadorY, 15, 3);
+                ctx.fillRect(screenX, canvas.height - 35 - jugadorY, 15, 3);
                 if (b.x > mundoX + canvas.width) bullets.splice(idx, 1);
             });
 
-            let playerScreenY = canvas.height - 65 - jugadorY;
-            ctx.font = '24px sans-serif';
+            let playerScreenY = canvas.height - 58 - jugadorY;
+            ctx.font = '22px sans-serif';
             ctx.fillText(skinActual.emoji, jugadorX, playerScreenY);
             ctx.fillStyle = skinActual.color;
-            ctx.fillRect(jugadorX + 4, playerScreenY + 10, 16, 16);
+            ctx.fillRect(jugadorX + 4, playerScreenY + 8, 14, 14);
             ctx.fillStyle = '#00ffff';
-            ctx.font = '8px Courier New';
-            ctx.fillText(skinActual.nombre, jugadorX - 4, playerScreenY + 32);
+            ctx.font = '7px Courier New';
+            ctx.fillText(skinActual.nombre, jugadorX - 4, playerScreenY + 28);
         }
 
         function loop() {

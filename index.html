@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batalla de Aura: Edición Definitiva 1v1</title>
+    <title>Batalla de Aura: Anime Edition Suprema</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -84,35 +84,73 @@
         }
         .mode-btn.active { background: #d4af37; color: #030303; }
 
-        /* Selector de avatares */
-        .avatar-selector {
+        /* Arena de Combate Anime */
+        .battle-arena {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: linear-gradient(180deg, #1f1f1f, #0d0d0d);
+            border: 2px solid #ff0055;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .fighter {
+            text-align: center;
+            width: 45%;
+            transition: transform 0.15s ease;
+        }
+        .fighter-avatar {
+            font-size: 55px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+            margin-bottom: 4px;
+        }
+        .fighter-name { font-size: 10px; font-weight: bold; margin-bottom: 2px; }
+        .fighter-score { font-size: 22px; font-weight: bold; }
+        
+        .vs-badge {
+            font-size: 16px;
+            font-weight: bold;
+            color: #d4af37;
+            text-shadow: 0 0 10px #ff0055;
+        }
+
+        /* Selector de personaje */
+        .selector-box {
             display: flex;
             justify-content: center;
             gap: 6px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            background: #151515;
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid #333;
         }
-        .avatar-opcion {
-            font-size: 18px;
+        .char-option {
+            font-size: 24px;
             background: #222;
             border: 1px solid #444;
-            padding: 4px 6px;
+            padding: 4px 8px;
             border-radius: 6px;
             cursor: pointer;
         }
-        .avatar-opcion.activo { border-color: #00ff66; background: #152215; }
+        .char-option.activo { border-color: #00ff66; background: #1a2a1a; }
 
-        .npc-box {
-            font-size: 35px;
-            margin: 2px 0;
-            display: inline-block;
+        @keyframes attackLeft {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(25px) scale(1.15); filter: drop-shadow(0 0 15px #00ff66); }
+            100% { transform: translateX(0); }
         }
+        .animar-ataque-p1 { animation: attackLeft 0.2s ease-in-out; }
 
-        @keyframes auraHit {
-            0% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.12); filter: brightness(1.6); }
-            100% { transform: scale(1); filter: brightness(1); }
+        @keyframes attackRight {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-25px) scale(1.15); filter: drop-shadow(0 0 15px #ff0055); }
+            100% { transform: translateX(0); }
         }
-        .animar-golpe { animation: auraHit 0.15s ease-in-out; }
+        .animar-ataque-p2 { animation: attackRight 0.2s ease-in-out; }
 
         .energy-container {
             background: #1a1a1a;
@@ -126,52 +164,26 @@
         .energy-bar-bg { width: 100%; background: #333; height: 6px; border-radius: 3px; overflow: hidden; }
         .energy-bar-fill { width: 100%; background: linear-gradient(90deg, #ffcc00, #00ff66); height: 100%; }
 
-        /* Estilo tipo video de duelo */
-        .duel-container {
-            background: #151515;
-            border: 2px solid #ff0055;
-            border-radius: 12px;
-            padding: 10px;
-        }
-        .player-score-box {
-            background: #111;
-            border-radius: 8px;
-            padding: 6px 10px;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #444;
-        }
-        .box-p1 { border-color: #00ff66; }
-        .box-p2 { border-color: #ff0055; }
-        .player-title { font-size: 10px; }
-        .box-p1 .player-title { color: #00ff66; }
-        .box-p2 .player-title { color: #ff0055; }
-        .player-points { font-size: 16px; font-weight: bold; }
-        .box-p1 .player-points { color: #00ff66; }
-        .box-p2 .player-points { color: #ff0055; }
-
         .action-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: none;
             font-weight: bold;
             border-radius: 10px;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
             text-transform: uppercase;
             background: linear-gradient(90deg, #ff0055, #7a00ff, #00ffcc);
             color: white;
-            box-shadow: 0 3px 10px rgba(122, 0, 255, 0.4);
-            margin-bottom: 5px;
+            box-shadow: 0 4px 15px rgba(122, 0, 255, 0.4);
+            margin-bottom: 6px;
         }
         .action-btn:active { transform: scale(0.95); }
         .action-btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
 
         .special-btn {
             width: 100%;
-            padding: 8px;
+            padding: 9px;
             background: linear-gradient(90deg, #d4af37, #ff8800);
             color: #030303;
             border: none;
@@ -184,20 +196,21 @@
         }
         .special-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
+        /* Tienda de mejoras detallada */
         .store-box {
             display: flex;
             justify-content: space-between;
             gap: 4px;
             background: #1a1a1a;
             border: 1px dashed #555;
-            padding: 5px;
+            padding: 6px;
             border-radius: 8px;
             font-size: 8px;
             margin-bottom: 6px;
         }
         .store-item { 
             background: #222; 
-            padding: 5px 3px; 
+            padding: 6px 4px; 
             border-radius: 5px; 
             flex: 1; 
             text-align: center; 
@@ -207,25 +220,27 @@
         }
         .store-item:hover { border-color: #d4af37; color: #fff; }
 
+        /* Chat Rápido */
         .chat-container {
             background: #111;
             border: 1px solid #333;
             border-radius: 6px;
-            padding: 5px;
-            margin-top: 5px;
+            padding: 6px;
+            margin-top: 6px;
         }
-        .chat-burlas { display: flex; gap: 3px; margin-top: 3px; }
+        .chat-burlas { display: flex; gap: 4px; margin-top: 4px; }
         .chat-btn {
             background: #222;
             border: 1px solid #444;
             color: #ddd;
-            font-size: 8px;
-            padding: 3px;
-            border-radius: 3px;
+            font-size: 9px;
+            padding: 4px;
+            border-radius: 4px;
             flex: 1;
             cursor: pointer;
         }
-        #chatLog { font-size: 9px; color: #ffcc00; margin-top: 2px; font-style: italic; }
+        .chat-btn:hover { background: #333; border-color: #ff0055; }
+        #chatLog { font-size: 9px; color: #ffcc00; margin-top: 3px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -246,36 +261,42 @@
             <p id="connectionStatus" style="font-size: 9px; color: #aaa; margin-top: 2px;">Estado: Desconectado</p>
         </div>
 
-        <div class="duel-container">
-            <div style="font-size: 9px; color: #d4af37; margin-bottom: 4px;">⚡ BATALLA DE AURA SUPREMA ⚡</div>
-            
-            <div class="avatar-selector">
-                <div class="avatar-opcion activo" onclick="cambiarAvatar('🧟', this)">🧟</div>
-                <div class="avatar-opcion" onclick="cambiarAvatar('🗿', this)">🗿</div>
-                <div class="avatar-opcion" onclick="cambiarAvatar('🔥', this)">🔥</div>
-                <div class="avatar-opcion" onclick="cambiarAvatar('⚡', this)">⚡</div>
+        <div class="card">
+            <h2>Elige tu Guerrero Animado</h2>
+            <div class="selector-box">
+                <div class="char-option activo" onclick="cambiarGuerrero('🥷', this)">🥷</div>
+                <div class="char-option" onclick="cambiarGuerrero('🧙‍♂️', this)">🧙‍♂️</div>
+                <div class="char-option" onclick="cambiarGuerrero('🧛‍♂️', this)">🧛‍♂️</div>
+                <div class="char-option" onclick="cambiarGuerrero('🤖', this)">🤖</div>
             </div>
+        </div>
+
+        <div class="card" style="border-color: #ff0055;">
             
-            <div class="npc-box" id="npcAvatar">🧟</div>
+            <div class="battle-arena">
+                <div class="fighter" id="fighterP1">
+                    <div class="fighter-avatar" id="avatarP1">🥷</div>
+                    <div class="fighter-name" style="color: #00ff66;">TÚ (<span id="multiplicadorText">x1</span>)</div>
+                    <div class="fighter-score" id="scoreP1" style="color: #00ff66;">0</div>
+                </div>
+
+                <div class="vs-badge">VS</div>
+
+                <div class="fighter" id="fighterP2">
+                    <div class="fighter-avatar" id="avatarP2">🤖</div>
+                    <div class="fighter-name" id="labelRival" style="color: #ff0055;">BOT RIVAL</div>
+                    <div class="fighter-score" id="scoreP2" style="color: #ff0055;">0</div>
+                </div>
+            </div>
 
             <div class="energy-container">
                 <div class="energy-label">
-                    <span>⚡ ESTAMINA</span>
+                    <span>⚡ ESTAMINA DE COMBATE</span>
                     <span id="energyText">100%</span>
                 </div>
                 <div class="energy-bar-bg">
                     <div class="energy-bar-fill" id="energyFill"></div>
                 </div>
-            </div>
-
-            <div class="player-score-box box-p1" id="cardP1">
-                <div class="player-title">Jugador 1 (Tú) <span id="multiplicadorText">(+1)</span>:</div>
-                <div class="player-points" id="scoreP1">0</div>
-            </div>
-
-            <div class="player-score-box box-p2" id="cardP2">
-                <div class="player-title" id="labelRival">Jugador 2 (Bot) <span id="rivalAvatarDisplay"></span>:</div>
-                <div class="player-points" id="scoreP2">0</div>
             </div>
 
             <button class="action-btn" id="btnFarmear">🔥 Farmear Aura 🔥</button>
@@ -295,7 +316,7 @@
                     <button class="chat-btn" onclick="enviarMensajeChat('¡Demasiado fácil! 🔥')">🔥 Fácil</button>
                     <button class="chat-btn" onclick="enviarMensajeChat('¡Ríndete ya! ⚡')">⚡ Ríndete</button>
                 </div>
-                <div id="chatLog">Listo para la batalla...</div>
+                <div id="chatLog">Listo para el combate...</div>
             </div>
         </div>
 
@@ -307,7 +328,7 @@
         let estamina = 100;
         let multiplicador = 1;
         let estaCansado = false;
-        let avatarActual = '🧟';
+        let avatarActual = '🥷';
         let poderCargado = true;
         let peer, conn, botInterval;
 
@@ -333,22 +354,22 @@
                 document.getElementById('btnModoCPU').classList.add('active');
                 document.getElementById('btnModoOnline').classList.remove('active');
                 document.getElementById('panelOnline').style.display = 'none';
-                document.getElementById('labelRival').innerHTML = `Jugador 2 (Bot) <span id="rivalAvatarDisplay"></span>:`;
+                document.getElementById('labelRival').textContent = "BOT RIVAL";
                 iniciarBot();
             } else {
                 document.getElementById('btnModoOnline').classList.add('active');
                 document.getElementById('btnModoCPU').classList.remove('active');
                 document.getElementById('panelOnline').style.display = 'block';
-                document.getElementById('labelRival').innerHTML = `Jugador 2 (Online) <span id="rivalAvatarDisplay"></span>:`;
+                document.getElementById('labelRival').textContent = "JUGADOR 2";
                 if(botInterval) clearInterval(botInterval);
             }
         }
 
-        function cambiarAvatar(emoji, el) {
-            document.querySelectorAll('.avatar-opcion').forEach(e => e.classList.remove('activo'));
+        function cambiarGuerrero(emoji, el) {
+            document.querySelectorAll('.char-option').forEach(e => e.classList.remove('activo'));
             el.classList.add('activo');
             avatarActual = emoji;
-            document.getElementById("npcAvatar").textContent = emoji;
+            document.getElementById("avatarP1").textContent = emoji;
             reproducirSonido(600, 'sine', 0.1);
             sincronizarDatos();
         }
@@ -358,7 +379,7 @@
                 score1 -= costo;
                 multiplicador = multValor;
                 document.getElementById("scoreP1").textContent = score1;
-                document.getElementById("multiplicadorText").textContent = `(x${multiplicador})`;
+                document.getElementById("multiplicadorText").textContent = `x${multiplicador}`;
                 reproducirSonido(880, 'triangle', 0.3);
                 alert(`¡Has comprado ${nombre}! Tu multiplicador subió a x${multiplicador}`);
                 sincronizarDatos();
@@ -401,13 +422,13 @@
         function iniciarBot() {
             if(botInterval) clearInterval(botInterval);
             botInterval = setInterval(() => {
-                if(modoJuego === 'cpu' && score1 < 100 && score2 < 100) {
+                if(modoJuego === 'cpu' && score1 < 150 && score2 < 150) {
                     if(Math.random() > 0.4) {
                         score2 += 1;
                         document.getElementById("scoreP2").textContent = score2;
-                        let c2 = document.getElementById("cardP2");
-                        c2.classList.add("animar-golpe");
-                        setTimeout(() => c2.classList.remove("animar-golpe"), 150);
+                        let f2 = document.getElementById("fighterP2");
+                        f2.classList.add("animar-ataque-p2");
+                        setTimeout(() => f2.classList.remove("animar-ataque-p2"), 200);
                         verificarGanador();
                     }
                 }
@@ -422,9 +443,9 @@
             document.getElementById("scoreP1").textContent = score1;
             reproducirSonido(350 + (multiplicador * 15), 'square', 0.08);
 
-            let c1 = document.getElementById("cardP1");
-            c1.classList.add("animar-golpe");
-            setTimeout(() => c1.classList.remove("animar-golpe"), 150);
+            let f1 = document.getElementById("fighterP1");
+            f1.classList.add("animar-ataque-p1");
+            setTimeout(() => f1.classList.remove("animar-ataque-p1"), 200);
 
             estamina -= 5;
             if (estamina <= 0) {
@@ -447,13 +468,13 @@
         });
 
         function verificarGanador() {
-            if (score1 >= 100) {
+            if (score1 >= 150) {
                 reproducirSonido(800, 'sine', 0.5);
-                alert("¡Has ganado la batalla de aura suprema!");
+                alert("¡Has ganado la batalla de aura anime!");
                 reiniciarPartida();
-            } else if (score2 >= 100) {
+            } else if (score2 >= 150) {
                 reproducirSonido(120, 'sawtooth', 0.6);
-                alert("¡El rival te ha humillado en aura!");
+                alert("¡El rival te ha superado en aura!");
                 reiniciarPartida();
             }
         }
@@ -463,14 +484,14 @@
             document.getElementById("scoreP1").textContent = 0;
             document.getElementById("scoreP2").textContent = 0;
             estamina = 100; multiplicador = 1;
-            document.getElementById("multiplicadorText").textContent = "(+1)";
+            document.getElementById("multiplicadorText").textContent = "x1";
         }
 
         // Multijugador Online (PeerJS)
         document.getElementById("crearSalaBtn").addEventListener("click", () => {
             let codigo = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById("myIdText").textContent = "Código: " + codigo;
-            peer = new Peer("auraduel-" + codigo);
+            peer = new Peer("animeaura-" + codigo);
             peer.on('open', () => document.getElementById("connectionStatus").textContent = "Esperando rival...");
             peer.on('connection', (c) => { conn = c; setupConnection(); });
         });
@@ -480,7 +501,7 @@
             if(codigoAmigo.length !== 6) { alert("Ingresa código de 6 dígitos"); return; }
             if(!peer) peer = new Peer();
             peer.on('open', () => {
-                conn = peer.connect("auraduel-" + codigoAmigo);
+                conn = peer.connect("animeaura-" + codigoAmigo);
                 setupConnection();
             });
         });
@@ -494,10 +515,12 @@
                 } else if(data.score !== undefined) {
                     score2 = data.score;
                     document.getElementById("scoreP2").textContent = score2;
-                    if(data.avatar) document.getElementById("rivalAvatarDisplay").textContent = `[${data.avatar}]`;
-                    let c2 = document.getElementById("cardP2");
-                    c2.classList.add("animar-golpe");
-                    setTimeout(() => c2.classList.remove("animar-golpe"), 150);
+                    if(data.avatar) {
+                        document.getElementById("avatarP2").textContent = data.avatar;
+                    }
+                    let f2 = document.getElementById("fighterP2");
+                    f2.classList.add("animar-ataque-p2");
+                    setTimeout(() => f2.classList.remove("animar-ataque-p2"), 200);
                     verificarGanador();
                 }
             });

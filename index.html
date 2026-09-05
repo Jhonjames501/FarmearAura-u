@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batalla de Aura: Free Fire con Joystick y Movimiento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Batalla de Aura: Free Fire HUD Inmersivo</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -13,22 +13,18 @@
             font-family: 'Courier New', Courier, monospace;
             -webkit-tap-highlight-color: transparent;
         }
-        body {
-            background-color: #080810;
+        html, body {
+            width: 100%;
+            height: 100vh;
+            background-color: #05050a;
             color: #f0f0f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            background-image: radial-gradient(circle at center, #16162c 0%, #080810 100%);
-            padding-bottom: 30px;
+            overflow: hidden;
             position: relative;
-            overflow-x: hidden;
             user-select: none;
         }
 
         .particles-container {
-            position: fixed;
+            position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 1;
@@ -72,106 +68,98 @@
         }
         .escudo-activo { opacity: 1 !important; }
 
-        .main-layout {
+        /* --- PANTALLA COMPLETA HUD TIPO FREE FIRE --- */
+        .fullscreen-hud {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            max-width: 440px;
-            padding: 12px;
-            position: relative;
-            z-index: 2;
-        }
-        .card {
-            background: #12121c;
-            border: 2px solid #ffaa00;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-        }
-        h2 { color: #ffaa00; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
-        input {
-            width: 100%;
+            justify-content: space-between;
             padding: 8px;
-            background: #1c1c2b;
-            border: 1px solid #444;
-            color: #fff;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-bottom: 6px;
-            text-align: center;
-            letter-spacing: 2px;
+            z-index: 5;
+            pointer-events: none;
         }
-        .btn {
-            width: 100%;
-            padding: 8px;
-            background: #ffaa00;
-            color: #030303;
-            border: none;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 10px;
-        }
-        .btn-green { background: #00ff66; }
-        .btn-pink { background: #ff0055; color: white; }
+        .hud-element { pointer-events: auto; }
 
+        /* BARRA SUPERIOR: Modos y Selector minimizable o compacto */
+        .top-hud {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(18, 18, 28, 0.85);
+            border: 1px solid #ffaa00;
+            border-radius: 8px;
+            padding: 6px;
+            backdrop-filter: blur(5px);
+        }
         .menu-modes {
             display: flex;
-            gap: 5px;
-            margin-bottom: 4px;
+            gap: 4px;
         }
         .mode-btn {
             flex: 1;
             background: #171727;
             border: 1px solid #ffaa00;
             color: #ffaa00;
-            padding: 6px;
-            font-size: 10px;
-            border-radius: 6px;
+            padding: 4px;
+            font-size: 9px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
         }
         .mode-btn.active { background: #ffaa00; color: #080810; }
 
-        /* --- ARENA Y JOYSTICK DE MOVIMIENTO --- */
+        .selector-box-mini {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+        .char-option {
+            font-size: 16px;
+            background: #1f1f33;
+            border: 1px solid #444;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .char-option.activo { border-color: #00ff66; background: #113322; box-shadow: 0 0 8px #00ff66; }
+
+        /* --- ARENA DE BATALLA GIGANTE (OCUPA EL CENTRO) --- */
         .battle-arena {
+            flex: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, #1b263b, #0d1b2a);
+            background: linear-gradient(135deg, rgba(27, 38, 59, 0.9), rgba(13, 27, 42, 0.9));
             border: 2px solid #00ffff;
             border-radius: 12px;
-            padding: 15px 5px;
-            height: 140px;
-            margin-bottom: 8px;
+            padding: 10px;
+            margin: 6px 0;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 25px rgba(0, 255, 255, 0.25), 0 0 15px rgba(0,255,255,0.1);
+            box-shadow: inset 0 0 35px rgba(0, 255, 255, 0.3), 0 0 15px rgba(0,255,255,0.2);
         }
         .battle-arena::after {
             content: "";
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            height: 8px;
+            height: 6px;
             background: linear-gradient(90deg, #00ffff, #ff00ff, #ffaa00);
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         .fighter {
             position: absolute;
-            bottom: 12px;
+            bottom: 15px;
             text-align: center;
-            transition: left 0.1s linear;
+            transition: left 0.1s linear, right 0.1s linear;
         }
         #fighterP1 { left: 40px; }
         #fighterP2 { right: 40px; }
 
         .fighter-model {
-            width: 70px;
-            height: 105px;
+            width: 65px;
+            height: 95px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -179,67 +167,55 @@
             position: relative;
         }
 
-        /* Estructura del monigote vivo */
         .body-container {
             position: relative;
-            width: 36px;
-            height: 70px;
+            width: 32px;
+            height: 65px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .head {
-            font-size: 24px;
-            line-height: 24px;
-            z-index: 2;
-            filter: drop-shadow(0 0 5px rgba(255,255,255,0.6));
-        }
+        .head { font-size: 22px; line-height: 22px; z-index: 2; filter: drop-shadow(0 0 4px rgba(255,255,255,0.6)); }
         .torso {
-            width: 22px;
-            height: 25px;
+            width: 20px;
+            height: 22px;
             background: #ffaa00;
-            border-radius: 5px;
+            border-radius: 4px;
             position: relative;
             margin-top: -2px;
             z-index: 2;
         }
         .arm {
             position: absolute;
-            width: 6px;
-            height: 20px;
+            width: 5px;
+            height: 18px;
             background: #ffaa00;
-            border-radius: 3px;
+            border-radius: 2px;
             top: 2px;
         }
-        .arm.left { left: -8px; transform-origin: top center; transform: rotate(10deg); }
-        .arm.right { right: -8px; transform-origin: top center; transform: rotate(-10deg); }
+        .arm.left { left: -7px; transform-origin: top center; transform: rotate(10deg); }
+        .arm.right { right: -7px; transform-origin: top center; transform: rotate(-10deg); }
 
-        .legs {
-            display: flex;
-            gap: 4px;
-            margin-top: 1px;
-            z-index: 1;
-        }
+        .legs { display: flex; gap: 4px; margin-top: 1px; z-index: 1; }
         .leg {
-            width: 6px;
-            height: 20px;
+            width: 5px;
+            height: 18px;
             background: #33334d;
-            border-radius: 3px;
+            border-radius: 2px;
             position: relative;
         }
         .leg::after {
             content: '';
             position: absolute;
             bottom: -2px;
-            width: 10px;
-            height: 4px;
+            width: 8px;
+            height: 3px;
             background: #111;
             border-radius: 2px;
         }
         .leg.left::after { right: -2px; }
         .leg.right::after { left: -2px; }
 
-        /* Animaciones de Caminata (Walking) */
         @keyframes caminarPernasIzq {
             0%, 100% { transform: rotate(0deg); }
             50% { transform: rotate(-25deg); }
@@ -250,177 +226,176 @@
         }
         .caminando #legLeftP1 { animation: caminarPernasIzq 0.25s infinite alternate ease-in-out; }
         .caminando #legRightP1 { animation: caminarPernasDer 0.25s infinite alternate ease-in-out; }
-        
         .caminando-rival #legLeftP2 { animation: caminarPernasIzq 0.25s infinite alternate ease-in-out; }
         .caminando-rival #legRightP2 { animation: caminarPernasDer 0.25s infinite alternate ease-in-out; }
 
         .fighter-skin-name {
             font-size: 7px;
             color: #00ffff;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             padding: 1px 4px;
-            border-radius: 4px;
+            border-radius: 3px;
             margin-top: 2px;
             text-transform: uppercase;
             white-space: nowrap;
         }
-        .fighter-score { font-size: 18px; font-weight: bold; text-shadow: 0 0 10px currentColor; }
+        .fighter-score { font-size: 16px; font-weight: bold; text-shadow: 0 0 10px currentColor; }
 
-        /* Controles de Joystick en pantalla */
-        .joystick-panel {
+        /* --- HUD INFERIOR: DISTRIBUCIÓN ESTILO JUEGO DE CELULAR --- */
+        .controls-hud {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            background: #171727;
-            border: 1px solid #444;
-            padding: 8px 15px;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            align-items: flex-end;
+            width: 100%;
+            gap: 10px;
         }
-        .joystick-title { font-size: 9px; color: #ffaa00; font-weight: bold; }
-        .joystick-btns { display: flex; gap: 8px; }
+
+        /* Lado Izquierdo: Joystick de Movimiento */
+        .joystick-group {
+            display: flex;
+            gap: 6px;
+            background: rgba(18, 18, 28, 0.85);
+            border: 1px solid #444;
+            padding: 8px;
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+        }
         .joy-btn {
-            width: 45px;
-            height: 35px;
-            background: #252538;
-            border: 1px solid #ffaa00;
+            width: 50px;
+            height: 45px;
+            background: rgba(37, 37, 56, 0.9);
+            border: 2px solid #ffaa00;
             color: #ffaa00;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         .joy-btn:active { background: #ffaa00; color: #080810; transform: scale(0.95); }
 
-        .selector-box {
+        /* Centro inferior: Barra de Energía y Chat rápido */
+        .center-group {
+            flex: 1;
             display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 8px;
-            background: #171727;
-            padding: 6px;
-            border-radius: 8px;
-            border: 1px solid #333;
-        }
-        .char-option {
-            font-size: 22px;
-            background: #1f1f33;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(18, 18, 28, 0.85);
             border: 1px solid #444;
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .char-option.activo { border-color: #00ff66; background: #113322; box-shadow: 0 0 10px #00ff66; transform: scale(1.05); }
-
-        @keyframes baileCompleto {
-            0% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-8px) rotate(-10deg) scale(1.08); filter: drop-shadow(0 0 12px #00ff66); }
-            50% { transform: translateY(0) rotate(0deg) scale(1); }
-            75% { transform: translateY(-8px) rotate(10deg) scale(1.08); filter: drop-shadow(0 0 12px #ffaa00); }
-            100% { transform: translateY(0) rotate(0deg) scale(1); }
-        }
-        .animar-baile { animation: baileCompleto 0.4s ease-in-out; }
-
-        @keyframes rivalAccion {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1) rotate(-5deg); filter: drop-shadow(0 0 12px #ff0055); }
-            100% { transform: scale(1); }
-        }
-        .animar-rival { animation: rivalAccion 0.35s ease-in-out; }
-
-        @keyframes danioEfecto {
-            0% { filter: brightness(1); transform: scale(1); }
-            50% { filter: brightness(2.5) sepia(1) hue-rotate(180deg); transform: scale(0.92); }
-            100% { filter: brightness(1); transform: scale(1); }
-        }
-        .recibir-impacto { animation: danioEfecto 0.4s ease-in-out; }
-
-        .energy-container {
-            background: #171727;
-            border: 1px solid #333;
-            border-radius: 8px;
             padding: 6px;
-            margin-bottom: 6px;
-            text-align: left;
+            border-radius: 10px;
+            backdrop-filter: blur(4px);
         }
-        .energy-label { font-size: 9px; color: #aaa; margin-bottom: 3px; display: flex; justify-content: space-between; }
-        .energy-bar-bg { width: 100%; background: #222; height: 6px; border-radius: 3px; overflow: hidden; }
+        .energy-container {
+            width: 100%;
+        }
+        .energy-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .energy-bar-bg { width: 100%; background: #222; height: 5px; border-radius: 3px; overflow: hidden; }
         .energy-bar-fill { width: 100%; background: linear-gradient(90deg, #ffaa00, #00ff66); height: 100%; }
 
-        .action-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            font-weight: bold;
-            border-radius: 10px;
-            font-size: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #ff0055, #ffaa00, #00ffcc);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.4);
-            margin-bottom: 6px;
-        }
-        .action-btn:active { transform: scale(0.95); }
-        .action-btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
-
-        .special-btn {
-            width: 100%;
-            padding: 8px;
-            background: linear-gradient(90deg, #ffaa00, #ff4400);
-            color: #080810;
-            border: none;
-            font-weight: bold;
-            border-radius: 6px;
-            font-size: 10px;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-        .attack-btn {
-            width: 100%;
-            padding: 8px;
-            background: linear-gradient(90deg, #00ffff, #0055ff);
-            color: #080810;
-            border: none;
-            font-weight: bold;
-            border-radius: 6px;
-            font-size: 10px;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-        .gloo-btn {
-            width: 100%;
-            padding: 8px;
-            background: linear-gradient(90deg, #ffffff, #88ccff);
-            color: #080810;
-            border: none;
-            font-weight: bold;
-            border-radius: 6px;
-            font-size: 10px;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .store-box {
-            display: flex;
-            justify-content: space-between;
-            gap: 4px;
-            background: #171727;
-            border: 1px dashed #555;
-            padding: 6px;
-            border-radius: 8px;
+        .chat-burlas { display: flex; gap: 3px; }
+        .chat-btn {
+            background: #1c1c2b;
+            border: 1px solid #444;
+            color: #ddd;
             font-size: 8px;
+            padding: 3px;
+            border-radius: 3px;
+            flex: 1;
+            cursor: pointer;
+            text-align: center;
+        }
+        #chatLog { font-size: 8px; color: #00ffcc; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Lado Derecho: Botones Redondos de Ataques y Habilidades */
+        .action-buttons-group {
+            display: grid;
+            grid-template-columns: repeat(2, 50px);
+            grid-template-rows: repeat(2, 50px);
+            gap: 8px;
+        }
+        .round-action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            transition: transform 0.1s;
+        }
+        .round-action-btn:active { transform: scale(0.9); }
+        .round-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* Colores específicos para botones redondos */
+        #btnFarmearRedondo { background: linear-gradient(135deg, #ff0055, #ffaa00); border-color: #ffaa00; }
+        #btnPoderRedondo { background: linear-gradient(135deg, #ffaa00, #ff4400); border-color: #ffaa00; font-size: 14px; }
+        #btnAtaqueRedondo { background: linear-gradient(135deg, #00ffff, #0055ff); border-color: #00ffff; }
+        #btnGlooRedondo { background: linear-gradient(135deg, #ffffff, #88ccff); border-color: #ffffff; }
+
+        /* Panel Online Ocultable */
+        #panelOnline {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #12121c;
+            border: 2px solid #ffaa00;
+            padding: 15px;
+            border-radius: 12px;
+            z-index: 1000;
+            width: 90%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            display: none;
+        }
+        #panelOnline h2 { color: #ffaa00; font-size: 11px; margin-bottom: 8px; text-transform: uppercase; }
+        #panelOnline input {
+            width: 100%;
+            padding: 6px;
+            background: #1c1c2b;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 12px;
             margin-bottom: 6px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .btn {
+            width: 100%;
+            padding: 6px;
+            background: #ffaa00;
+            color: #030303;
+            border: none;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 9px;
+            margin-bottom: 4px;
+        }
+        .btn-green { background: #00ff66; }
+        .btn-pink { background: #ff0055; color: white; }
+
+        /* Tienda compacta flotante opcional o integrada */
+        .store-bar {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            background: rgba(18, 18, 28, 0.85);
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px dashed #555;
         }
         .store-item { 
             background: #1f1f33; 
-            padding: 6px 4px; 
-            border-radius: 5px; 
-            flex: 1; 
+            padding: 3px 6px; 
+            border-radius: 4px; 
+            font-size: 7px; 
             text-align: center; 
             border: 1px solid #333; 
             cursor: pointer;
@@ -428,39 +403,19 @@
         }
         .store-item:hover { border-color: #ffaa00; color: #fff; }
 
-        .chat-container {
-            background: #12121c;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 6px;
-            margin-top: 6px;
-        }
-        .chat-burlas { display: flex; gap: 4px; margin-top: 4px; }
-        .chat-btn {
-            background: #1c1c2b;
-            border: 1px solid #444;
-            color: #ddd;
-            font-size: 9px;
-            padding: 4px;
-            border-radius: 4px;
-            flex: 1;
-            cursor: pointer;
-        }
-        #chatLog { font-size: 9px; color: #00ffcc; margin-top: 3px; font-style: italic; }
-
         #alertaBooyah {
             position: fixed;
             top: 30%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             border: 3px solid #ffaa00;
             color: #ffaa00;
             padding: 15px 30px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             border-radius: 12px;
-            z-index: 1000;
+            z-index: 2000;
             text-align: center;
             box-shadow: 0 0 30px #ff0055;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -476,111 +431,118 @@
     <div id="efectoGloo"></div>
     <div id="alertaBooyah">🔥 ¡ÚLTIMA RONDA DE AURA! 🔥</div>
 
-    <div class="main-layout">
+    <!-- PANEL ONLINE FLOTANTE -->
+    <div id="panelOnline">
+        <h2>🌐 Sala Privada Plaza 1v1</h2>
+        <button class="btn btn-green" id="crearSalaBtn">Generar Código Sala</button>
+        <p id="myIdText" style="font-size: 10px; color: #00ff66; font-weight: bold; margin: 4px 0;">Código: ------</p>
+        <input type="text" id="codigoRivalInput" placeholder="Código de la sala" maxlength="6">
+        <button class="btn btn-pink" id="unirseSalaBtn">Entrar a Sala</button>
+        <p id="connectionStatus" style="font-size: 8px; color: #aaa; margin-top: 2px;">Estado: Desconectado</p>
+        <button class="btn" style="background:#444; color:#fff; margin-top:6px;" onclick="cerrarPanelOnline()">Cerrar</button>
+    </div>
+
+    <!-- HUD TOTAL PANTALLA COMPLETA -->
+    <div class="fullscreen-hud">
         
-        <div class="menu-modes">
-            <button class="mode-btn active" id="btnModoCPU" onclick="cambiarModo('cpu')">MODO VS BOT</button>
-            <button class="mode-btn" id="btnModoOnline" onclick="cambiarModo('online')">MULTIJUGADOR 1V1</button>
-        </div>
-
-        <div class="card" id="panelOnline" style="display: none;">
-            <h2>🌐 Sala Privada Plaza 1v1</h2>
-            <button class="btn btn-green" id="crearSalaBtn" style="margin-bottom:4px;">Generar Código Sala</button>
-            <p id="myIdText" style="font-size: 11px; color: #00ff66; font-weight: bold; margin: 4px 0;">Código: ------</p>
-            <input type="text" id="codigoRivalInput" placeholder="Código de la sala" maxlength="6">
-            <button class="btn btn-pink" id="unirseSalaBtn">Entrar a Sala</button>
-            <p id="connectionStatus" style="font-size: 9px; color: #aaa; margin-top: 2px;">Estado: Desconectado</p>
-        </div>
-
-        <div class="card">
-            <h2>Elige tu Skin de Personaje</h2>
-            <div class="selector-box">
-                <div class="char-option activo" onclick="cambiarGuerrero('🥷', 'Alok', '#ffaa00', this)">🥷</div>
-                <div class="char-option" onclick="cambiarGuerrero('🕵️‍♂️', 'Chrono', '#00ffff', this)">🕵️‍♂️</div>
-                <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', 'Criminal', '#ff0055', this)">🦹‍♂️</div>
-                <div class="char-option" onclick="cambiarGuerrero('🤖', 'Kenta', '#00ff66', this)">🤖</div>
+        <!-- PARTE SUPERIOR: Modos, skins y tienda rápida -->
+        <div class="top-hud hud-element">
+            <div class="menu-modes">
+                <button class="mode-btn active" id="btnModoCPU" onclick="cambiarModo('cpu')">MODO VS BOT</button>
+                <button class="mode-btn" id="btnModoOnline" onclick="cambiarModo('online')">MULTIJUGADOR 1V1</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                <div class="selector-box-mini">
+                    <div class="char-option activo" onclick="cambiarGuerrero('🥷', 'Alok', '#ffaa00', this)">🥷</div>
+                    <div class="char-option" onclick="cambiarGuerrero('🕵️‍♂️', 'Chrono', '#00ffff', this)">🕵️‍♂️</div>
+                    <div class="char-option" onclick="cambiarGuerrero('🦹‍♂️', 'Criminal', '#ff0055', this)">🦹‍♂️</div>
+                    <div class="char-option" onclick="cambiarGuerrero('🤖', 'Kenta', '#00ff66', this)">🤖</div>
+                </div>
+                <div class="store-bar">
+                    <div class="store-item" onclick="comprarMejora(500, 2, 'Criminal', '#ff0055')">🎭 Crim (500)</div>
+                    <div class="store-item" onclick="comprarMejora(3000, 5, 'MP40 Max', '#00ffff')">⚡ MP40 (3k)</div>
+                    <div class="store-item" onclick="comprarMejora(10000, 15, 'Angelical', '#ffffff')">🪽 Botas (10k)</div>
+                </div>
             </div>
         </div>
 
-        <div class="card" style="border-color: #00ffff;">
+        <!-- CENTRO: Arena de Batalla con Monigotes -->
+        <div class="battle-arena hud-element" id="arenaBox">
+            <!-- JUGADOR 1 -->
+            <div class="fighter" id="fighterP1">
+                <div class="fighter-model" id="modelP1">
+                    <div class="body-container">
+                        <div class="head" id="headP1">🥷</div>
+                        <div class="torso" id="torsoP1">
+                            <div class="arm left"></div>
+                            <div class="arm right"></div>
+                        </div>
+                        <div class="legs">
+                            <div class="leg left" id="legLeftP1"></div>
+                            <div class="leg right" id="legRightP1"></div>
+                        </div>
+                    </div>
+                    <div class="fighter-skin-name" id="skinNameP1">Alok</div>
+                </div>
+                <div class="fighter-score" id="scoreP1" style="color: #00ff66;">0</div>
+            </div>
+
+            <!-- JUGADOR 2 / BOT -->
+            <div class="fighter" id="fighterP2">
+                <div class="fighter-model" id="modelP2">
+                    <div class="body-container">
+                        <div class="head" id="headP2">🤖</div>
+                        <div class="torso" id="torsoP2" style="background: #00ff66;">
+                            <div class="arm left"></div>
+                            <div class="arm right"></div>
+                        </div>
+                        <div class="legs">
+                            <div class="leg left" id="legLeftP2"></div>
+                            <div class="leg right" id="legRightP2"></div>
+                        </div>
+                    </div>
+                    <div class="fighter-skin-name" id="skinNameP2">Bot FF</div>
+                </div>
+                <div class="fighter-score" id="scoreP2" style="color: #ff0055;">0</div>
+            </div>
+        </div>
+
+        <!-- PARTE INFERIOR: Distribución Tipo Consola de Celular -->
+        <div class="controls-hud hud-element">
             
-            <div class="battle-arena" id="arenaBox">
-                <div class="fighter" id="fighterP1">
-                    <div class="fighter-model" id="modelP1">
-                        <div class="body-container">
-                            <div class="head" id="headP1">🥷</div>
-                            <div class="torso" id="torsoP1">
-                                <div class="arm left"></div>
-                                <div class="arm right"></div>
-                            </div>
-                            <div class="legs">
-                                <div class="leg left" id="legLeftP1"></div>
-                                <div class="leg right" id="legRightP1"></div>
-                            </div>
-                        </div>
-                        <div class="fighter-skin-name" id="skinNameP1">Alok</div>
+            <!-- Izquierda: Joystick de Movimiento -->
+            <div class="joystick-group">
+                <button class="joy-btn" onmousedown="moverAvatar(-1)" ontouchstart="moverAvatar(-1)">◀</button>
+                <button class="joy-btn" onmousedown="moverAvatar(1)" ontouchstart="moverAvatar(1)">▶</button>
+            </div>
+
+            <!-- Centro: Energía, Chat y Burlas -->
+            <div class="center-group">
+                <div class="energy-container">
+                    <div class="energy-label">
+                        <span>⚡ ESTAMINA EMOTE</span>
+                        <span id="energyText">100%</span>
                     </div>
-                    <div class="fighter-score" id="scoreP1" style="color: #00ff66;">0</div>
-                </div>
-
-                <div class="fighter" id="fighterP2">
-                    <div class="fighter-model" id="modelP2">
-                        <div class="body-container">
-                            <div class="head" id="headP2">🤖</div>
-                            <div class="torso" id="torsoP2" style="background: #00ff66;">
-                                <div class="arm left"></div>
-                                <div class="arm right"></div>
-                            </div>
-                            <div class="legs">
-                                <div class="leg left" id="legLeftP2"></div>
-                                <div class="leg right" id="legRightP2"></div>
-                            </div>
-                        </div>
-                        <div class="fighter-skin-name" id="skinNameP2">Bot FF</div>
+                    <div class="energy-bar-bg">
+                        <div class="energy-bar-fill" id="energyFill"></div>
                     </div>
-                    <div class="fighter-score" id="scoreP2" style="color: #ff0055;">0</div>
                 </div>
-            </div>
-
-            <div class="joystick-panel">
-                <span class="joystick-title">🕹️ JOYSTICK MOVIMIENTO</span>
-                <div class="joystick-btns">
-                    <button class="joy-btn" onmousedown="moverAvatar(-1)" ontouchstart="moverAvatar(-1)">◀</button>
-                    <button class="joy-btn" onmousedown="moverAvatar(1)" ontouchstart="moverAvatar(1)">▶</button>
-                </div>
-            </div>
-
-            <div class="energy-container">
-                <div class="energy-label">
-                    <span>⚡ ENERGÍA DE EMOTE</span>
-                    <span id="energyText">100%</span>
-                </div>
-                <div class="energy-bar-bg">
-                    <div class="energy-bar-fill" id="energyFill"></div>
-                </div>
-            </div>
-
-            <button class="action-btn" id="btnFarmear">🔥 Framear Aura (Emote) 🔥</button>
-
-            <button class="special-btn" id="btnPoder" onclick="usarPoderEspecial()">⚡ Baile Épico (+25 Aura)</button>
-            <button class="attack-btn" id="btnAtaque" onclick="lanzarAtaqueRival()">🧊 Tirar Globo Hielo (-10 Aura Rival)</button>
-            <button class="gloo-btn" id="btnGloo" onclick="activarParedGloo()">🛡️ Poner Pared Gloo (Escudo)</button>
-
-            <div class="store-box">
-                <div class="store-item" onclick="comprarMejora(500, 2, 'Criminal', '#ff0055')">🎭 Criminal<br><b>500 (x2)</b></div>
-                <div class="store-item" onclick="comprarMejora(3000, 5, 'MP40 Max', '#00ffff')">⚡ MP40<br><b>3k (x5)</b></div>
-                <div class="store-item" onclick="comprarMejora(10000, 15, 'Angelical', '#ffffff')">🪽 Botas<br><b>10k (x15)</b></div>
-            </div>
-
-            <div class="chat-container">
-                <div style="font-size: 8px; color: #aaa;">💬 BURLAS DE SALA:</div>
+                <div id="chatLog">¡Listo para la batalla!</div>
                 <div class="chat-burlas">
                     <button class="chat-btn" onclick="enviarMensajeChat('¡Ya aguanta JAJJAJJA! 🗿')">🗿 Ya aguanta</button>
                     <button class="chat-btn" onclick="enviarMensajeChat('¡Manco de sala! 🔥')">🔥 Manco</button>
                     <button class="chat-btn" onclick="enviarMensajeChat('¡GG facilito! ⚡')">⚡ GG</button>
                 </div>
-                <div id="chatLog">Mueve el joystick o framea aura...</div>
             </div>
+
+            <!-- Derecha: Botones Redondos de Ataques y Habilidades -->
+            <div class="action-buttons-group">
+                <button class="round-action-btn" id="btnFarmearRedondo" title="Farmear Aura">🔥</button>
+                <button class="round-action-btn" id="btnPoderRedondo" onclick="usarPoderEspecial()" title="Baile Épico">⚡</button>
+                <button class="round-action-btn" id="btnAtaqueRedondo" onclick="lanzarAtaqueRival()" title="Globo Hielo">🧊</button>
+                <button class="round-action-btn" id="btnGlooRedondo" onclick="activarParedGloo()" title="Pared Gloo">🛡️</button>
+            </div>
+
         </div>
 
     </div>
@@ -599,9 +561,8 @@
         let escudoActivo = false;
         let alertaMostrada = false;
         
-        // Posiciones en pixeles dentro de la arena
         let posX1 = 30;
-        let posX2 = 30; // Distancia desde la derecha para P2
+        let posX2 = 30;
         let peer, conn, botInterval;
 
         const peerOptions = {
@@ -628,13 +589,11 @@
             osc.stop(audioCtx.currentTime + duracion);
         }
 
-        // Joystick de movimiento
         function moverAvatar(direccion) {
             posX1 = Math.max(10, Math.min(220, posX1 + (direccion * 15)));
             let f1 = document.getElementById("fighterP1");
             f1.style.left = posX1 + "px";
             
-            // Activar animación de caminata temporal
             let model = document.getElementById("modelP1");
             model.classList.add("caminando");
             reproducirSonido(400, 'sine', 0.05);
@@ -646,7 +605,7 @@
             sincronizarDatos();
         }
 
-        // Generar partículas de fondo
+        // Partículas flotantes de fondo
         setInterval(() => {
             let container = document.getElementById("particlesContainer");
             if(container.childElementCount > 15) return;
@@ -682,7 +641,7 @@
             reproducirSonido(700, 'triangle', 0.3);
             document.getElementById("chatLog").textContent = "🛡️ ¡Pared Gloo colocada! Inmune al siguiente ataque.";
             
-            let btnGloo = document.getElementById("btnGloo");
+            let btnGloo = document.getElementById("btnGlooRedondo");
             btnGloo.disabled = true;
             
             setTimeout(() => {
@@ -692,12 +651,12 @@
 
             let tiempo = 12;
             let intervalo = setInterval(() => {
-                btnGloo.textContent = `⏳ Gloo en Cooldown (${tiempo}s)...`;
+                btnGloo.textContent = `⏳${tiempo}`;
                 tiempo--;
                 if(tiempo < 0) {
                     clearInterval(intervalo);
                     btnGloo.disabled = false;
-                    btnGloo.textContent = "🛡️ Poner Pared Gloo (Escudo)";
+                    btnGloo.textContent = "🛡️";
                 }
             }, 1000);
         }
@@ -720,6 +679,10 @@
                 document.getElementById('panelOnline').style.display = 'block';
                 if(botInterval) clearInterval(botInterval);
             }
+        }
+
+        function cerrarPanelOnline() {
+            document.getElementById('panelOnline').style.display = 'none';
         }
 
         function cambiarGuerrero(emoji, nombreSkin, colorHex, el) {
@@ -751,11 +714,11 @@
                 document.querySelectorAll('#fighterP1 .arm').forEach(a => a.style.background = colorHex);
 
                 reproducirSonido(880, 'triangle', 0.3);
-                alert(`¡Equipaste ${nombre}! Multiplicador x${multiplicador}`);
+                document.getElementById("chatLog").textContent = `¡Equipado ${nombre} (x${multiplicador})!`;
                 sincronizarDatos();
             } else {
                 reproducirSonido(150, 'sawtooth', 0.2);
-                alert("¡Te faltan puntos de aura!");
+                document.getElementById("chatLog").textContent = "¡Faltan puntos de aura!";
             }
         }
 
@@ -766,17 +729,17 @@
             reproducirSonido(900, 'square', 0.4);
             
             poderCargado = false;
-            let btnPoder = document.getElementById("btnPoder");
+            let btnPoder = document.getElementById("btnPoderRedondo");
             btnPoder.disabled = true;
             let tiempo = 10;
             let intervalo = setInterval(() => {
-                btnPoder.textContent = `⏳ En Cooldown (${tiempo}s)...`;
+                btnPoder.textContent = `⏳${tiempo}`;
                 tiempo--;
                 if(tiempo < 0) {
                     clearInterval(intervalo);
                     poderCargado = true;
                     btnPoder.disabled = false;
-                    btnPoder.textContent = "⚡ Baile Épico (+25 Aura)";
+                    btnPoder.textContent = "⚡";
                 }
             }, 1000);
             sincronizarDatos();
@@ -792,7 +755,7 @@
             setTimeout(() => f2.classList.remove("recibir-impacto"), 400);
 
             ataqueCargado = false;
-            let btnAtaque = document.getElementById("btnAtaque");
+            let btnAtaque = document.getElementById("btnAtaqueRedondo");
             btnAtaque.disabled = true;
 
             if (conn && conn.open) {
@@ -800,18 +763,18 @@
             } else if (modoJuego === 'cpu') {
                 score2 = Math.max(0, score2 - 10);
                 document.getElementById("scoreP2").textContent = score2;
-                alert("¡Le lanzaste un Globo de Hielo al Bot!");
+                document.getElementById("chatLog").textContent = "¡Lanzaste Globo de Hielo al Bot!";
             }
 
             let tiempo = 8;
             let intervalo = setInterval(() => {
-                btnAtaque.textContent = `⏳ Recargando Hielo (${tiempo}s)...`;
+                btnAtaque.textContent = `⏳${tiempo}`;
                 tiempo--;
                 if(tiempo < 0) {
                     clearInterval(intervalo);
                     ataqueCargado = true;
                     btnAtaque.disabled = false;
-                    btnAtaque.textContent = "🧊 Tirar Globo Hielo (-10 Aura Rival)";
+                    btnAtaque.textContent = "🧊";
                 }
             }, 1000);
         }
@@ -829,7 +792,6 @@
                         score2 += 1;
                         document.getElementById("scoreP2").textContent = score2;
                         
-                        // Simular movimiento del bot
                         posX2 = Math.max(10, Math.min(220, posX2 + (Math.random() > 0.5 ? 10 : -10)));
                         document.getElementById("fighterP2").style.right = posX2 + "px";
                         
@@ -843,7 +805,7 @@
             }, 700);
         }
 
-        const btnFarmear = document.getElementById("btnFarmear");
+        const btnFarmear = document.getElementById("btnFarmearRedondo");
         btnFarmear.addEventListener("click", () => {
             if (estaCansado) return;
 
@@ -860,12 +822,12 @@
                 estamina = 0;
                 estaCansado = true;
                 btnFarmear.disabled = true;
-                btnFarmear.textContent = "💤 CANSADO (Recuperando)...";
+                btnFarmear.textContent = "💤";
                 setTimeout(() => {
                     estamina = 100;
                     estaCansado = false;
                     btnFarmear.disabled = false;
-                    btnFarmear.textContent = "🔥 Framear Aura (Emote) 🔥";
+                    btnFarmear.textContent = "🔥";
                 }, 2000);
             }
             document.getElementById("energyFill").style.width = estamina + "%";
@@ -942,6 +904,7 @@
         function setupConnection() {
             document.getElementById("connectionStatus").textContent = "¡Rival conectado!";
             document.getElementById("chatLog").textContent = "¡Partida 1v1 iniciada!";
+            document.getElementById("panelOnline").style.display = 'none';
             
             conn.on('open', () => sincronizarDatos());
             conn.on('data', (data) => {

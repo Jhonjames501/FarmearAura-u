@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmear Aura: Ultimate Edition</title>
+    <title>Farmear Aura: Ultra Pro Edition</title>
     <style>
         * {
             box-sizing: border-box;
@@ -20,11 +20,12 @@
             min-height: 100vh;
             background-image: radial-gradient(circle at center, #151515 0%, #030303 100%);
             overflow-x: hidden;
+            padding-bottom: 30px;
         }
         .main-layout {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             width: 100%;
             max-width: 420px;
             padding: 15px;
@@ -35,7 +36,7 @@
             background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
             border: 3px solid #d4af37;
             border-radius: 20px;
-            height: 200px;
+            height: 180px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -43,98 +44,97 @@
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
         
-        /* Personaje Animado en Movimiento Real */
         .avatar-container {
-            font-size: 80px;
+            font-size: 75px;
             animation: floatCharacter 2s ease-in-out infinite;
             filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8));
         }
 
         @keyframes floatCharacter {
             0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
             100% { transform: translateY(0px) rotate(0deg); }
         }
 
         .rank-tag {
             position: absolute;
-            top: 12px;
-            left: 12px;
+            top: 10px;
+            left: 10px;
             background: #d4af37;
             color: #030303;
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        /* Barra de Vida / Estamina Realista */
+        /* Barra de Vida / Estamina */
         .stamina-container {
             background: #111;
             border: 2px solid #333;
             border-radius: 12px;
-            padding: 10px;
-            text-align: left;
+            padding: 8px 12px;
         }
         .stamina-label {
             display: flex;
             justify-content: space-between;
-            font-size: 10px;
+            font-size: 9px;
             color: #aaa;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             text-transform: uppercase;
         }
         .stamina-bar-bg {
             width: 100%;
-            height: 12px;
+            height: 10px;
             background: #222;
-            border-radius: 6px;
+            border-radius: 5px;
             overflow: hidden;
             border: 1px solid #444;
         }
         .stamina-bar-fill {
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, #ff3333, #00ff00);
+            background: linear-gradient(90deg, #ff3333, #00ff66);
             transition: width 0.3s linear;
         }
 
-        /* Panel de Puntos */
+        /* Panel de Puntos y APS */
         .stats-panel {
             background: #111;
             border: 2px solid #444;
             border-radius: 16px;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
         }
         .aura-counter {
-            font-size: 44px;
+            font-size: 40px;
             font-weight: bold;
             color: #00ff66;
-            margin: 5px 0;
+            margin: 2px 0;
             text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
         }
+        .aps-text {
+            font-size: 10px;
+            color: #d4af37;
+        }
 
-        /* Botón de Acción Principal con Animación de Clic */
+        /* Botón Principal */
         .action-btn {
             width: 100%;
-            padding: 18px;
+            padding: 16px;
             background: linear-gradient(90deg, #ff0055, #7a00ff, #00ffcc);
             background-size: 200% 100%;
             animation: gradientAnimation 4s linear infinite;
             border: none;
             color: white;
             font-weight: bold;
-            font-size: 17px;
+            font-size: 16px;
             border-radius: 14px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
             box-shadow: 0 5px 20px rgba(122, 0, 255, 0.4);
-            position: relative;
-            overflow: hidden;
         }
         .action-btn:active {
             transform: scale(0.96);
@@ -146,12 +146,12 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Tienda Activa */
+        /* Tienda Funcional Interactiva */
         .shop-panel {
             background: #121212;
             border: 1px dashed #d4af37;
             border-radius: 16px;
-            padding: 12px;
+            padding: 10px;
         }
         .shop-title {
             color: #d4af37;
@@ -172,48 +172,65 @@
             width: 32%;
             text-align: center;
             font-size: 9px;
-            border: 1px solid #333;
-            opacity: 0.4;
+            border: 1px solid #444;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .shop-item.unlocked {
-            opacity: 1;
+        .shop-item:hover {
             border-color: #00ff66;
-            background: #112211;
+        }
+        .shop-item.bought {
+            background: #0f2215;
+            border-color: #00ff66;
+            opacity: 0.8;
+            cursor: default;
         }
         .shop-icon {
-            font-size: 20px;
-            margin-bottom: 3px;
+            font-size: 18px;
+            margin-bottom: 2px;
         }
 
-        /* Números Flotantes al hacer clic */
+        /* Consola de Frases Sigma */
+        .sigma-quote {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #aaa;
+            font-style: italic;
+        }
+
+        /* Números Flotantes */
         .floating-text {
             position: absolute;
             color: #00ff66;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             pointer-events: none;
             animation: floatUp 0.8s ease-out forwards;
         }
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-50px) scale(1.3); }
+            100% { opacity: 0; transform: translateY(-40px) scale(1.2); }
         }
     </style>
 </head>
 <body>
 
-    <div class="main-layout" id="gameScreen">
+    <div class="main-layout">
         
-        <!-- PERSONAJE EN MOVIMIENTO -->
-        <div class="character-display" id="cajaAvatar">
+        <!-- PERSONAJE -->
+        <div class="character-display">
             <div class="rank-tag" id="rangoEtiqueta">NPC Beta</div>
             <div class="avatar-container" id="imagenPersonaje">🧟</div>
         </div>
 
-        <!-- VIDA / ESTAMINA REALISTA -->
+        <!-- ESTAMINA -->
         <div class="stamina-container">
             <div class="stamina-label">
-                <span>⚡ Energía / Vida Realista</span>
+                <span>⚡ Energía Sigma</span>
                 <span id="staminaTexto">100%</span>
             </div>
             <div class="stamina-bar-bg">
@@ -221,40 +238,52 @@
             </div>
         </div>
 
-        <!-- ESTADÍSTICAS -->
+        <!-- PUNTOS Y APS -->
         <div class="stats-panel">
             <div class="aura-counter" id="puntosAura">0</div>
-            <p style="font-size: 10px; color: #777;">PUNTOS DE AURA</p>
+            <div class="aps-text" id="apsTexto">Generando: +0 Aura/seg</div>
         </div>
 
         <!-- BOTÓN PRINCIPAL -->
         <button class="action-btn" id="btnFarmear">🔥 FARMEAR AURA 🔥</button>
 
-        <!-- TIENDA -->
+        <!-- TIENDA INTERACTIVA -->
         <div class="shop-panel">
-            <h3 class="shop-title">Mejoras Sigma</h3>
+            <h3 class="shop-title">Tienda de Mejoras</h3>
             <div class="shop-items">
-                <div class="shop-item" id="shopLentes">
+                <div class="shop-item" onclick="comprarMejora('lentes')">
                     <div class="shop-icon">🕶️</div>
-                    <p>Lentes (500)</p>
+                    <p><b>Lentes</b></p>
+                    <p style="color:#d4af37;">500 Aura</p>
                 </div>
-                <div class="shop-item" id="shopCorte">
+                <div class="shop-item" onclick="comprarMejora('corte')">
                     <div class="shop-icon">✂️</div>
-                    <p>Fade (2k)</p>
+                    <p><b>Fade Pro</b></p>
+                    <p style="color:#d4af37;">2,000 Aura</p>
                 </div>
-                <div class="shop-item" id="shopCadenita">
+                <div class="shop-item" onclick="comprarMejora('oro')">
                     <div class="shop-icon">⛓️</div>
-                    <p>Oro (10k)</p>
+                    <p><b>Cadenita</b></p>
+                    <p style="color:#d4af37;">10,000 Aura</p>
                 </div>
             </div>
+        </div>
+
+        <!-- CONSOLA DE FRASES -->
+        <div class="sigma-quote" id="fraseSigma">
+            "Un verdadero sigma no compite, domina en silencio..."
         </div>
 
     </div>
 
     <script>
         let aura = 0;
-        let estamina = 100; // Sistema de vida/energía realista (de 0 a 100)
-        let rangoActual = "NPC Beta";
+        let estamina = 100;
+        let powerClick = 1; // Cuánto sube por clic
+        let auraPorSegundoo = 0; // Auto-farm
+
+        // Estado de compras
+        let mejorasCompradas = { lentes: false, corte: false, oro: false };
 
         const btnFarmear = document.getElementById("btnFarmear");
         const puntosAura = document.getElementById("puntosAura");
@@ -262,48 +291,70 @@
         const imagenPersonaje = document.getElementById("imagenPersonaje");
         const staminaBarra = document.getElementById("staminaBarra");
         const staminaTexto = document.getElementById("staminaTexto");
-        const cajaAvatar = document.getElementById("cajaAvatar");
+        const apsTexto = document.getElementById("apsTexto");
+        const fraseSigma = document.getElementById("fraseSigma");
 
-        const shopLentes = document.getElementById("shopLentes");
-        const shopCorte = document.getElementById("shopCorte");
-        const shopCadenita = document.getElementById("shopCadenita");
-
-        // Rangos con animaciones y estilos de personaje
         const nivelesConfig = [
-            { auraMin: 0, nombre: "NPC Beta", emoji: "🧟" },
-            { auraMin: 150, nombre: "Sigma Male", emoji: "🗿" },
-            { auraMin: 600, nombre: "Gigachad 💪", emoji: "🦾" },
-            { auraMin: 2500, nombre: "Patrick Bateman", emoji: "🕴️" },
-            { auraMin: 12000, nombre: "Dios del Aura", emoji: "👑" }
+            { auraMin: 0, nombre: "NPC Beta", emoji: "🧟", frase: "Sigues mirando la tele en lugar de tradear cripto." },
+            { auraMin: 200, nombre: "Sigma Male", emoji: "🗿", frase: "Ignoras a todo el mundo. Tu mente está en la cima." },
+            { auraMin: 800, nombre: "Gigachad 💪", emoji: "🦾", frase: "Tu mandíbula puede cortar diamantes." },
+            { auraMin: 3000, nombre: "Patrick Bateman", emoji: "🕴️", frase: "Tienes que devolver unas videocintas." },
+            { auraMin: 15000, nombre: "Dios del Aura", emoji: "👑", frase: "Has trascendido la realidad. Eres intocable." }
         ];
 
-        // Decremento de estamina realista en el tiempo (si dejas de farmear, pierdes vida/energía)
+        // Bucle de Auto-Farm (Aura por segundo) y bajada de estamina
         setInterval(() => {
-            if (estamina > 0) {
-                estamina -= 1.5; // Baja poco a poco
-                if (estamina < 0) estamina = 0;
-            } else {
-                // Penalización si la estamina llega a 0 (pierdes aura lentamente por falta de actividad)
-                if (aura > 10) aura -= 5;
+            if (auraPorSegundoo > 0) {
+                aura += auraPorSegundoo;
             }
-            actualizarEstaminaVisual();
+            if (estamina > 0) {
+                estamina -= 1;
+            } else {
+                if (aura > 5) aura -= 2; // Penalización si se acaba la energía
+            }
+            actualizarJuego();
         }, 1000);
 
         btnFarmear.addEventListener("click", (e) => {
-            let ganado = Math.floor(Math.random() * 15) + 5;
+            let ganado = Math.floor(Math.random() * 10) + powerClick;
             aura += ganado;
-            
-            // Subir estamina al hacer clic (acción de farmear)
-            estamina += 8;
+            estamina += 5;
             if (estamina > 100) estamina = 100;
 
             actualizarJuego();
-            crearTextoFlotantFlotante(e, `+${ganado}`);
+            crearTextoFlotante(e, `+${ganado}`);
         });
 
-        function actualizarJuego() {
-            puntosAura.textContent = aura;
+        function comprarMejora(tipo) {
+            if (tipo === 'lentes' && !mejorasCompradas.lentes && aura >= 500) {
+                aura -= 500;
+                mejorasCompradas.lentes = true;
+                powerClick += 3;
+                auraPorSegundoo += 2; // Da +2 por segundo
+                fraseSigma.textContent = "🕶️ Te compraste los lentes oscuros. Nadie sabe qué estás pensando.";
+            } else if (tipo === 'corte' && !mejorasCompradas.corte && aura >= 2000) {
+                aura -= 2000;
+                mejorasCompradas.corte = true;
+                powerClick += 8;
+                auraPorSegundoo += 10; // Da +10 por segundo
+                fraseSigma.textContent = "✂️ Corte Fade impecable. Las miradas se desvían a tu paso.";
+            } else if (tipo === 'oro' && !mejorasCompradas.oro && aura >= 10000) {
+                aura -= 10000;
+                mejorasCompradas.oro = true;
+                powerClick += 25;
+                auraPorSegundoo += 50; // Da +50 por segundo
+                fraseSigma.textContent = "⛓️ Cadenita de oro puro desbloqueada. Aura estelar.";
+            }
+            actualizarJuego();
+        }
 
+        function actualizarJuego() {
+            puntosAura.textContent = Math.floor(aura);
+            apsTexto.textContent = `Generando: +${auraPorSegundoo} Aura/seg`;
+            staminaBarra.style.width = estamina + "%";
+            staminaTexto.textContent = Math.floor(estamina) + "%";
+
+            // Determinar Rango Actual
             let nivelActualConfig = nivelesConfig[0];
             for (let i = 0; i < nivelesConfig.length; i++) {
                 if (aura >= nivelesConfig[i].auraMin) {
@@ -316,34 +367,19 @@
             rangoEtiqueta.textContent = nivelActualConfig.nombre;
             imagenPersonaje.textContent = nivelActualConfig.emoji;
 
-            // Desbloqueo de tienda
-            if(aura >= 500) shopLentes.classList.add('unlocked');
-            if(aura >= 2000) shopCorte.classList.add('unlocked');
-            if(aura >= 12000) shopCadenita.classList.add('unlocked');
-        }
-
-        function actualizarEstaminaVisual() {
-            staminaBarra.style.width = estamina + "%";
-            staminaTexto.textContent = Math.floor(estamina) + "%";
-
-            // Cambiar color de la barra según la salud/energía
-            if (estamina < 30) {
-                staminaBarra.style.background = "#ff2222"; // Peligro
-            } else {
-                staminaBarra.style.background = "linear-gradient(90deg, #ffaa00, #00ff66)";
+            // Cambiar frase si cambió de rango (solo si no compraron mejora recientemente)
+            if (Math.random() < 0.05) {
+                fraseSigma.textContent = `"${nivelActualConfig.frase}"`;
             }
         }
 
-        function crearTextoFlotantFlotante(e, texto) {
+        function crearTextoFlotante(e, texto) {
             let el = document.createElement("div");
             el.className = "floating-text";
             el.textContent = texto;
-            
-            // Posicionar cerca del clic o del botón
             let rect = btnFarmear.getBoundingClientRect();
-            el.style.left = (rect.left + rect.width / 2 + (Math.random() * 40 - 20)) + "px";
+            el.style.left = (rect.left + rect.width / 2 + (Math.random() * 30 - 15)) + "px";
             el.style.top = rect.top + "px";
-            
             document.body.appendChild(el);
             setTimeout(() => { el.remove(); }, 800);
         }

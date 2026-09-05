@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmear Aura: Multijugador Completo</title>
+    <title>Farmear Aura: Batalla Real</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -66,9 +66,37 @@
         .btn-green { background: #00ff66; }
         .btn-pink { background: #ff0055; color: white; }
 
-        /* Estilos originales de tu interfaz de juego */
-        .npc-box { font-size: 45px; margin: 10px 0; }
-        
+        /* --- ANIMACIONES DE BATALLA REALES PARA EL PERSONAJE --- */
+        .npc-box {
+            font-size: 50px;
+            margin: 10px 0;
+            transition: transform 0.1s ease;
+            display: inline-block;
+        }
+
+        /* Animación cuando golpeas (Efecto de carga de poder / golpe crítico) */
+        @keyframes auraHit {
+            0% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0px #00ff66); }
+            50% { transform: scale(1.25) rotate(-5deg); filter: drop-shadow(0 0 20px #00ff66) brightness(1.5); }
+            100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 5px #00ff66); }
+        }
+        .animar-golpe {
+            animation: auraHit 0.25s ease-in-out;
+        }
+
+        /* Animación de vibración constante de poder (Modo Aura Activa) */
+        @keyframes powerVibrate {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-1px, -1px); }
+            80% { transform: translate(1px, 1px); }
+            100% { transform: translate(0, 0); }
+        }
+        .animar-vibracion {
+            animation: powerVibrate 0.15s infinite;
+        }
+
         .energy-container {
             background: #1a1a1a;
             border: 1px solid #333;
@@ -105,7 +133,7 @@
             box-shadow: 0 4px 15px rgba(122, 0, 255, 0.4);
             margin-bottom: 10px;
         }
-        .action-btn:active { transform: scale(0.96); }
+        .action-btn:active { transform: scale(0.94); }
 
         .store-box {
             display: flex;
@@ -121,13 +149,26 @@
         .store-item { background: #222; padding: 6px; border-radius: 6px; flex: 1; text-align: center; border: 1px solid #333; }
         
         .multiplayer-status { font-size: 10px; color: #00ff66; margin-top: 5px; font-style: italic; }
+
+        /* Texto flotante de impacto de aura */
+        .aura-flotante {
+            position: absolute;
+            color: #00ff66;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            animation: subirTexto 0.6s ease-out forwards;
+        }
+        @keyframes subirTexto {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
+        }
     </style>
 </head>
 <body>
 
     <div class="main-layout">
         
-        <!-- SECCIÓN 1: CONEXIÓN ONLINE (6 DÍGITOS) -->
         <div class="card">
             <h2>🌐 Multijugador Online</h2>
             <button class="btn btn-green" id="crearSalaBtn">Generar mi Código</button>
@@ -140,14 +181,13 @@
             <p id="connectionStatus" style="font-size: 10px; color: #aaa; margin-top: 4px;">Estado: Desconectado</p>
         </div>
 
-        <!-- SECCIÓN 2: TU DISEÑO ORIGINAL COMPLETO -->
-        <div class="card" style="border-color: #ff0055;">
+        <div class="card" style="border-color: #ff0055; position: relative;">
             <h2>NPC Beta</h2>
             
-            <!-- Imagen / Emoji original -->
-            <div class="npc-box">🧟</div>
+            <div id="npcContenedor">
+                <div class="npc-box" id="npcAvatar">🧟</div>
+            </div>
 
-            <!-- Barra de Estamina / Energía -->
             <div class="energy-container">
                 <div class="energy-label">
                     <span>⚡ ENERGÍA / VIDA REALISTA</span>
@@ -158,7 +198,6 @@
                 </div>
             </div>
 
-            <!-- Puntuación Tuya y del Rival -->
             <div class="score-display">
                 <div class="score-number" id="scoreP1">0</div>
                 <div class="score-title">Tus Puntos de Aura</div>
@@ -167,17 +206,15 @@
                 <div class="score-title">Puntos del Rival</div>
             </div>
 
-            <!-- Botón principal de Farmear -->
             <button class="action-btn" id="btnFarmear">🔥 Farmear Aura 🔥</button>
 
-            <!-- Tienda de mejoras original -->
             <div class="store-box">
                 <div class="store-item">👓 Lentes (500)</div>
                 <div class="store-item">✂️ Corte (7k)</div>
                 <div class="store-item">🧬 Gym (15k)</div>
             </div>
 
-            <div class="multiplayer-status" id="multiplayerStatus">Listo para jugar en solitario o en línea.</div>
+            <div class="multiplayer-status" id="multiplayerStatus">¡Listo para la batalla de aura real!</div>
         </div>
 
     </div>
@@ -201,12 +238,12 @@
         const energyText = document.getElementById("energyText");
         const connectionStatus = document.getElementById("connectionStatus");
         const multiplayerStatus = document.getElementById("multiplayerStatus");
+        const npcAvatar = document.getElementById("npcAvatar");
 
         function generarCodigo6Digitos() {
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
 
-        // Crear Sala
         crearSalaBtn.addEventListener("click", () => {
             codigoPersonal = generarCodigo6Digitos();
             myIdText.textContent = "Código: " + codigoPersonal;
@@ -231,10 +268,10 @@
                 setupConnection();
                 connectionStatus.textContent = "Estado: ¡Rival conectado!";
                 multiplayerStatus.textContent = "¡Partida multijugador activa!";
+                npcAvatar.classList.add("animar-vibracion"); // Entra en modo poder constante
             });
         });
 
-        // Unirse a Sala
         unirseSalaBtn.addEventListener("click", () => {
             let codigoAmigo = codigoRivalInput.value.trim();
             if (codigoAmigo.length !== 6) {
@@ -258,11 +295,15 @@
             conn.on('open', () => {
                 connectionStatus.textContent = "Estado: ¡Conectado con éxito!";
                 multiplayerStatus.textContent = "¡Partida multijugador activa!";
+                npcAvatar.classList.add("animar-vibracion");
             });
 
             conn.on('data', (data) => {
                 score2 = data;
                 scoreP2.textContent = score2;
+                // Si el rival ataca, hacemos que parpadee levemente
+                npcAvatar.classList.add("animar-golpe");
+                setTimeout(() => npcAvatar.classList.remove("animar-golpe"), 250);
                 verificarGanador();
             });
 
@@ -271,22 +312,44 @@
             });
         }
 
-        // Acción de farmear con el diseño original
-        btnFarmear.addEventListener("click", () => {
+        // ACCIÓN DE FARMEAR CON ANIMACIÓN DE GOLPE Y TEXTO FLOTANTE
+        btnFarmear.addEventListener("click", (e) => {
             score1 += 1;
             scoreP1.textContent = score1;
 
-            // Variar un poco la barra de energía para darle dinamismo
+            // 1. Activar animación de golpe en el personaje
+            npcAvatar.classList.remove("animar-golpe");
+            void npcAvatar.offsetWidth; // Reiniciar animación CSS
+            npcAvatar.classList.add("animar-golpe");
+
+            // 2. Crear texto flotante de "+1 AURA"
+            crearTextoFlotante(e, "+1 AURA");
+
+            // 3. Variar la barra de energía
             energia = Math.max(10, energia - 1);
             energyFill.style.width = energia + "%";
             energyText.textContent = energia + "%";
 
-            // Enviar datos al rival si está conectado
+            // 4. Enviar datos al rival online
             if (conn && conn.open) {
                 conn.send(score1);
             }
             verificarGanador();
         });
+
+        function crearTextoFlotante(e, texto) {
+            let el = document.createElement("div");
+            el.className = "aura-flotante";
+            el.textContent = texto;
+            
+            // Posicionar donde hizo clic el usuario
+            let rect = btnFarmear.getBoundingClientRect();
+            el.style.left = (rect.left + rect.width / 2 + (Math.random() * 30 - 15)) + "px";
+            el.style.top = rect.top + "px";
+            
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 600);
+        }
 
         function verificarGanador() {
             if (score1 >= 50) {
@@ -306,6 +369,7 @@
             energia = 85;
             energyFill.style.width = "85%";
             energyText.textContent = "85%";
+            npcAvatar.classList.remove("animar-vibracion");
         }
     </script>
 

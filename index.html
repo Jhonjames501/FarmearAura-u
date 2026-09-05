@@ -66,68 +66,97 @@
         .btn-green { background: #00ff66; }
         .btn-pink { background: #ff0055; color: white; }
         
-        .online-arena {
+        /* Estilos originales de la dinámica de juego */
+        .game-arena {
             display: none;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
-        .score-box {
+        .status-box {
+            border: 1px dashed #ff0055;
+            border-radius: 12px;
+            padding: 12px;
+            background: #090909;
+        }
+        .player-row {
             display: flex;
             justify-content: space-between;
-            background: #1a1a1a;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
+            align-items: center;
+            background: #181818;
+            border: 1px solid #333;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
-        .tap-btn {
+        .player-row.p1 { border-color: #00ff66; color: #00ff66; }
+        .player-row.p2 { border-color: #ff0055; color: #ff0055; }
+        
+        .action-btn {
             width: 100%;
-            padding: 40px 0;
-            background: linear-gradient(90deg, #ff0055, #7a00ff, #00ffcc);
+            padding: 22px;
             border: none;
-            color: white;
-            font-size: 20px;
             font-weight: bold;
-            border-radius: 16px;
-            text-transform: uppercase;
+            border-radius: 10px;
+            font-size: 15px;
             cursor: pointer;
-            box-shadow: 0 5px 20px rgba(122, 0, 255, 0.4);
+            text-transform: uppercase;
         }
-        .tap-btn:active { transform: scale(0.96); }
-        .status-text { font-size: 11px; color: #aaa; text-align: center; margin-top: 8px; }
+        .btn-toca-1 { background: #00ff66; color: #030303; display: none; }
+        .btn-toca-2 { background: #ff0055; color: #ffffff; display: block; }
+
+        .dynamic-msg {
+            font-size: 10px;
+            color: #888;
+            font-style: italic;
+            text-align: center;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
 
     <div class="main-layout">
         
-        <!-- PANTALLA DE CONEXIÓN -->
+        <!-- PANTALLA 1: LOBBY DE CONEXIÓN DE 6 DÍGITOS -->
         <div class="card" id="lobbyScreen">
-            <h2>🌐 SALA DE 6 DÍGITOS</h2>
-            <p style="font-size: 10px; color: #ccc; margin-bottom: 12px;">Crea tu sala o escribe el código de 6 dígitos que te dio tu amigo.</p>
+            <h2>🌐 MULTIJUGADOR ONLINE</h2>
+            <p style="font-size: 10px; color: #ccc; margin-bottom: 12px;">Crea tu sala o escribe el código de 6 dígitos de tu amigo.</p>
             
             <button class="btn btn-green" id="crearSalaBtn">Generar mi Código</button>
-            <p class="status-text" id="myIdText" style="font-size: 14px; color: #00ff66; font-weight: bold; margin: 10px 0;">Código: ------</p>
+            <p id="myIdText" style="font-size: 13px; color: #00ff66; font-weight: bold; margin: 10px 0;">Código: ------</p>
             
             <hr style="border: 0.5px solid #333; margin: 12px 0;">
             
             <input type="text" id="codigoRivalInput" placeholder="Ej: 482910" maxlength="6">
             <button class="btn btn-pink" id="unirseSalaBtn">Conectarme a la Sala</button>
-            <p class="status-text" id="connectionStatus"></p>
+            <p id="connectionStatus" style="font-size: 11px; color: #aaa; margin-top: 8px;"></p>
         </div>
 
-        <!-- PANTALLA DE BATALLA EN LÍNEA -->
-        <div class="online-arena" id="gameScreenOnline">
-            <div class="card">
-                <h2>⚔️ DUELO EN LÍNEA ⚔️</h2>
-                <div class="score-box">
-                    <span>Tú: <b id="myScore" style="color:#00ff66;">0</b></span>
-                    <span>Rival: <b id="rivalScore" style="color:#ff0055;">0</b></span>
+        <!-- PANTALLA 2: DINÁMICA DE JUEGO ORIGINAL -->
+        <div class="game-arena" id="gameScreen">
+            <div class="card" style="border-color: #ff0055;">
+                <h2>⚡ DUELO 1V1 EN LÍNEA ⚡</h2>
+                
+                <div class="status-box">
+                    <div class="player-row p1">
+                        <span>Jugador 1 (Tú):</span>
+                        <b id="scoreP1">0</b>
+                    </div>
+                    <div class="player-row p2">
+                        <span>Jugador 2 (Rival):</span>
+                        <b id="scoreP2">0</b>
+                    </div>
                 </div>
-            </div>
 
-            <button class="tap-btn" id="btnFarmearOnline">🔥 ¡TOCA RÁPIDO! 🔥</button>
-            <div class="status-text" style="color:#00ff66;">¡Conectados con éxito!</div>
+                <!-- Botones de dinámica originales -->
+                <div style="margin-top: 12px;">
+                    <button class="action-btn btn-toca-1" id="btnTocaTuyo">¡TOCA TÚ RÁPIDO!</button>
+                    <button class="action-btn btn-toca-2" id="btnTocaEsperar" disabled>TURNO DEL RIVAL...</button>
+                </div>
+
+                <div class="dynamic-msg" id="dynamicMsg">Esperando acción en la red...</div>
+            </div>
         </div>
 
     </div>
@@ -135,60 +164,57 @@
     <script>
         let peer;
         let conn;
-        let myScore = 0;
-        let rivalScore = 0;
+        let score1 = 0;
+        let score2 = 0;
         let codigoPersonal = "";
+        let esMiTurno = true; // Turnos alternados o competencia libre
 
         const lobbyScreen = document.getElementById("lobbyScreen");
-        const gameScreenOnline = document.getElementById("gameScreenOnline");
+        const gameScreen = document.getElementById("gameScreen");
         const myIdText = document.getElementById("myIdText");
         const codigoRivalInput = document.getElementById("codigoRivalInput");
         const crearSalaBtn = document.getElementById("crearSalaBtn");
         const unirseSalaBtn = document.getElementById("unirseSalaBtn");
-        const btnFarmearOnline = document.getElementById("btnFarmearOnline");
-        const myScoreEl = document.getElementById("myScore");
-        const rivalScoreEl = document.getElementById("rivalScore");
+        
+        const scoreP1 = document.getElementById("scoreP1");
+        const scoreP2 = document.getElementById("scoreP2");
+        const btnTocaTuyo = document.getElementById("btnTocaTuyo");
+        const btnTocaEsperar = document.getElementById("btnTocaEsperar");
+        const dynamicMsg = document.getElementById("dynamicMsg");
         const connectionStatus = document.getElementById("connectionStatus");
 
-        // Generar un número aleatorio de 6 dígitos único para la sala
         function generarCodigo6Digitos() {
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
 
+        // Crear Sala
         crearSalaBtn.addEventListener("click", () => {
             codigoPersonal = generarCodigo6Digitos();
-            myIdText.textContent = "Código: " + codigoPersonal;
+            myIdText.textContent = "Tu Código: " + codigoPersonal;
             crearSalaBtn.disabled = true;
             crearSalaBtn.style.opacity = "0.5";
 
-            // Creamos el peer usando nuestro código corto como ID personalizado
             peer = new Peer("sigma-" + codigoPersonal);
 
             peer.on('open', () => {
-                connectionStatus.textContent = "Sala creada. Esperando al rival...";
+                connectionStatus.textContent = "Sala creada. Esperando rival...";
             });
 
-            peer.on('error', (err) => {
-                // Si casualmente el número ya está en uso, generamos otro al instante
-                if(err.type === 'unavailable-id') {
-                    codigoPersonal = generarCodigo6Digitos();
-                    myIdText.textContent = "Código: " + codigoPersonal;
-                    peer.destroy();
-                    peer = new Peer("sigma-" + codigoPersonal);
-                } else {
-                    connectionStatus.textContent = "Error al crear sala. Intenta de nuevo.";
-                }
+            peer.on('error', () => {
+                codigoPersonal = generarCodigo6Digitos();
+                myIdText.textContent = "Tu Código: " + codigoPersonal;
+                peer.destroy();
+                peer = new Peer("sigma-" + codigoPersonal);
             });
 
             peer.on('connection', (connection) => {
                 conn = connection;
                 setupConnection();
-                lobbyScreen.style.display = "none";
-                gameScreenOnline.style.display = "flex";
+                iniciarJuegoOnline();
             });
         });
 
-        // Unirse a la sala de tu amigo usando su código de 6 dígitos
+        // Unirse a Sala
         unirseSalaBtn.addEventListener("click", () => {
             let codigoAmigo = codigoRivalInput.value.trim();
             if (codigoAmigo.length !== 6) {
@@ -197,59 +223,67 @@
             }
 
             if (!peer) {
-                peer = new Peer(); // Peer temporal para el invitado
+                peer = new Peer();
             }
 
             connectionStatus.textContent = "Conectando...";
-            
+
             peer.on('open', () => {
                 conn = peer.connect("sigma-" + codigoAmigo);
                 setupConnection();
+                iniciarJuegoOnline();
             });
         });
 
         function setupConnection() {
             conn.on('open', () => {
-                lobbyScreen.style.display = "none";
-                gameScreenOnline.style.display = "flex";
+                iniciarJuegoOnline();
             });
 
             conn.on('data', (data) => {
-                rivalScore = data;
-                rivalScoreEl.textContent = rivalScore;
-                verificarFinJuego();
-            });
-
-            conn.on('error', () => {
-                connectionStatus.textContent = "No se pudo conectar. Revisa el código.";
+                // Recibimos los puntos o estado del rival
+                score2 = data;
+                scoreP2.textContent = score2;
+                dynamicMsg.textContent = "¡El rival acaba de farmear aura!";
+                verificarGanador();
             });
         }
 
-        btnFarmearOnline.addEventListener("click", () => {
-            myScore += 1;
-            myScoreEl.textContent = myScore;
-            
+        function iniciarJuegoOnline() {
+            lobbyScreen.style.display = "none";
+            gameScreen.style.display = "flex";
+            btnTocaTuyo.style.display = "block";
+            btnTocaEsperar.style.display = "none";
+            dynamicMsg.textContent = "¡Duelo iniciado! ¡A farmear aura!";
+        }
+
+        // Dinámica de toque
+        btnTocaTuyo.addEventListener("click", () => {
+            score1 += 1;
+            scoreP1.textContent = score1;
+            dynamicMsg.textContent = "¡Farmedaste aura con éxito!";
+
             if (conn && conn.open) {
-                conn.send(myScore);
+                conn.send(score1);
             }
-            verificarFinJuego();
+            verificarGanador();
         });
 
-        function verificarFinJuego() {
-            if (myScore >= 50) {
-                alert("¡Ganaste la batalla!");
-                reiniciarJuego();
-            } else if (rivalScore >= 50) {
-                alert("¡Tu rival te ganó!");
-                reiniciarJuego();
+        function verificarGanador() {
+            if (score1 >= 30) {
+                alert("¡Has ganado el duelo online!");
+                reiniciar();
+            } else if (score2 >= 30) {
+                alert("¡El rival te ha superado!");
+                reiniciar();
             }
         }
 
-        function reiniciarJuego() {
-            myScore = 0;
-            rivalScore = 0;
-            myScoreEl.textContent = 0;
-            rivalScoreEl.textContent = 0;
+        function reiniciar() {
+            score1 = 0;
+            score2 = 0;
+            scoreP1.textContent = 0;
+            scoreP2.textContent = 0;
         }
     </script>
 

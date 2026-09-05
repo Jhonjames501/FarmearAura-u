@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmear Aura: Multijugador Online</title>
-    <!-- Librería PeerJS para conexión directa entre celulares -->
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         * {
@@ -39,7 +38,7 @@
             padding: 15px;
             text-align: center;
         }
-        h2 { color: #d4af37; font-size: 16px; margin-bottom: 10px; }
+        h2 { color: #d4af37; font-size: 15px; margin-bottom: 10px; }
         input {
             width: 100%;
             padding: 12px;
@@ -47,9 +46,10 @@
             border: 1px solid #444;
             color: #fff;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 16px;
             margin-bottom: 10px;
             text-align: center;
+            letter-spacing: 2px;
         }
         .btn {
             width: 100%;
@@ -66,7 +66,6 @@
         .btn-green { background: #00ff66; }
         .btn-pink { background: #ff0055; color: white; }
         
-        /* Zona de Juego Online */
         .online-arena {
             display: none;
             flex-direction: column;
@@ -95,7 +94,7 @@
             box-shadow: 0 5px 20px rgba(122, 0, 255, 0.4);
         }
         .tap-btn:active { transform: scale(0.96); }
-        .status-text { font-size: 11px; color: #aaa; text-align: center; margin-top: 5px; }
+        .status-text { font-size: 11px; color: #aaa; text-align: center; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -104,20 +103,21 @@
         
         <!-- PANTALLA DE CONEXIÓN -->
         <div class="card" id="lobbyScreen">
-            <h2>🌐 MULTIJUGADOR ONLINE</h2>
-            <p style="font-size: 11px; color: #ccc; margin-bottom: 15px;">Crea una sala o conéctate al código de tu amigo para batallar a distancia.</p>
+            <h2>🌐 SALA DE 6 DÍGITOS</h2>
+            <p style="font-size: 10px; color: #ccc; margin-bottom: 12px;">Crea tu sala o escribe el código de 6 dígitos que te dio tu amigo.</p>
             
-            <button class="btn btn-green" id="crearSalaBtn">Crear Sala (Anfitrión)</button>
-            <p class="status-text" id="myIdText">Tu ID de Sala: Generando...</p>
+            <button class="btn btn-green" id="crearSalaBtn">Generar mi Código</button>
+            <p class="status-text" id="myIdText" style="font-size: 14px; color: #00ff66; font-weight: bold; margin: 10px 0;">Código: ------</p>
             
-            <hr style="border: 0.5px solid #333; margin: 15px 0;">
+            <hr style="border: 0.5px solid #333; margin: 12px 0;">
             
-            <input type="text" id="codigoRivalInput" placeholder="Pega el código de tu amigo aquí">
-            <button class="btn btn-pink" id="unirseSalaBtn">Unirse a la Sala</button>
+            <input type="text" id="codigoRivalInput" placeholder="Ej: 482910" maxlength="6">
+            <button class="btn btn-pink" id="unirseSalaBtn">Conectarme a la Sala</button>
+            <p class="status-text" id="connectionStatus"></p>
         </div>
 
         <!-- PANTALLA DE BATALLA EN LÍNEA -->
-        <div class="online-arena" id="gameScreenOnline" style="display:none;">
+        <div class="online-arena" id="gameScreenOnline">
             <div class="card">
                 <h2>⚔️ DUELO EN LÍNEA ⚔️</h2>
                 <div class="score-box">
@@ -127,7 +127,7 @@
             </div>
 
             <button class="tap-btn" id="btnFarmearOnline">🔥 ¡TOCA RÁPIDO! 🔥</button>
-            <div class="status-text" id="connectionStatus">Conectado con éxito</div>
+            <div class="status-text" style="color:#00ff66;">¡Conectados con éxito!</div>
         </div>
 
     </div>
@@ -137,13 +137,12 @@
         let conn;
         let myScore = 0;
         let rivalScore = 0;
-        let roomId = "";
+        let codigoPersonal = "";
 
         const lobbyScreen = document.getElementById("lobbyScreen");
         const gameScreenOnline = document.getElementById("gameScreenOnline");
         const myIdText = document.getElementById("myIdText");
         const codigoRivalInput = document.getElementById("codigoRivalInput");
-        
         const crearSalaBtn = document.getElementById("crearSalaBtn");
         const unirseSalaBtn = document.getElementById("unirseSalaBtn");
         const btnFarmearOnline = document.getElementById("btnFarmearOnline");
@@ -151,61 +150,85 @@
         const rivalScoreEl = document.getElementById("rivalScore");
         const connectionStatus = document.getElementById("connectionStatus");
 
-        // Inicializar PeerJS (crea un ID único para este dispositivo)
-        peer = new Peer();
+        // Generar un número aleatorio de 6 dígitos único para la sala
+        function generarCodigo6Digitos() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
 
-        peer.on('open', (id) => {
-            roomId = id;
-            // Mostramos los últimos 5 caracteres del ID para que sea fácil de compartir
-            myIdText.textContent = "Tu Código de Sala: " + id;
-        });
-
-        // 1. Crear Sala (Anfitrión)
         crearSalaBtn.addEventListener("click", () => {
-            connectionStatus.textContent = "Esperando a que el rival se conecte...";
+            codigoPersonal = generarCodigo6Digitos();
+            myIdText.textContent = "Código: " + codigoPersonal;
+            crearSalaBtn.disabled = true;
+            crearSalaBtn.style.opacity = "0.5";
+
+            // Creamos el peer usando nuestro código corto como ID personalizado
+            peer = new Peer("sigma-" + codigoPersonal);
+
+            peer.on('open', () => {
+                connectionStatus.textContent = "Sala creada. Esperando al rival...";
+            });
+
+            peer.on('error', (err) => {
+                // Si casualmente el número ya está en uso, generamos otro al instante
+                if(err.type === 'unavailable-id') {
+                    codigoPersonal = generarCodigo6Digitos();
+                    myIdText.textContent = "Código: " + codigoPersonal;
+                    peer.destroy();
+                    peer = new Peer("sigma-" + codigoPersonal);
+                } else {
+                    connectionStatus.textContent = "Error al crear sala. Intenta de nuevo.";
+                }
+            });
+
             peer.on('connection', (connection) => {
                 conn = connection;
                 setupConnection();
                 lobbyScreen.style.display = "none";
                 gameScreenOnline.style.display = "flex";
-                alert("¡Un rival se ha conectado a tu sala!");
             });
         });
 
-        // 2. Unirse a una Sala (Invitado)
+        // Unirse a la sala de tu amigo usando su código de 6 dígitos
         unirseSalaBtn.addEventListener("click", () => {
-            let codeToJoin = codigoRivalInput.value.trim();
-            if (!codeToJoin) {
-                alert("Por favor ingresa el código de la sala de tu amigo.");
+            let codigoAmigo = codigoRivalInput.value.trim();
+            if (codigoAmigo.length !== 6) {
+                alert("El código debe tener exactamente 6 dígitos.");
                 return;
             }
-            conn = peer.connect(codeToJoin);
-            setupConnection();
-            lobbyScreen.style.display = "none";
-            gameScreenOnline.style.display = "flex";
-            connectionStatus.textContent = "Conectado al anfitrión con éxito.";
+
+            if (!peer) {
+                peer = new Peer(); // Peer temporal para el invitado
+            }
+
+            connectionStatus.textContent = "Conectando...";
+            
+            peer.on('open', () => {
+                conn = peer.connect("sigma-" + codigoAmigo);
+                setupConnection();
+            });
         });
 
-        // Configurar eventos de transmisión de datos entre los dos teléfonos
         function setupConnection() {
+            conn.on('open', () => {
+                lobbyScreen.style.display = "none";
+                gameScreenOnline.style.display = "flex";
+            });
+
             conn.on('data', (data) => {
-                // Cuando el otro jugador toca, actualizamos su puntaje en nuestra pantalla
                 rivalScore = data;
                 rivalScoreEl.textContent = rivalScore;
                 verificarFinJuego();
             });
 
-            conn.on('open', () => {
-                connectionStatus.textContent = "¡Conexión establecida en tiempo real!";
+            conn.on('error', () => {
+                connectionStatus.textContent = "No se pudo conectar. Revisa el código.";
             });
         }
 
-        // Al hacer clic para farmear puntos
         btnFarmearOnline.addEventListener("click", () => {
             myScore += 1;
             myScoreEl.textContent = myScore;
             
-            // Enviamos nuestro nuevo puntaje al otro teléfono al instante
             if (conn && conn.open) {
                 conn.send(myScore);
             }
@@ -214,10 +237,10 @@
 
         function verificarFinJuego() {
             if (myScore >= 50) {
-                alert("¡Has ganado la batalla online!");
+                alert("¡Ganaste la batalla!");
                 reiniciarJuego();
             } else if (rivalScore >= 50) {
-                alert("¡El rival te ha ganado!");
+                alert("¡Tu rival te ganó!");
                 reiniciarJuego();
             }
         }

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Free Fire 2D - Multijugador Online por Sala</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -23,6 +23,7 @@
             overflow: hidden;
             position: fixed;
             user-select: none;
+            -webkit-overflow-scrolling: touch;
         }
 
         #efectoDaño {
@@ -395,13 +396,28 @@
         let bullets = [];
         let animacionFrame = 0;
 
-        // Variables para habilidades especiales funcionales
         let dashCooldown = 0;
         let escudoActivo = false;
         let volarActivo = false;
 
         let audioCtx = null;
         let masterGain = null;
+
+        function forzarModoPantallaCompletaYHorizontal() {
+            try {
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(() => {});
+                }
+            } catch(e) {}
+            try {
+                let elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(() => {});
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                }
+            } catch(e) {}
+        }
 
         function inicializarAudio() {
             if (!audioCtx) {
@@ -411,16 +427,7 @@
                 masterGain.connect(audioCtx.destination);
             }
             if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-
-            // Forzar pantalla horizontal y ocultar barras de navegación / modo immersivo si el entorno lo soporta
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(() => {});
-            }
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            }
+            forzarModoPantallaCompletaYHorizontal();
         }
 
         document.getElementById('volRange').addEventListener('input', (e) => {
@@ -505,6 +512,7 @@
         construirMenuNiveles();
 
         function iniciarNivelSolo(num) {
+            forzarModoPantallaCompletaYHorizontal();
             esOnline = false;
             nivelActual = num;
             document.getElementById('lblNivelActual').textContent = nivelActual;
@@ -513,6 +521,7 @@
         }
 
         function iniciarPartidaOnline() {
+            forzarModoPantallaCompletaYHorizontal();
             esOnline = true;
             nivelActual = 1;
             document.getElementById('lblNivelActual').textContent = "Online";
@@ -584,7 +593,6 @@
         window.addEventListener('pointermove', (e) => { if (joyActive) actualizarJoystick(e.clientX); });
         window.addEventListener('pointerup', () => { joyActive = false; direccionMovimiento = 0; joyKnob.style.transform = `translate(0px, 0px)`; });
 
-        // SALTO CORREGIDO (Permite saltar sostenido o volar)
         document.getElementById('btnSaltoPrincipal').addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (!gameActive) return;
@@ -595,7 +603,6 @@
             }
         });
 
-        // BOTÓN 1: FUEGO (Disparar)
         document.getElementById('btnAccion1').addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (!gameActive) return;
@@ -613,7 +620,6 @@
             });
         });
 
-        // BOTÓN 2: DASH (Impulso rápido hacia adelante)
         document.getElementById('btnAccion2').addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (!gameActive) return;
@@ -625,7 +631,6 @@
             }, 400);
         });
 
-        // BOTÓN 3: ESCUDO (Protección temporal contra daño)
         document.getElementById('btnAccion3').addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (!gameActive) return;
@@ -638,7 +643,6 @@
             }, 4000);
         });
 
-        // BOTÓN 4: VOLAR (AHORA FUNCIONAL: Permite elevarse y mantenerse en el aire al presionarlo)
         document.getElementById('btnAccion4').addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (!gameActive) return;
@@ -732,7 +736,7 @@
 
                 if (saltando) {
                     jugadorY += velocidadY;
-                    velocidadY -= volarActivo ? 0.3 : 1; // Si vuela, cae más lento y flota
+                    velocidadY -= volarActivo ? 0.3 : 1;
                     if (jugadorY <= 0) { jugadorY = 0; saltando = false; velocidadY = 0; }
                 }
 
@@ -747,7 +751,6 @@
                     }
                 });
 
-                // Movimiento, colisiones y mecánica de eliminar enemigo al caerle encima
                 enemies.forEach(en => {
                     if (en.hp > 0) {
                         if (en.x > jugadorMundoX + 15) en.x -= en.vel;
@@ -755,15 +758,13 @@
 
                         let distanciaX = Math.abs(en.x - jugadorMundoX);
 
-                        // Si el jugador cae encima del enemigo (está bajando y sobre su cabeza)
                         if (distanciaX < 18 && jugadorY > 15 && velocidadY < 0) {
                             en.hp = 0;
                             oro += 30;
                             document.getElementById('txtOro').textContent = oro;
-                            velocidadY = 10; // Rebote al aplastar al enemigo
+                            velocidadY = 10;
                             reproducirSonido(950, 'square', 0.1);
                         } 
-                        // Colisión normal (daño al jugador)
                         else if (distanciaX < 16 && jugadorY <= 10) {
                             if (!escudoActivo) {
                                 vida = Math.max(0, vida - 0.6);

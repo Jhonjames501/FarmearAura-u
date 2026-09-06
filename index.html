@@ -42,7 +42,7 @@
             justify-content: space-between;
             width: 100vw;
             height: 100vh;
-            padding: 8px 12px;
+            padding: 6px 10px;
             position: relative;
         }
 
@@ -64,34 +64,34 @@
             background: rgba(20, 20, 35, 0.95);
             border: 2px solid #ffaa00;
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px;
             width: 90%;
             max-width: 340px;
             box-shadow: 0 0 20px rgba(255,170,0,0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .lobby-title {
-            font-size: 20px;
+            font-size: 18px;
             color: #ffaa00;
             text-shadow: 0 0 10px rgba(255,170,0,0.6);
             letter-spacing: 2px;
         }
         .lobby-subtitle {
-            font-size: 11px;
+            font-size: 10px;
             color: #00ffff;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .main-btn {
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             color: #fff;
-            padding: 12px 15px;
-            font-size: 12px;
+            padding: 10px 12px;
+            font-size: 11px;
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
@@ -104,8 +104,8 @@
             background: #141420;
             border: 2px solid #00ffff;
             color: #fff;
-            padding: 10px;
-            font-size: 16px;
+            padding: 8px;
+            font-size: 15px;
             text-align: center;
             border-radius: 8px;
             width: 100%;
@@ -114,9 +114,9 @@
 
         .levels-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            max-height: 40vh;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            max-height: 38vh;
             overflow-y: auto;
             width: 100%;
             padding: 4px;
@@ -125,12 +125,13 @@
             background: #141420;
             border: 2px solid #555;
             border-radius: 6px;
-            padding: 10px 0;
-            font-size: 11px;
+            padding: 8px 0;
+            font-size: 10px;
             font-weight: bold;
             color: #00ff66;
             cursor: pointer;
         }
+        .level-card:active { background: #00ff66; color: #000; }
 
         .top-hud-stats {
             display: flex;
@@ -139,21 +140,21 @@
             background: #12121c;
             border: 1px solid #444;
             border-radius: 6px;
-            padding: 6px 10px;
-            font-size: 10px;
+            padding: 4px 8px;
+            font-size: 9px;
             font-weight: bold;
-            height: 32px;
+            height: 30px;
         }
 
         .volume-control-box {
             display: flex;
             align-items: center;
-            gap: 5px;
-            font-size: 9px;
+            gap: 4px;
+            font-size: 8px;
             color: #ffaa00;
         }
         .volume-control-box input {
-            width: 45px;
+            width: 40px;
             accent-color: #ffaa00;
         }
 
@@ -165,7 +166,7 @@
             border-radius: 8px;
             position: relative;
             overflow: hidden;
-            margin: 6px 0;
+            margin: 4px 0;
         }
 
         canvas { display: block; width: 100%; height: 100%; }
@@ -173,10 +174,10 @@
         .controls-hud {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             background: rgba(15, 15, 25, 0.98);
             border: 2px solid #555;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: 12px;
         }
 
@@ -186,21 +187,21 @@
             align-items: center;
         }
 
-        .hp-container { width: 160px; }
-        .hp-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
-        .hp-bar-bg { width: 100%; background: #222; height: 6px; border-radius: 3px; overflow: hidden; }
+        .hp-container { width: 150px; }
+        .hp-label { font-size: 7px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .hp-bar-bg { width: 100%; background: #222; height: 5px; border-radius: 3px; overflow: hidden; }
         .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.15s ease; }
 
         .actions-mini-grid {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         .round-action-btn {
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.9);
-            font-size: 11px;
+            font-size: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -209,7 +210,7 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
         .round-action-btn:active { transform: scale(0.9); }
-        .round-action-btn span { font-size: 7px; font-weight: bold; color: #fff; }
+        .round-action-btn span { font-size: 6px; font-weight: bold; color: #fff; }
 
         #btnAccion1 { background: linear-gradient(135deg, rgba(255,0,85,0.9), rgba(255,170,0,0.9)); border-color: #ffaa00; }
         #btnAccion2 { background: linear-gradient(135deg, rgba(255,170,0,0.9), rgba(255,68,0,0.9)); border-color: #ffaa00; }
@@ -220,12 +221,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 4px;
+            padding: 0 2px;
         }
 
         .joystick-base {
-            width: 85px;
-            height: 85px;
+            width: 80px;
+            height: 80px;
             background: rgba(30, 30, 50, 0.7);
             border: 3px solid rgba(255, 170, 0, 0.8);
             border-radius: 50%;
@@ -235,8 +236,8 @@
             justify-content: center;
         }
         .joystick-knob {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             border-radius: 50%;
@@ -244,29 +245,28 @@
             pointer-events: none;
         }
 
-        /* Botón de salto grande y súper sensible al toque inmediato */
         .jump-action-btn {
-            width: 110px;
-            height: 50px;
+            width: 105px;
+            height: 48px;
             background: linear-gradient(135deg, #00ffff, #0088cc);
             border: 2px solid #fff;
-            border-radius: 25px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 12px;
             color: #000;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,255,255,0.4);
         }
         .jump-action-btn:active { transform: scale(0.92); background: #00ffff; }
-        .jump-action-btn span { font-size: 10px; color: #fff; margin-left: 4px; }
+        .jump-action-btn span { font-size: 9px; color: #fff; margin-left: 4px; }
 
         .info-bottom-bar {
             display: flex;
             justify-content: space-between;
-            font-size: 8px;
+            font-size: 7px;
             color: #888;
             padding: 2px 4px;
         }
@@ -279,29 +279,29 @@
         <div class="lobby-card-ui">
             <h1 class="lobby-title">FREE FIRE 2D</h1>
             <p class="lobby-subtitle">ONLINE MULTIPLAYER</p>
-            <div style="font-size: 28px; margin: 5px 0;">🌐🔥</div>
-            <button class="main-btn" id="btnJugarCampana">▶ CAMPAÑA SOLO</button>
+            <div style="font-size: 24px; margin: 4px 0;">🌐🔥</div>
+            <button class="main-btn" id="btnJugarCampana">▶ CAMPAÑA SOLO (30 NIVELES)</button>
             <button class="main-btn" id="btnOnlineMenu" style="background: linear-gradient(135deg, #00ffcc, #0088cc);">👥 MODO ONLINE (SALA)</button>
         </div>
     </div>
 
     <div id="screenLevels" class="oculto">
         <div class="lobby-card-ui" style="max-width: 360px;">
-            <h2 class="lobby-title" style="font-size: 17px;">NIVELES SOLO</h2>
+            <h2 class="lobby-title" style="font-size: 16px;">SELECCIONAR NIVEL (1 - 30)</h2>
             <div class="levels-grid" id="levelsGridContainer"></div>
-            <button class="main-btn" style="padding: 8px 10px; font-size: 10px; margin-top: 6px;" id="btnVolverLobby">Volver</button>
+            <button class="main-btn" style="padding: 7px 10px; font-size: 10px; margin-top: 4px;" id="btnVolverLobby">Volver al Lobby</button>
         </div>
     </div>
 
     <div id="screenMultiplayer" class="oculto">
         <div class="lobby-card-ui">
-            <h2 class="lobby-title" style="font-size: 17px;">CÓDIGO DE SALA</h2>
-            <p class="lobby-subtitle">Crea una sala o ingresa el código de tu amigo</p>
+            <h2 class="lobby-title" style="font-size: 16px;">CÓDIGO DE SALA</h2>
+            <p class="lobby-subtitle">Crea una sala o ingresa el código</p>
             <button class="main-btn" id="btnCrearSala">⚡ CREAR NUEVA SALA</button>
-            <div style="font-size: 10px; color: #aaa; margin: 6px 0;">O UNIRSE A UNA SALA:</div>
+            <div style="font-size: 9px; color: #aaa; margin: 4px 0;">O UNIRSE A UNA SALA:</div>
             <input type="text" id="inputCodigoSala" class="room-input" placeholder="Ej: 4815" maxlength="6">
-            <button class="main-btn" style="background: linear-gradient(135deg, #00ffcc, #0088cc); margin-top: 6px;" id="btnUnirseSala">🔗 UNIRSE A SALA</button>
-            <button class="main-btn" style="padding: 8px 10px; font-size: 10px; margin-top: 8px; background: #444;" id="btnVolverMenuOnline">Volver</button>
+            <button class="main-btn" style="background: linear-gradient(135deg, #00ffcc, #0088cc); margin-top: 4px;" id="btnUnirseSala">🔗 UNIRSE A SALA</button>
+            <button class="main-btn" style="padding: 7px 10px; font-size: 9px; margin-top: 6px; background: #444;" id="btnVolverMenuOnline">Volver</button>
         </div>
     </div>
 
@@ -315,7 +315,7 @@
                 <span>🔊</span>
                 <input type="range" id="volRange" min="0" max="1" step="0.1" value="0.8">
             </div>
-            <span>💎 <strong id="txtOro" style="color:#00ff66;">0</strong></span>
+            <span>💎 ORO: <strong id="txtOro" style="color:#00ff66; font-size: 11px;">0</strong></span>
         </div>
 
         <div class="battle-arena">
@@ -345,7 +345,6 @@
                 <div class="joystick-base" id="joystickBase">
                     <div class="joystick-knob" id="joystickKnob"></div>
                 </div>
-                <!-- Botón de salto con respuesta inmediata usando pointerdown -->
                 <div class="jump-action-btn" id="btnSaltoPrincipal">
                     ⬆️<span>SALTAR</span>
                 </div>
@@ -353,8 +352,8 @@
         </div>
 
         <div class="info-bottom-bar">
-            <span>ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-            <span id="chatLog">Conectado al servidor global.</span>
+            <span>NIVEL: <strong id="lblNivelActual" style="color:#00ff66;">1</strong> | ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
+            <span id="chatLog">Sistema online sincronizado.</span>
         </div>
     </div>
 
@@ -377,6 +376,7 @@
 
         let vida = 100;
         let oro = 0;
+        let nivelActual = 1;
         let mundoX = 0;
         let jugadorX = 70;
         let jugadorY = 0;
@@ -393,6 +393,12 @@
         let coins = [];
         let enemies = [];
         let bullets = [];
+        let animacionFrame = 0;
+
+        // Variables para habilidades especiales funcionales
+        let dashCooldown = 0;
+        let escudoActivo = false;
+        let volarActivo = false;
 
         let audioCtx = null;
         let masterGain = null;
@@ -455,8 +461,7 @@
             esOnline = true;
             document.getElementById('txtSalaInfo').textContent = codigoSalaActual;
             document.getElementById('txtRolInfo').textContent = "Host (P1)";
-            alert(`¡Sala creada con éxito!\nComparte este código con tu compañero: ${codigoSalaActual}`);
-            
+            alert(`¡Sala creada con éxito!\nComparte este código: ${codigoSalaActual}`);
             document.getElementById('screenMultiplayer').classList.add('oculto');
             iniciarPartidaOnline();
         });
@@ -464,7 +469,7 @@
         document.getElementById('btnUnirseSala').addEventListener('click', () => {
             let codigo = document.getElementById('inputCodigoSala').value.trim();
             if (codigo.length < 4) {
-                alert("Por favor ingresa un código de sala válido.");
+                alert("Ingresa un código de sala válido.");
                 return;
             }
             inicializarAudio();
@@ -472,15 +477,15 @@
             esOnline = true;
             document.getElementById('txtSalaInfo').textContent = codigoSalaActual;
             document.getElementById('txtRolInfo').textContent = "Invitado (P2)";
-
             document.getElementById('screenMultiplayer').classList.add('oculto');
             iniciarPartidaOnline();
         });
 
+        // Construir los 30 niveles
         function construirMenuNiveles() {
             let container = document.getElementById('levelsGridContainer');
             container.innerHTML = '';
-            for (let i = 1; i <= 10; i++) {
+            for (let i = 1; i <= 30; i++) {
                 let card = document.createElement('div');
                 card.className = 'level-card';
                 card.textContent = `Nvl ${i}`;
@@ -492,11 +497,16 @@
 
         function iniciarNivelSolo(num) {
             esOnline = false;
+            nivelActual = num;
+            document.getElementById('lblNivelActual').textContent = nivelActual;
             document.getElementById('screenLevels').classList.add('oculto');
             configurarPartidaComun();
         }
 
         function iniciarPartidaOnline() {
+            esOnline = true;
+            nivelActual = 1;
+            document.getElementById('lblNivelActual').textContent = "Online";
             configurarPartidaComun();
             let refSala = db.ref('salas/' + codigoSalaActual + '/' + miIdJugador);
             
@@ -530,12 +540,18 @@
             coins = [];
             enemies = [];
             bullets = [];
+            escudoActivo = false;
+            volarActivo = false;
 
-            for (let i = 1; i < 20; i++) {
-                let posX = i * 220 + Math.random() * 30;
-                obstacles.push({ x: posX, y: (i % 2 === 0) ? 0 : 32, w: 35, h: 22, icono: '📦' });
-                coins.push({ x: posX + 20, y: 32, recolectada: false });
-                enemies.push({ x: posX + 130, y: 0, hp: 40, emoji: '🧟', vel: 0.5 });
+            let cantidadObstaculos = 12 + (nivelActual * 2);
+            for (let i = 1; i < cantidadObstaculos; i++) {
+                let posX = i * 200 + Math.random() * 40;
+                obstacles.push({ x: posX, y: (i % 2 === 0) ? 0 : 35, w: 35, h: 22, icono: '📦' });
+                coins.push({ x: posX + 20, y: 35, recolectada: false });
+                
+                // Enemigos con mayor dificultad según el nivel
+                let hpEnemigo = 30 + (nivelActual * 5);
+                enemies.push({ x: posX + 120, y: 0, hp: hpEnemigo, maxHp: hpEnemigo, vel: 0.6 + (nivelActual * 0.05), animOffset: Math.random() * 100 });
             }
             gameActive = true;
         }
@@ -560,16 +576,16 @@
         window.addEventListener('pointermove', (e) => { if (joyActive) actualizarJoystick(e.clientX); });
         window.addEventListener('pointerup', () => { joyActive = false; direccionMovimiento = 0; joyKnob.style.transform = `translate(0px, 0px)`; });
 
-        // SALTO INMEDIATO con pointerdown para evitar demoras
+        // SALTO INMEDIATO
         document.getElementById('btnSaltoPrincipal').addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (!gameActive || saltando) return;
             saltando = true;
-            velocidadY = 12;
+            velocidadY = volarActivo ? 15 : 12;
             reproducirSonido(500, 'triangle', 0.1);
         });
 
-        // ACCIÓN DE FUEGO con respuesta inmediata
+        // BOTÓN 1: FUEGO (Disparar)
         document.getElementById('btnAccion1').addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (!gameActive) return;
@@ -577,33 +593,142 @@
             bullets.push({ x: mundoX + jugadorX + 25, y: jugadorY + 20 });
             let jugadorMundoX = mundoX + jugadorX;
             enemies.forEach(en => {
-                if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 90) {
-                    en.hp -= 30;
-                    if (en.hp <= 0) { oro += 35; document.getElementById('txtOro').textContent = oro; }
+                if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 100) {
+                    en.hp -= 35;
+                    if (en.hp <= 0) { 
+                        oro += 25; 
+                        document.getElementById('txtOro').textContent = oro; 
+                    }
                 }
             });
         });
 
-        function dibujarPersonaje(x, y, colorBase) {
+        // BOTÓN 2: DASH (Impulso rápido hacia adelante)
+        document.getElementById('btnAccion2').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (!gameActive) return;
+            reproducirSonido(900, 'sine', 0.12);
+            mundoX += 90;
+            document.getElementById('lblEstadoTransformacion').textContent = "Dash!";
+            setTimeout(() => {
+                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
+            }, 400);
+        });
+
+        // BOTÓN 3: ESCUDO (Protección temporal contra daño)
+        document.getElementById('btnAccion3').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (!gameActive) return;
+            reproducirSonido(400, 'square', 0.2);
+            escudoActivo = true;
+            document.getElementById('lblEstadoTransformacion').textContent = "Escudo Activo";
+            setTimeout(() => {
+                escudoActivo = false;
+                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
+            }, 4000);
+        });
+
+        // BOTÓN 4: VOLAR (Permite saltar más alto y flotar)
+        document.getElementById('btnAccion4').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (!gameActive) return;
+            reproducirSonido(700, 'triangle', 0.2);
+            volarActivo = true;
+            document.getElementById('lblEstadoTransformacion').textContent = "Modo Vuelo";
+            setTimeout(() => {
+                volarActivo = false;
+                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
+            }, 5000);
+        });
+
+        // DIBUJAR PERSONAJE CON CUERPO COMPLETO, PIES Y MANOS ANIMADAS
+        function dibujarPersonaje(x, y, colorBase, caminando) {
             let baseScreenY = canvas.height - 10 - y;
+            
+            // Cabeza y Casco
             ctx.fillStyle = '#ffccaa';
-            ctx.fillRect(x + 4, baseScreenY - 32, 12, 11);
+            ctx.fillRect(x + 4, baseScreenY - 34, 12, 11);
             ctx.fillStyle = colorBase;
-            ctx.fillRect(x + 5, baseScreenY - 30, 10, 4);
-            ctx.fillRect(x + 3, baseScreenY - 21, 14, 12);
+            ctx.fillRect(x + 5, baseScreenY - 32, 10, 4);
+            
+            // Torso
+            ctx.fillStyle = colorBase;
+            ctx.fillRect(x + 3, baseScreenY - 23, 14, 13);
+
+            // Manos (con animación si camina)
+            let offsetMano = caminando ? Math.sin(animacionFrame * 0.3) * 4 : 0;
             ctx.fillStyle = '#ffccaa';
-            ctx.fillRect(x - 1, baseScreenY - 19, 4, 8);
-            ctx.fillRect(x + 17, baseScreenY - 19, 4, 8);
-            ctx.fillStyle = '#333344';
-            ctx.fillRect(x + 4, baseScreenY - 9, 5, 9);
-            ctx.fillRect(x + 11, baseScreenY - 9, 5, 9);
+            ctx.fillRect(x - 2, baseScreenY - 21 + offsetMano, 4, 6);
+            ctx.fillRect(x + 16, baseScreenY - 21 - offsetMano, 4, 6);
+
+            // Piernas completas con movimiento de caminata
+            let offsetPie1 = caminando ? Math.sin(animacionFrame * 0.3) * 5 : 0;
+            let offsetPie2 = caminando ? -Math.sin(animacionFrame * 0.3) * 5 : 0;
+
+            ctx.fillStyle = '#222233';
+            ctx.fillRect(x + 4, baseScreenY - 10, 5, 8 + offsetPie1);
+            ctx.fillRect(x + 11, baseScreenY - 10, 5, 8 + offsetPie2);
+
+            // Zapatos / Pies
+            ctx.fillStyle = '#111';
+            ctx.fillRect(x + 2, baseScreenY - 2 + offsetPie1, 7, 3);
+            ctx.fillRect(x + 11, baseScreenY - 2 + offsetPie2, 7, 3);
+
+            // Efecto visual si el escudo está activo
+            if (escudoActivo && colorBase === '#ffaa00') {
+                ctx.strokeStyle = '#00ffcc';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x + 10, baseScreenY - 18, 20, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        // DIBUJAR ENEMIGO CON CUERPO COMPLETO, PIES Y MANOS QUE CAMINAN
+        function dibujarEnemigo(screenX, caminando, animOffset) {
+            let baseScreenY = canvas.height - 10;
+            let frame = animacionFrame + animOffset;
+
+            // Cabeza Zombie
+            ctx.fillStyle = '#44aa44';
+            ctx.fillRect(screenX + 4, baseScreenY - 34, 12, 11);
+            ctx.fillStyle = '#ff0000'; // Ojos rojos
+            ctx.fillRect(screenX + 6, baseScreenY - 30, 2, 2);
+            ctx.fillRect(screenX + 12, baseScreenY - 30, 2, 2);
+
+            // Torso Zombie
+            ctx.fillStyle = '#226622';
+            ctx.fillRect(screenX + 3, baseScreenY - 23, 14, 13);
+
+            // Manos Zombie con movimiento
+            let offsetMano = caminando ? Math.sin(frame * 0.25) * 5 : 0;
+            ctx.fillStyle = '#44aa44';
+            ctx.fillRect(screenX - 3, baseScreenY - 22 + offsetMano, 5, 5);
+            ctx.fillRect(screenX + 16, baseScreenY - 22 - offsetMano, 5, 5);
+
+            // Piernas Zombie completas y animadas
+            let offsetPie1 = caminando ? Math.sin(frame * 0.25) * 6 : 0;
+            let offsetPie2 = caminando ? -Math.sin(frame * 0.25) * 6 : 0;
+
+            ctx.fillStyle = '#113311';
+            ctx.fillRect(screenX + 4, baseScreenY - 10, 5, 8 + offsetPie1);
+            ctx.fillRect(screenX + 11, baseScreenY - 10, 5, 8 + offsetPie2);
+
+            // Pies
+            ctx.fillStyle = '#051a05';
+            ctx.fillRect(screenX + 3, baseScreenY - 2 + offsetPie1, 6, 3);
+            ctx.fillRect(screenX + 11, baseScreenY - 2 + offsetPie2, 6, 3);
         }
 
         function loop() {
             if (gameActive) {
+                animacionFrame++;
+                let estaCaminando = false;
+
                 if (Math.abs(direccionMovimiento) > 0.1) {
                     mundoX += direccionMovimiento * 5;
                     if (mundoX < 0) mundoX = 0;
+                    estaCaminando = true;
                 }
 
                 if (saltando) {
@@ -617,28 +742,31 @@
                 coins.forEach(c => {
                     if (!c.recolectada && Math.abs(c.x - jugadorMundoX) < 20 && Math.abs(c.y - jugadorY) < 22) {
                         c.recolectada = true;
-                        oro += 15;
+                        oro += 10;
                         document.getElementById('txtOro').textContent = oro;
                         reproducirSonido(1200, 'sine', 0.05);
                     }
                 });
 
+                // Movimiento y colisión de enemigos
                 enemies.forEach(en => {
                     if (en.hp > 0) {
                         if (en.x > jugadorMundoX + 15) en.x -= en.vel;
-                        else if (en.x < jugadorMundoX - 15) en.x += (en.vel * 0.5);
+                        else if (en.x < jugadorMundoX - 15) en.x += (en.vel * 0.6);
 
                         if (Math.abs(en.x - jugadorMundoX) < 16 && jugadorY <= 8) {
-                            vida = Math.max(0, vida - 0.5);
-                            document.getElementById('hpFill').style.width = vida + '%';
-                            document.getElementById('hpText').textContent = Math.ceil(vida) + ' / 100 HP';
-                            document.getElementById('efectoDaño').classList.add('recibiendo-daño');
-                            setTimeout(() => document.getElementById('efectoDaño').classList.remove('recibiendo-daño'), 100);
+                            if (!escudoActivo) {
+                                vida = Math.max(0, vida - 0.6);
+                                document.getElementById('hpFill').style.width = vida + '%';
+                                document.getElementById('hpText').textContent = Math.ceil(vida) + ' / 100 HP';
+                                document.getElementById('efectoDaño').classList.add('recibiendo-daño');
+                                setTimeout(() => document.getElementById('efectoDaño').classList.remove('recibiendo-daño'), 100);
 
-                            if (vida <= 0) {
-                                gameActive = false;
-                                alert("¡Has sido derrotado en la partida online!");
-                                document.getElementById('screenMultiplayer').classList.remove('oculto');
+                                if (vida <= 0) {
+                                    gameActive = false;
+                                    alert("¡Has sido derrotado! Inténtalo de nuevo.");
+                                    document.getElementById('screenLobby').classList.remove('oculto');
+                                }
                             }
                         }
                     }
@@ -648,16 +776,18 @@
                 ctx.fillStyle = '#ffaa00';
                 ctx.fillRect(0, canvas.height - 4, canvas.width, 4);
 
+                // Dibujar obstáculos
                 obstacles.forEach(b => {
                     let screenX = b.x - mundoX;
                     if (screenX > -50 && screenX < canvas.width + 50) {
                         ctx.fillStyle = '#A0522D';
                         ctx.fillRect(screenX, canvas.height - 26 - b.y, b.w, b.h);
-                        ctx.font = '11px sans-serif';
+                        ctx.font = '10px sans-serif';
                         ctx.fillText(b.icono, screenX + 8, canvas.height - 10 - b.y);
                     }
                 });
 
+                // Dibujar monedas
                 coins.forEach(c => {
                     if (!c.recolectada) {
                         let screenX = c.x - mundoX;
@@ -670,28 +800,37 @@
                     }
                 });
 
+                // Dibujar enemigos con cuerpo completo
                 enemies.forEach(en => {
                     if (en.hp > 0) {
                         let screenX = en.x - mundoX;
                         if (screenX > -40 && screenX < canvas.width + 40) {
-                            ctx.font = '16px sans-serif';
-                            ctx.fillText(en.emoji, screenX, canvas.height - 16);
+                            dibujarEnemigo(screenX, true, en.animOffset);
+                            
+                            // Barra de vida del enemigo
+                            ctx.fillStyle = '#444';
+                            ctx.fillRect(screenX - 2, canvas.height - 42, 24, 3);
+                            ctx.fillStyle = '#ff0055';
+                            ctx.fillRect(screenX - 2, canvas.height - 42, (en.hp / en.maxHp) * 24, 3);
                         }
                     }
                 });
 
-                dibujarPersonaje(jugadorX, jugadorY, '#ffaa00');
+                // Dibujar Jugador Principal
+                dibujarPersonaje(jugadorX, jugadorY, '#ffaa00', estaCaminando);
 
+                // Dibujar Compañero en Multijugador
                 if (esOnline) {
                     let compScreenX = datosCompañero.x - mundoX;
                     if (compScreenX > -40 && compScreenX < canvas.width + 40) {
-                        dibujarPersonaje(compScreenX, datosCompañero.y || 0, '#00ffff');
+                        dibujarPersonaje(compScreenX, datosCompañero.y || 0, '#00ffff', true);
                         ctx.fillStyle = '#00ffff';
                         ctx.font = '7px sans-serif';
                         ctx.fillText('COMPAÑERO', compScreenX - 8, canvas.height - 45 - (datosCompañero.y || 0));
                     }
                 }
 
+                // Balas
                 ctx.fillStyle = '#ffff00';
                 bullets.forEach((b, idx) => {
                     b.x += 12;

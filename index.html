@@ -1,366 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Free Fire 2D - Multijugador Online por Sala</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Courier New', Courier, monospace;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        html, body {
-            width: 100vw;
-            height: 100vh;
-            background-color: #05050a;
-            color: #f0f0f0;
-            overflow: hidden;
-            position: fixed;
-            user-select: none;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        #efectoDaño {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(255,0,0,0) 40%, rgba(255,0,0,0.6) 100%);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.1s ease;
-            z-index: 999;
-        }
-        .recibiendo-daño { opacity: 1 !important; }
-
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 100vw;
-            height: 100vh;
-            padding: 4px 8px;
-            position: relative;
-        }
-
-        #screenLobby, #screenLevels, #screenMultiplayer {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(135deg, #0d0d1a, #030308);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            text-align: center;
-        }
-        .oculto { display: none !important; }
-
-        .lobby-card-ui {
-            background: rgba(20, 20, 35, 0.95);
-            border: 2px solid #ffaa00;
-            border-radius: 12px;
-            padding: 16px;
-            width: 90%;
-            max-width: 340px;
-            box-shadow: 0 0 20px rgba(255,170,0,0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .lobby-title {
-            font-size: 18px;
-            color: #ffaa00;
-            text-shadow: 0 0 10px rgba(255,170,0,0.6);
-            letter-spacing: 2px;
-        }
-        .lobby-subtitle {
-            font-size: 10px;
-            color: #00ffff;
-            margin-bottom: 2px;
-        }
-
-        .main-btn {
-            background: linear-gradient(135deg, #ffaa00, #ff4400);
-            border: 2px solid #fff;
-            color: #fff;
-            padding: 10px 12px;
-            font-size: 11px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255,170,0,0.4);
-            width: 100%;
-        }
-        .main-btn:active { transform: scale(0.95); }
-
-        .room-input {
-            background: #141420;
-            border: 2px solid #00ffff;
-            color: #fff;
-            padding: 8px;
-            font-size: 15px;
-            text-align: center;
-            border-radius: 8px;
-            width: 100%;
-            letter-spacing: 4px;
-        }
-
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-            max-height: 38vh;
-            overflow-y: auto;
-            width: 100%;
-            padding: 4px;
-        }
-        .level-card {
-            background: #141420;
-            border: 2px solid #555;
-            border-radius: 6px;
-            padding: 8px 0;
-            font-size: 10px;
-            font-weight: bold;
-            color: #00ff66;
-            cursor: pointer;
-        }
-        .level-card:active { background: #00ff66; color: #000; }
-
-        .top-hud-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #12121c;
-            border: 1px solid #444;
-            border-radius: 6px;
-            padding: 4px 8px;
-            font-size: 9px;
-            font-weight: bold;
-            height: 28px;
-        }
-
-        .volume-control-box {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 8px;
-            color: #ffaa00;
-        }
-        .volume-control-box input {
-            width: 40px;
-            accent-color: #ffaa00;
-        }
-
-        .battle-arena {
-            flex: 1;
-            display: flex;
-            background: linear-gradient(135deg, rgba(15, 20, 35, 1), rgba(5, 10, 20, 1));
-            border: 2px solid #ffaa00;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            margin: 3px 0;
-        }
-
-        canvas { display: block; width: 100%; height: 100%; }
-
-        .controls-hud {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            background: rgba(15, 15, 25, 0.98);
-            border: 2px solid #555;
-            padding: 8px 12px;
-            border-radius: 12px;
-        }
-
-        .hud-row-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .hp-container { width: 140px; }
-        .hp-label { font-size: 7px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
-        .hp-bar-bg { width: 100%; background: #222; height: 5px; border-radius: 3px; overflow: hidden; }
-        .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.15s ease; }
-
-        .actions-mini-grid {
-            display: flex;
-            gap: 6px;
-        }
-        .round-action-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.9);
-            font-size: 9px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-        }
-        .round-action-btn:active { transform: scale(0.9); }
-        .round-action-btn span { font-size: 6px; font-weight: bold; color: #fff; }
-
-        #btnAccion1 { background: linear-gradient(135deg, rgba(255,0,85,0.9), rgba(255,170,0,0.9)); border-color: #ffaa00; }
-        #btnAccion2 { background: linear-gradient(135deg, rgba(255,170,0,0.9), rgba(255,68,0,0.9)); border-color: #ffaa00; }
-        #btnAccion3 { background: linear-gradient(135deg, rgba(0,255,102,0.9), rgba(0,150,80,0.9)); border-color: #00ff66; }
-        #btnAccion4 { background: linear-gradient(135deg, rgba(138,43,226,0.9), rgba(255,0,255,0.9)); border-color: #ff00ff; }
-
-        .hud-row-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2px;
-        }
-
-        .joystick-base {
-            width: 72px;
-            height: 72px;
-            background: rgba(30, 30, 50, 0.7);
-            border: 3px solid rgba(255, 170, 0, 0.8);
-            border-radius: 50%;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .joystick-knob {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #ffaa00, #ff4400);
-            border: 2px solid #fff;
-            border-radius: 50%;
-            position: absolute;
-            pointer-events: none;
-        }
-
-        .jump-action-btn {
-            width: 95px;
-            height: 42px;
-            background: linear-gradient(135deg, #00ffff, #0088cc);
-            border: 2px solid #fff;
-            border-radius: 21px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,255,255,0.4);
-        }
-        .jump-action-btn:active { transform: scale(0.92); background: #00ffff; }
-        .jump-action-btn span { font-size: 8px; color: #fff; margin-left: 3px; }
-
-        .info-bottom-bar {
-            display: flex;
-            justify-content: space-between;
-            font-size: 7px;
-            color: #888;
-            padding: 1px 4px;
-        }
-        #chatLog { color: #00ffcc; font-style: italic; }
-    </style>
-</head>
-<body>
-
-    <div id="screenLobby">
-        <div class="lobby-card-ui">
-            <h1 class="lobby-title">FREE FIRE 2D</h1>
-            <p class="lobby-subtitle">ONLINE MULTIPLAYER</p>
-            <div style="font-size: 24px; margin: 4px 0;">🌐🔥</div>
-            <button class="main-btn" id="btnJugarCampana">▶ CAMPAÑA SOLO (30 NIVELES)</button>
-            <button class="main-btn" id="btnOnlineMenu" style="background: linear-gradient(135deg, #00ffcc, #0088cc);">👥 MODO ONLINE (SALA)</button>
-        </div>
-    </div>
-
-    <div id="screenLevels" class="oculto">
-        <div class="lobby-card-ui" style="max-width: 360px;">
-            <h2 class="lobby-title" style="font-size: 16px;">SELECCIONAR NIVEL (1 - 30)</h2>
-            <div class="levels-grid" id="levelsGridContainer"></div>
-            <button class="main-btn" style="padding: 7px 10px; font-size: 10px; margin-top: 4px;" id="btnVolverLobby">Volver al Lobby</button>
-        </div>
-    </div>
-
-    <div id="screenMultiplayer" class="oculto">
-        <div class="lobby-card-ui">
-            <h2 class="lobby-title" style="font-size: 16px;">CÓDIGO DE SALA</h2>
-            <p class="lobby-subtitle">Crea una sala o ingresa el código</p>
-            <button class="main-btn" id="btnCrearSala">⚡ CREAR NUEVA SALA</button>
-            <div style="font-size: 9px; color: #aaa; margin: 4px 0;">O UNIRSE A UNA SALA:</div>
-            <input type="text" id="inputCodigoSala" class="room-input" placeholder="Ej: 4815" maxlength="6">
-            <button class="main-btn" style="background: linear-gradient(135deg, #00ffcc, #0088cc); margin-top: 4px;" id="btnUnirseSala">🔗 UNIRSE A SALA</button>
-            <button class="main-btn" style="padding: 7px 10px; font-size: 9px; margin-top: 6px; background: #444;" id="btnVolverMenuOnline">Volver</button>
-        </div>
-    </div>
-
-    <div id="efectoDaño"></div>
-
-    <div class="app-container">
-        <div class="top-hud-stats">
-            <span>SALA: <strong id="txtSalaInfo" style="color:#00ffff;">SOLO</strong></span>
-            <span style="color:#ffaa00;" id="txtRolInfo">Jugador 1</span>
-            <div class="volume-control-box">
-                <span>🔊</span>
-                <input type="range" id="volRange" min="0" max="1" step="0.1" value="0.8">
-            </div>
-            <span>💎 ORO: <strong id="txtOro" style="color:#00ff66; font-size: 11px;">0</strong></span>
-        </div>
-
-        <div class="battle-arena">
-            <canvas id="gameCanvas"></canvas>
-        </div>
-
-        <div class="controls-hud">
-            <div class="hud-row-top">
-                <div class="hp-container">
-                    <div class="hp-label">
-                        <span>❤️ MI VIDA (HP)</span>
-                        <span id="hpText">100 / 100 HP</span>
-                    </div>
-                    <div class="hp-bar-bg">
-                        <div class="hp-bar-fill" id="hpFill" style="width: 100%;"></div>
-                    </div>
-                </div>
-                <div class="actions-mini-grid">
-                    <button class="round-action-btn" id="btnAccion1">🔥<span>Fuego</span></button>
-                    <button class="round-action-btn" id="btnAccion2">🐺<span>Dash</span></button>
-                    <button class="round-action-btn" id="btnAccion3">🤖<span>Escudo</span></button>
-                    <button class="round-action-btn" id="btnAccion4">🦅<span>Volar</span></button>
-                </div>
-            </div>
-
-            <div class="hud-row-bottom">
-                <div class="joystick-base" id="joystickBase">
-                    <div class="joystick-knob" id="joystickKnob"></div>
-                </div>
-                <div class="jump-action-btn" id="btnSaltoPrincipal">
-                    ⬆️<span>SALTAR</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="info-bottom-bar">
-            <span>NIVEL: <strong id="lblNivelActual" style="color:#00ff66;">1</strong> | ESTADO: <strong id="lblEstadoTransformacion" style="color:#ffaa00;">Normal</strong></span>
-            <span id="chatLog">Sistema online sincronizado.</span>
-        </div>
-    </div>
-
     <script>
         const firebaseConfig = {
             databaseURL: "https://freefire2d-default-rtdb.firebaseio.com/"
@@ -382,7 +19,7 @@
         let oro = 0;
         let nivelActual = 1;
         let mundoX = 0;
-        let jugadorX = 70;
+        let jugadorX = 70; // Posición fija horizontal en la pantalla
         let jugadorY = 0;
         let velocidadY = 0;
         let saltando = false;
@@ -399,7 +36,6 @@
         let bullets = [];
         let animacionFrame = 0;
 
-        let dashCooldown = 0;
         let escudoActivo = false;
         let volarActivo = false;
 
@@ -564,37 +200,34 @@
             escudoActivo = false;
             volarActivo = false;
 
-            let cantidadObstaculos = 12 + (nivelActual * 2);
+            let cantidadObstaculos = 15 + (nivelActual * 3);
             for (let i = 1; i < cantidadObstaculos; i++) {
-                let posX = i * 200 + Math.random() * 40;
-                obstacles.push({ x: posX, y: (i % 2 === 0) ? 0 : 35, w: 35, h: 22, icono: '📦' });
+                let posX = i * 220 + Math.random() * 50;
+                obstacles.push({ x: posX, y: 0, w: 35, h: 22, icono: '📦' });
                 coins.push({ x: posX + 20, y: 35, recolectada: false });
                 
                 let hpEnemigo = 30 + (nivelActual * 5);
-                enemies.push({ x: posX + 120, y: 0, hp: hpEnemigo, maxHp: hpEnemigo, vel: 0.6 + (nivelActual * 0.05), animOffset: Math.random() * 100 });
+                enemies.push({ x: posX + 110, y: 0, hp: hpEnemigo, maxHp: hpEnemigo, vel: 0.5, animOffset: Math.random() * 100 });
             }
             gameActive = true;
         }
 
+        // Reemplazamos el joystick por un botón de salto grande y cómodo que abarque la zona izquierda
         const joyBase = document.getElementById('joystickBase');
-        const joyKnob = document.getElementById('joystickKnob');
-        let joyActive = false;
-        let direccionMovimiento = 0;
-
-        function actualizarJoystick(clientX) {
-            let rect = joyBase.getBoundingClientRect();
-            let centroX = rect.left + rect.width / 2;
-            let deltaX = clientX - centroX;
-            let radioMax = 25;
-            if (deltaX > radioMax) deltaX = radioMax;
-            if (deltaX < -radioMax) deltaX = -radioMax;
-            joyKnob.style.transform = `translate(${deltaX}px, 0px)`;
-            direccionMovimiento = deltaX / radioMax;
-        }
-
-        joyBase.addEventListener('pointerdown', (e) => { joyActive = true; actualizarJoystick(e.clientX); });
-        window.addEventListener('pointermove', (e) => { if (joyActive) actualizarJoystick(e.clientX); });
-        window.addEventListener('pointerup', () => { joyActive = false; direccionMovimiento = 0; joyKnob.style.transform = `translate(0px, 0px)`; });
+        joyBase.style.display = 'flex';
+        joyBase.style.alignItems = 'center';
+        joyBase.style.justifyContent = 'center';
+        joyBase.style.background = 'linear-gradient(135deg, #00ffff, #0088cc)';
+        joyBase.style.border = '2px solid #fff';
+        joyBase.innerHTML = '<span style="color:#000; font-weight:bold; font-size:10px;">⚡ SALTAR</span>';
+        joyBase.onclick = () => {
+            if (!gameActive) return;
+            if (!saltando || volarActivo) {
+                saltando = true;
+                velocidadY = volarActivo ? 14 : 12;
+                reproducirSonido(500, 'triangle', 0.1);
+            }
+        };
 
         document.getElementById('btnSaltoPrincipal').addEventListener('pointerdown', (e) => {
             e.preventDefault();
@@ -627,7 +260,7 @@
             e.preventDefault();
             if (!gameActive) return;
             reproducirSonido(900, 'sine', 0.12);
-            mundoX += 90;
+            mundoX += 120; // Impulso extra hacia adelante
             document.getElementById('lblEstadoTransformacion').textContent = "Dash!";
             setTimeout(() => {
                 document.getElementById('lblEstadoTransformacion').textContent = "Normal";
@@ -729,13 +362,9 @@
         function loop() {
             if (gameActive) {
                 animacionFrame++;
-                let estaCaminando = false;
-
-                if (Math.abs(direccionMovimiento) > 0.1) {
-                    mundoX += direccionMovimiento * 5;
-                    if (mundoX < 0) mundoX = 0;
-                    estaCaminando = true;
-                }
+                
+                // El escenario avanza automáticamente de manera constante hacia adelante
+                mundoX += 4 + (nivelActual * 0.2);
 
                 if (saltando) {
                     jugadorY += velocidadY;
@@ -756,9 +385,6 @@
 
                 enemies.forEach(en => {
                     if (en.hp > 0) {
-                        if (en.x > jugadorMundoX + 15) en.x -= en.vel;
-                        else if (en.x < jugadorMundoX - 15) en.x += (en.vel * 0.6);
-
                         let distanciaX = Math.abs(en.x - jugadorMundoX);
 
                         if (distanciaX < 18 && jugadorY > 15 && velocidadY < 0) {
@@ -770,7 +396,7 @@
                         } 
                         else if (distanciaX < 16 && jugadorY <= 10) {
                             if (!escudoActivo) {
-                                vida = Math.max(0, vida - 0.6);
+                                vida = Math.max(0, vida - 0.8);
                                 document.getElementById('hpFill').style.width = vida + '%';
                                 document.getElementById('hpText').textContent = Math.ceil(vida) + ' / 100 HP';
                                 document.getElementById('efectoDaño').classList.add('recibiendo-daño');
@@ -826,7 +452,8 @@
                     }
                 });
 
-                dibujarPersonaje(jugadorX, jugadorY, '#ffaa00', estaCaminando);
+                // El personaje siempre corre de forma animada en su sitio mientras el escenario fluye
+                dibujarPersonaje(jugadorX, jugadorY, '#ffaa00', true);
 
                 if (esOnline) {
                     let compScreenX = datosCompañero.x - mundoX;
@@ -851,5 +478,3 @@
 
         requestAnimationFrame(loop);
     </script>
-</body>
-</html>

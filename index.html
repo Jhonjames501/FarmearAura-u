@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Free Fire 2D - Multijugador Online por Sala</title>
-    <!-- Firebase SDK para la sincronización online por códigos de sala -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -42,12 +41,11 @@
             justify-content: space-between;
             width: 100vw;
             height: 100vh;
-            padding: 2px 4px;
+            padding: 6px 10px; /* Más espacio en los bordes para que no se pegue */
             position: relative;
         }
 
-        /* Pantallas de Lobby, Salas Online y Tienda */
-        #screenLobby, #screenLevels, #screenShop, #screenMultiplayer, #screenRoom {
+        #screenLobby, #screenLevels, #screenMultiplayer {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             background: linear-gradient(135deg, #0d0d1a, #030308);
@@ -65,24 +63,24 @@
             background: rgba(20, 20, 35, 0.95);
             border: 2px solid #ffaa00;
             border-radius: 12px;
-            padding: 15px;
+            padding: 20px;
             width: 90%;
-            max-width: 320px;
+            max-width: 340px;
             box-shadow: 0 0 20px rgba(255,170,0,0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
         .lobby-title {
-            font-size: 18px;
+            font-size: 20px;
             color: #ffaa00;
             text-shadow: 0 0 10px rgba(255,170,0,0.6);
             letter-spacing: 2px;
         }
         .lobby-subtitle {
-            font-size: 9px;
+            font-size: 11px;
             color: #00ffff;
             margin-bottom: 4px;
         }
@@ -91,10 +89,10 @@
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             color: #fff;
-            padding: 8px 15px;
-            font-size: 10px;
+            padding: 12px 15px;
+            font-size: 12px;
             font-weight: bold;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(255,170,0,0.4);
             width: 100%;
@@ -106,18 +104,18 @@
             background: #141420;
             border: 2px solid #00ffff;
             color: #fff;
-            padding: 8px;
-            font-size: 14px;
+            padding: 10px;
+            font-size: 16px;
             text-align: center;
             border-radius: 8px;
             width: 100%;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
         }
 
         .levels-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
+            gap: 8px;
             max-height: 40vh;
             overflow-y: auto;
             width: 100%;
@@ -127,8 +125,8 @@
             background: #141420;
             border: 2px solid #555;
             border-radius: 6px;
-            padding: 7px 0;
-            font-size: 9px;
+            padding: 10px 0;
+            font-size: 11px;
             font-weight: bold;
             color: #00ff66;
             cursor: pointer;
@@ -140,22 +138,22 @@
             align-items: center;
             background: #12121c;
             border: 1px solid #444;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 8px;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 10px;
             font-weight: bold;
-            height: 22px;
+            height: 30px;
         }
 
         .volume-control-box {
             display: flex;
             align-items: center;
-            gap: 3px;
-            font-size: 7px;
+            gap: 5px;
+            font-size: 9px;
             color: #ffaa00;
         }
         .volume-control-box input {
-            width: 35px;
+            width: 45px;
             accent-color: #ffaa00;
         }
 
@@ -164,22 +162,23 @@
             display: flex;
             background: linear-gradient(135deg, rgba(15, 20, 35, 1), rgba(5, 10, 20, 1));
             border: 2px solid #ffaa00;
-            border-radius: 4px;
+            border-radius: 8px;
             position: relative;
             overflow: hidden;
-            margin: 2px 0;
+            margin: 6px 0;
         }
 
         canvas { display: block; width: 100%; height: 100%; }
 
+        /* Controles inferiores rediseñados y más grandes */
         .controls-hud {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 8px;
             background: rgba(15, 15, 25, 0.95);
-            border: 1px solid #444;
-            padding: 4px 6px;
-            border-radius: 4px;
+            border: 2px solid #555;
+            padding: 10px 14px;
+            border-radius: 10px;
         }
 
         .hud-row-top {
@@ -188,28 +187,29 @@
             align-items: center;
         }
 
-        .hp-container { width: 125px; }
-        .hp-label { font-size: 6px; color: #aaa; margin-bottom: 1px; display: flex; justify-content: space-between; }
-        .hp-bar-bg { width: 100%; background: #222; height: 4px; border-radius: 2px; overflow: hidden; }
+        .hp-container { width: 150px; }
+        .hp-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .hp-bar-bg { width: 100%; background: #222; height: 6px; border-radius: 3px; overflow: hidden; }
         .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.15s ease; }
 
         .actions-mini-grid {
             display: flex;
-            gap: 3px;
+            gap: 8px;
         }
         .round-action-btn {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            font-size: 9px;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            font-size: 11px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
-        .round-action-btn span { font-size: 5px; font-weight: bold; color: #fff; }
+        .round-action-btn span { font-size: 7px; font-weight: bold; color: #fff; }
 
         #btnAccion1 { background: linear-gradient(135deg, rgba(255,0,85,0.85), rgba(255,170,0,0.85)); border-color: #ffaa00; }
         #btnAccion2 { background: linear-gradient(135deg, rgba(255,170,0,0.85), rgba(255,68,0,0.85)); border-color: #ffaa00; }
@@ -220,13 +220,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 5px;
         }
 
         .joystick-base {
-            width: 55px;
-            height: 55px;
-            background: rgba(30, 30, 50, 0.6);
-            border: 2px solid rgba(255, 170, 0, 0.6);
+            width: 75px;
+            height: 75px;
+            background: rgba(30, 30, 50, 0.7);
+            border: 3px solid rgba(255, 170, 0, 0.8);
             border-radius: 50%;
             position: relative;
             display: flex;
@@ -235,8 +236,8 @@
             touch-action: none;
         }
         .joystick-knob {
-            width: 25px;
-            height: 25px;
+            width: 35px;
+            height: 35px;
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             border-radius: 50%;
@@ -245,63 +246,61 @@
         }
 
         .jump-action-btn {
-            width: 55px;
-            height: 30px;
+            width: 90px;
+            height: 45px;
             background: linear-gradient(135deg, #00ffff, #0088cc);
             border: 2px solid #fff;
-            border-radius: 15px;
+            border-radius: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9px;
+            font-size: 12px;
             color: #000;
             font-weight: bold;
             cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0,255,255,0.4);
         }
-        .jump-action-btn span { font-size: 6px; color: #fff; margin-left: 2px; }
+        .jump-action-btn span { font-size: 9px; color: #fff; margin-left: 4px; }
 
         .info-bottom-bar {
             display: flex;
             justify-content: space-between;
-            font-size: 6px;
+            font-size: 8px;
             color: #888;
-            padding: 0 2px;
+            padding: 2px 4px;
         }
         #chatLog { color: #00ffcc; font-style: italic; }
     </style>
 </head>
 <body>
 
-    <!-- Menú Lobby Principal -->
     <div id="screenLobby">
         <div class="lobby-card-ui">
             <h1 class="lobby-title">FREE FIRE 2D</h1>
             <p class="lobby-subtitle">ONLINE MULTIPLAYER</p>
-            <div style="font-size: 24px; margin: 3px 0;">🌐🔥</div>
+            <div style="font-size: 28px; margin: 5px 0;">🌐🔥</div>
             <button class="main-btn" id="btnJugarCampana">▶ CAMPAÑA SOLO</button>
             <button class="main-btn" id="btnOnlineMenu" style="background: linear-gradient(135deg, #00ffcc, #0088cc);">👥 MODO ONLINE (SALA)</button>
         </div>
     </div>
 
-    <!-- Pantalla de Selección de Campaña -->
     <div id="screenLevels" class="oculto">
-        <div class="lobby-card-ui" style="max-width: 340px;">
-            <h2 class="lobby-title" style="font-size: 15px;">NIVELES SOLO</h2>
+        <div class="lobby-card-ui" style="max-width: 360px;">
+            <h2 class="lobby-title" style="font-size: 17px;">NIVELES SOLO</h2>
             <div class="levels-grid" id="levelsGridContainer"></div>
-            <button class="main-btn" style="padding: 4px 10px; font-size: 9px; margin-top: 4px;" id="btnVolverLobby">Volver</button>
+            <button class="main-btn" style="padding: 8px 10px; font-size: 10px; margin-top: 6px;" id="btnVolverLobby">Volver</button>
         </div>
     </div>
 
-    <!-- Menú de Conexión por Código de Sala Online -->
     <div id="screenMultiplayer" class="oculto">
         <div class="lobby-card-ui">
-            <h2 class="lobby-title" style="font-size: 15px;">CÓDIGO DE SALA</h2>
+            <h2 class="lobby-title" style="font-size: 17px;">CÓDIGO DE SALA</h2>
             <p class="lobby-subtitle">Crea una sala o ingresa el código de tu amigo</p>
             <button class="main-btn" id="btnCrearSala">⚡ CREAR NUEVA SALA</button>
-            <div style="font-size: 9px; color: #aaa; margin: 4px 0;">O UNIRSE A UNA SALA:</div>
+            <div style="font-size: 10px; color: #aaa; margin: 6px 0;">O UNIRSE A UNA SALA:</div>
             <input type="text" id="inputCodigoSala" class="room-input" placeholder="Ej: 4815" maxlength="6">
-            <button class="main-btn" style="background: linear-gradient(135deg, #00ffcc, #0088cc); margin-top: 4px;" id="btnUnirseSala">🔗 UNIRSE A SALA</button>
-            <button class="main-btn" style="padding: 4px 10px; font-size: 8px; margin-top: 6px; background: #444;" id="btnVolverMenuOnline">Volver</button>
+            <button class="main-btn" style="background: linear-gradient(135deg, #00ffcc, #0088cc); margin-top: 6px;" id="btnUnirseSala">🔗 UNIRSE A SALA</button>
+            <button class="main-btn" style="padding: 8px 10px; font-size: 10px; margin-top: 8px; background: #444;" id="btnVolverMenuOnline">Volver</button>
         </div>
     </div>
 
@@ -358,7 +357,6 @@
     </div>
 
     <script>
-        // Configuración de Firebase Realtime Database para partidas online
         const firebaseConfig = {
             databaseURL: "https://freefire2d-default-rtdb.firebaseio.com/"
         };
@@ -382,15 +380,12 @@
         let jugadorY = 0;
         let velocidadY = 0;
         let saltando = false;
-        let volando = false;
         let gameActive = false;
 
-        // Variables de Multijugador Online
         let esOnline = false;
         let codigoSalaActual = null;
         let miIdJugador = 'p_' + Math.floor(Math.random() * 100000);
-        let esHost = false;
-        let datosCompañero = { x: 150, y: 0, vida: 100, skin: '#00ffff' };
+        let datosCompañero = { x: 150, y: 0, vida: 100 };
 
         let obstacles = [];
         let coins = [];
@@ -430,7 +425,6 @@
             } catch (e) {}
         }
 
-        // Navegación de menús
         document.getElementById('btnJugarCampana').addEventListener('click', () => {
             inicializarAudio();
             document.getElementById('screenLobby').classList.add('oculto');
@@ -453,11 +447,9 @@
             document.getElementById('screenLobby').classList.remove('oculto');
         });
 
-        // Generar Sala Online
         document.getElementById('btnCrearSala').addEventListener('click', () => {
             inicializarAudio();
             codigoSalaActual = Math.floor(1000 + Math.random() * 9000).toString();
-            esHost = true;
             esOnline = true;
             document.getElementById('txtSalaInfo').textContent = codigoSalaActual;
             document.getElementById('txtRolInfo').textContent = "Host (P1)";
@@ -467,7 +459,6 @@
             iniciarPartidaOnline();
         });
 
-        // Unirse a Sala Online existente
         document.getElementById('btnUnirseSala').addEventListener('click', () => {
             let codigo = document.getElementById('inputCodigoSala').value.trim();
             if (codigo.length < 4) {
@@ -476,7 +467,6 @@
             }
             inicializarAudio();
             codigoSalaActual = codigo;
-            esHost = false;
             esOnline = true;
             document.getElementById('txtSalaInfo').textContent = codigoSalaActual;
             document.getElementById('txtRolInfo').textContent = "Invitado (P2)";
@@ -506,22 +496,17 @@
 
         function iniciarPartidaOnline() {
             configurarPartidaComun();
-            
-            // Sincronización en tiempo real con Firebase Database
             let refSala = db.ref('salas/' + codigoSalaActual + '/' + miIdJugador);
             
-            // Enviar datos propios periódicamente
             setInterval(() => {
                 if (!gameActive || !esOnline) return;
                 refSala.set({
                     x: mundoX + jugadorX,
                     y: jugadorY,
-                    vida: vida,
-                    skin: '#ffaa00'
+                    vida: vida
                 });
             }, 50);
 
-            // Escuchar cambios de otros jugadores en la sala
             db.ref('salas/' + codigoSalaActual).on('value', (snapshot) => {
                 let jugadores = snapshot.val();
                 if (!jugadores) return;
@@ -562,7 +547,7 @@
             let rect = joyBase.getBoundingClientRect();
             let centroX = rect.left + rect.width / 2;
             let deltaX = clientX - centroX;
-            let radioMax = 18;
+            let radioMax = 22;
             if (deltaX > radioMax) deltaX = radioMax;
             if (deltaX < -radioMax) deltaX = -radioMax;
             joyKnob.style.transform = `translate(${deltaX}px, 0px)`;
@@ -574,8 +559,7 @@
         window.addEventListener('pointerup', () => { joyActive = false; direccionMovimiento = 0; joyKnob.style.transform = `translate(0px, 0px)`; });
 
         document.getElementById('btnSaltoPrincipal').addEventListener('click', () => {
-            if (!gameActive) return;
-            if (saltando) return;
+            if (!gameActive || saltando) return;
             saltando = true;
             velocidadY = 12;
             reproducirSonido(500, 'triangle', 0.1);
@@ -654,7 +638,6 @@
                     }
                 });
 
-                // Renderizado en Canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ffaa00';
                 ctx.fillRect(0, canvas.height - 4, canvas.width, 4);
@@ -691,17 +674,15 @@
                     }
                 });
 
-                // Dibujar al jugador local principal
                 dibujarPersonaje(jugadorX, jugadorY, '#ffaa00');
 
-                // Dibujar al compañero conectado online en tiempo real
                 if (esOnline) {
                     let compScreenX = datosCompañero.x - mundoX;
                     if (compScreenX > -40 && compScreenX < canvas.width + 40) {
                         dibujarPersonaje(compScreenX, datosCompañero.y || 0, '#00ffff');
                         ctx.fillStyle = '#00ffff';
-                        ctx.font = '6px sans-serif';
-                        ctx.fillText('COMPAÑERO', compScreenX - 6, canvas.height - 45 - (datosCompañero.y || 0));
+                        ctx.font = '7px sans-serif';
+                        ctx.fillText('COMPAÑERO', compScreenX - 8, canvas.height - 45 - (datosCompañero.y || 0));
                     }
                 }
 

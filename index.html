@@ -13,6 +13,7 @@
             padding: 0;
             font-family: 'Courier New', Courier, monospace;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         html, body {
             width: 100vw;
@@ -41,7 +42,7 @@
             justify-content: space-between;
             width: 100vw;
             height: 100vh;
-            padding: 6px 10px; /* Más espacio en los bordes para que no se pegue */
+            padding: 8px 12px;
             position: relative;
         }
 
@@ -96,7 +97,6 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(255,170,0,0.4);
             width: 100%;
-            transition: transform 0.1s;
         }
         .main-btn:active { transform: scale(0.95); }
 
@@ -142,7 +142,7 @@
             padding: 6px 10px;
             font-size: 10px;
             font-weight: bold;
-            height: 30px;
+            height: 32px;
         }
 
         .volume-control-box {
@@ -170,15 +170,14 @@
 
         canvas { display: block; width: 100%; height: 100%; }
 
-        /* Controles inferiores rediseñados y más grandes */
         .controls-hud {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            background: rgba(15, 15, 25, 0.95);
+            background: rgba(15, 15, 25, 0.98);
             border: 2px solid #555;
-            padding: 10px 14px;
-            border-radius: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
         }
 
         .hud-row-top {
@@ -187,18 +186,18 @@
             align-items: center;
         }
 
-        .hp-container { width: 150px; }
+        .hp-container { width: 160px; }
         .hp-label { font-size: 8px; color: #aaa; margin-bottom: 2px; display: flex; justify-content: space-between; }
         .hp-bar-bg { width: 100%; background: #222; height: 6px; border-radius: 3px; overflow: hidden; }
         .hp-bar-fill { width: 100%; background: linear-gradient(90deg, #ff0055, #00ff66); height: 100%; transition: width 0.15s ease; }
 
         .actions-mini-grid {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
         .round-action-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.9);
             font-size: 11px;
@@ -209,23 +208,24 @@
             cursor: pointer;
             box-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
+        .round-action-btn:active { transform: scale(0.9); }
         .round-action-btn span { font-size: 7px; font-weight: bold; color: #fff; }
 
-        #btnAccion1 { background: linear-gradient(135deg, rgba(255,0,85,0.85), rgba(255,170,0,0.85)); border-color: #ffaa00; }
-        #btnAccion2 { background: linear-gradient(135deg, rgba(255,170,0,0.85), rgba(255,68,0,0.85)); border-color: #ffaa00; }
-        #btnAccion3 { background: linear-gradient(135deg, rgba(0,255,102,0.85), rgba(0,150,80,0.85)); border-color: #00ff66; }
-        #btnAccion4 { background: linear-gradient(135deg, rgba(138,43,226,0.85), rgba(255,0,255,0.85)); border-color: #ff00ff; }
+        #btnAccion1 { background: linear-gradient(135deg, rgba(255,0,85,0.9), rgba(255,170,0,0.9)); border-color: #ffaa00; }
+        #btnAccion2 { background: linear-gradient(135deg, rgba(255,170,0,0.9), rgba(255,68,0,0.9)); border-color: #ffaa00; }
+        #btnAccion3 { background: linear-gradient(135deg, rgba(0,255,102,0.9), rgba(0,150,80,0.9)); border-color: #00ff66; }
+        #btnAccion4 { background: linear-gradient(135deg, rgba(138,43,226,0.9), rgba(255,0,255,0.9)); border-color: #ff00ff; }
 
         .hud-row-bottom {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 5px;
+            padding: 0 4px;
         }
 
         .joystick-base {
-            width: 75px;
-            height: 75px;
+            width: 85px;
+            height: 85px;
             background: rgba(30, 30, 50, 0.7);
             border: 3px solid rgba(255, 170, 0, 0.8);
             border-radius: 50%;
@@ -233,11 +233,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            touch-action: none;
         }
         .joystick-knob {
-            width: 35px;
-            height: 35px;
+            width: 38px;
+            height: 38px;
             background: linear-gradient(135deg, #ffaa00, #ff4400);
             border: 2px solid #fff;
             border-radius: 50%;
@@ -245,22 +244,24 @@
             pointer-events: none;
         }
 
+        /* Botón de salto grande y súper sensible al toque inmediato */
         .jump-action-btn {
-            width: 90px;
-            height: 45px;
+            width: 110px;
+            height: 50px;
             background: linear-gradient(135deg, #00ffff, #0088cc);
             border: 2px solid #fff;
-            border-radius: 22px;
+            border-radius: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 13px;
             color: #000;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,255,255,0.4);
+            box-shadow: 0 4px 10px rgba(0,255,255,0.4);
         }
-        .jump-action-btn span { font-size: 9px; color: #fff; margin-left: 4px; }
+        .jump-action-btn:active { transform: scale(0.92); background: #00ffff; }
+        .jump-action-btn span { font-size: 10px; color: #fff; margin-left: 4px; }
 
         .info-bottom-bar {
             display: flex;
@@ -344,8 +345,9 @@
                 <div class="joystick-base" id="joystickBase">
                     <div class="joystick-knob" id="joystickKnob"></div>
                 </div>
+                <!-- Botón de salto con respuesta inmediata usando pointerdown -->
                 <div class="jump-action-btn" id="btnSaltoPrincipal">
-                    ⬆️<span id="txtBtnSalto">SALTAR</span>
+                    ⬆️<span>SALTAR</span>
                 </div>
             </div>
         </div>
@@ -547,7 +549,7 @@
             let rect = joyBase.getBoundingClientRect();
             let centroX = rect.left + rect.width / 2;
             let deltaX = clientX - centroX;
-            let radioMax = 22;
+            let radioMax = 25;
             if (deltaX > radioMax) deltaX = radioMax;
             if (deltaX < -radioMax) deltaX = -radioMax;
             joyKnob.style.transform = `translate(${deltaX}px, 0px)`;
@@ -558,14 +560,18 @@
         window.addEventListener('pointermove', (e) => { if (joyActive) actualizarJoystick(e.clientX); });
         window.addEventListener('pointerup', () => { joyActive = false; direccionMovimiento = 0; joyKnob.style.transform = `translate(0px, 0px)`; });
 
-        document.getElementById('btnSaltoPrincipal').addEventListener('click', () => {
+        // SALTO INMEDIATO con pointerdown para evitar demoras
+        document.getElementById('btnSaltoPrincipal').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
             if (!gameActive || saltando) return;
             saltando = true;
             velocidadY = 12;
             reproducirSonido(500, 'triangle', 0.1);
         });
 
-        document.getElementById('btnAccion1').addEventListener('click', () => {
+        // ACCIÓN DE FUEGO con respuesta inmediata
+        document.getElementById('btnAccion1').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
             if (!gameActive) return;
             reproducirSonido(800, 'sawtooth', 0.08);
             bullets.push({ x: mundoX + jugadorX + 25, y: jugadorY + 20 });

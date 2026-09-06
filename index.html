@@ -1,16 +1,119 @@
-    <script>
-        const firebaseConfig = {
-            databaseURL: "https://freefire2d-default-rtdb.firebaseio.com/"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Free Fire 2D - Runner</title>
+    <!-- Firebase App (Core) y Realtime Database SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #111; font-family: sans-serif; }
+        #gameContainer { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; background: #222; }
+        canvas { display: block; width: 100%; flex: 1; background: linear-gradient(to bottom, #1a1a2e, #16213e); }
+        
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,15,25,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; color: #fff; }
+        .oculto { display: none !important; }
+        
+        h1 { color: #ffaa00; margin-bottom: 20px; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
+        .btn { background: linear-gradient(135deg, #ffaa00, #ff5500); border: none; padding: 12px 24px; margin: 8px; color: #fff; font-weight: bold; border-radius: 8px; font-size: 16px; cursor: pointer; min-width: 200px; text-align: center; }
+        .btn:active { transform: scale(0.95); }
+        
+        #uiSuperior { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 5; pointer-events: none; color: #fff; font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
+        .hp-bar-container { width: 100px; height: 10px; background: #555; border-radius: 5px; overflow: hidden; border: 1px solid #fff; }
+        #hpFill { width: 100%; height: 100%; background: #00ff66; transition: width 0.2s; }
 
+        #controlesInferiores { position: absolute; bottom: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 5; height: 70px; pointer-events: auto; }
+        .joy-base { width: 120px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; }
+        
+        .acciones-derecha { display: flex; gap: 8px; }
+        .btn-accion { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid #fff; color: #fff; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        #levelsGridContainer { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 60vh; overflow-y: auto; padding: 10px; width: 90%; max-width: 500px; }
+        .level-card { background: #333; border: 1px solid #555; padding: 12px; text-align: center; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .level-card:active { background: #ffaa00; color: #000; }
+
+        #efectoDaño { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 8; }
+        .recibiendo-daño { background: rgba(255, 0, 0, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div id="gameContainer">
+        <div id="efectoDaño"></div>
+
+        <!-- UI Superior en Juego -->
+        <div id="uiSuperior" class="oculto">
+            <div>HP: <div class="hp-bar-container"><div id="hpFill"></div></div> <span id="hpText">100 / 100 HP</span></div>
+            <div>ORO: <span id="txtOro">0</span></div>
+            <div>NIVEL: <span id="lblNivelActual">1</span></div>
+            <div>ESTADO: <span id="lblEstadoTransformacion">Normal</span></div>
+            <div>VOL: <input type="range" id="volRange" min="0" max="1" step="0.1" value="0.5" style="width: 60px; pointer-events: auto;"></div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Controles Inferiores -->
+        <div id="controlesInferiores" class="oculto">
+            <div id="joystickBase" class="joy-base">⚡ SALTAR</div>
+            <div class="acciones-derecha">
+                <div class="btn-accion" id="btnAccion1" title="Disparar">🔥</div>
+                <div class="btn-accion" id="btnAccion2" title="Dash">⚡</div>
+                <div class="btn-accion" id="btnAccion3" title="Escudo">🛡️</div>
+                <div class="btn-accion" id="btnAccion4" title="Volar">🚀</div>
+            </div>
+        </div>
+
+        <!-- Pantalla Lobby Principal -->
+        <div id="screenLobby" class="screen">
+            <h1>Free Fire 2D Runner</h1>
+            <button class="btn" id="btnJugarCampana">Modo Campaña</button>
+            <button class="btn" id="btnOnlineMenu">Multijugador Online</button>
+        </div>
+
+        <!-- Pantalla Selección de Niveles -->
+        <div id="screenLevels" class="screen oculto">
+            <h1>Selecciona Nivel</h1>
+            <div id="levelsGridContainer"></div>
+            <button class="btn" id="btnVolverLobby" style="margin-top: 15px; background: #555;">Volver</button>
+        </div>
+
+        <!-- Pantalla Multijugador -->
+        <div id="screenMultiplayer" class="screen oculto">
+            <h1>Modo Online</h1>
+            <button class="btn" id="btnCrearSala">Crear Sala</button>
+            <div style="margin: 15px 0; display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="inputCodigoSala" placeholder="Código de Sala" maxlength="4" style="padding: 10px; font-size: 16px; border-radius: 6px; border: none; width: 130px; text-align: center;">
+                <button class="btn" id="btnUnirseSala" style="margin: 0; min-width: 130px;">Unirse</button>
+            </div>
+            <div id="infoSalaDiv" style="margin-top: 15px; font-size: 14px; color: #00ffcc;">
+                Sala: <span id="txtSalaInfo">Ninguna</span> | Rol: <span id="txtRolInfo">-</span>
+            </div>
+            <button class="btn" id="btnVolverMenuOnline" style="margin-top: 20px; background: #555;">Volver</button>
+        </div>
+    </div>
+
+    <script>
+        // Inicialización segura de Firebase
+        try {
+            const firebaseConfig = {
+                databaseURL: "https://freefire2d-default-rtdb.firebaseio.com/"
+            };
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+        } catch (e) {
+            console.error("Error al inicializar Firebase:", e);
+        }
+
+        const db = firebase.database();
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
         function ajustarCanvas() {
             canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
+            canvas.height = canvas.parentElement.clientHeight - 80;
         }
         window.addEventListener('resize', ajustarCanvas);
         ajustarCanvas();
@@ -19,7 +122,7 @@
         let oro = 0;
         let nivelActual = 1;
         let mundoX = 0;
-        let jugadorX = 70; // Posición fija horizontal en la pantalla
+        let jugadorX = 70;
         let jugadorY = 0;
         let velocidadY = 0;
         let saltando = false;
@@ -42,22 +145,6 @@
         let audioCtx = null;
         let masterGain = null;
 
-        function forzarModoPantallaCompletaYHorizontal() {
-            try {
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(() => {});
-                }
-            } catch(e) {}
-            try {
-                let elem = document.documentElement;
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen().catch(() => {});
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                }
-            } catch(e) {}
-        }
-
         function inicializarAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -66,7 +153,6 @@
                 masterGain.connect(audioCtx.destination);
             }
             if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-            forzarModoPantallaCompletaYHorizontal();
         }
 
         document.getElementById('volRange').addEventListener('input', (e) => {
@@ -151,7 +237,6 @@
         construirMenuNiveles();
 
         function iniciarNivelSolo(num) {
-            forzarModoPantallaCompletaYHorizontal();
             esOnline = false;
             nivelActual = num;
             document.getElementById('lblNivelActual').textContent = nivelActual;
@@ -160,7 +245,6 @@
         }
 
         function iniciarPartidaOnline() {
-            forzarModoPantallaCompletaYHorizontal();
             esOnline = true;
             nivelActual = 1;
             document.getElementById('lblNivelActual').textContent = "Online";
@@ -209,17 +293,14 @@
                 let hpEnemigo = 30 + (nivelActual * 5);
                 enemies.push({ x: posX + 110, y: 0, hp: hpEnemigo, maxHp: hpEnemigo, vel: 0.5, animOffset: Math.random() * 100 });
             }
+            
+            document.getElementById('uiSuperior').classList.remove('oculto');
+            document.getElementById('controlesInferiores').classList.remove('oculto');
             gameActive = true;
+            ajustarCanvas();
         }
 
-        // Reemplazamos el joystick por un botón de salto grande y cómodo que abarque la zona izquierda
         const joyBase = document.getElementById('joystickBase');
-        joyBase.style.display = 'flex';
-        joyBase.style.alignItems = 'center';
-        joyBase.style.justifyContent = 'center';
-        joyBase.style.background = 'linear-gradient(135deg, #00ffff, #0088cc)';
-        joyBase.style.border = '2px solid #fff';
-        joyBase.innerHTML = '<span style="color:#000; font-weight:bold; font-size:10px;">⚡ SALTAR</span>';
         joyBase.onclick = () => {
             if (!gameActive) return;
             if (!saltando || volarActivo) {
@@ -228,16 +309,6 @@
                 reproducirSonido(500, 'triangle', 0.1);
             }
         };
-
-        document.getElementById('btnSaltoPrincipal').addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            if (!gameActive) return;
-            if (!saltando || volarActivo) {
-                saltando = true;
-                velocidadY = volarActivo ? 14 : 12;
-                reproducirSonido(500, 'triangle', 0.1);
-            }
-        });
 
         document.getElementById('btnAccion1').addEventListener('pointerdown', (e) => {
             e.preventDefault();
@@ -260,7 +331,7 @@
             e.preventDefault();
             if (!gameActive) return;
             reproducirSonido(900, 'sine', 0.12);
-            mundoX += 120; // Impulso extra hacia adelante
+            mundoX += 120;
             document.getElementById('lblEstadoTransformacion').textContent = "Dash!";
             setTimeout(() => {
                 document.getElementById('lblEstadoTransformacion').textContent = "Normal";
@@ -272,7 +343,7 @@
             if (!gameActive) return;
             reproducirSonido(400, 'square', 0.2);
             escudoActivo = true;
-            document.getElementById('lblEstadoTransformacion').textContent = "Escudo Activo";
+            document.getElementById('lblEstadoTransformacion').textContent = "Escudo";
             setTimeout(() => {
                 escudoActivo = false;
                 document.getElementById('lblEstadoTransformacion').textContent = "Normal";
@@ -286,7 +357,7 @@
             volarActivo = true;
             velocidadY = 8;
             saltando = true;
-            document.getElementById('lblEstadoTransformacion').textContent = "Modo Vuelo";
+            document.getElementById('lblEstadoTransformacion').textContent = "Vuelo";
             setTimeout(() => {
                 volarActivo = false;
                 document.getElementById('lblEstadoTransformacion').textContent = "Normal";
@@ -362,8 +433,6 @@
         function loop() {
             if (gameActive) {
                 animacionFrame++;
-                
-                // El escenario avanza automáticamente de manera constante hacia adelante
                 mundoX += 4 + (nivelActual * 0.2);
 
                 if (saltando) {
@@ -404,7 +473,9 @@
 
                                 if (vida <= 0) {
                                     gameActive = false;
-                                    alert("¡Has sido derrotado! Inténtalo de nuevo.");
+                                    alert("¡Has sido derrotado!");
+                                    document.getElementById('uiSuperior').classList.add('oculto');
+                                    document.getElementById('controlesInferiores').classList.add('oculto');
                                     document.getElementById('screenLobby').classList.remove('oculto');
                                 }
                             }
@@ -443,7 +514,6 @@
                         let screenX = en.x - mundoX;
                         if (screenX > -40 && screenX < canvas.width + 40) {
                             dibujarEnemigo(screenX, true, en.animOffset);
-                            
                             ctx.fillStyle = '#444';
                             ctx.fillRect(screenX - 2, canvas.height - 42, 24, 3);
                             ctx.fillStyle = '#ff0055';
@@ -452,7 +522,6 @@
                     }
                 });
 
-                // El personaje siempre corre de forma animada en su sitio mientras el escenario fluye
                 dibujarPersonaje(jugadorX, jugadorY, '#ffaa00', true);
 
                 if (esOnline) {
@@ -478,3 +547,5 @@
 
         requestAnimationFrame(loop);
     </script>
+</body>
+</html>

@@ -1,777 +1,173 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire 2D - Pro Edition</title>
-    <!-- Firebase App y Realtime Database SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #05050a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        #gameContainer { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; background: #05050a; }
-        canvas { display: block; width: 100%; flex: 1; background: linear-gradient(to bottom, #020208, #0f172a); }
-        
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,10,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; color: #fff; }
-        .oculto { display: none !important; }
-        
-        h1 { color: #f59e0b; margin-bottom: 20px; font-size: 26px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(245,158,11,0.6); }
-        
-        /* Botones estilo comercial vibrante */
-        .btn { background: linear-gradient(135deg, #f59e0b, #d97706); border: 2px solid #fde68a; padding: 12px 28px; margin: 8px; color: #fff; font-weight: bold; border-radius: 12px; font-size: 16px; cursor: pointer; min-width: 200px; text-align: center; box-shadow: 0 6px 15px rgba(0,0,0,0.4); text-transform: uppercase; }
-        .btn:active { transform: scale(0.95); }
-        
-        /* UI Superior estilo HUD comercial */
-        #uiSuperior { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; z-index: 5; pointer-events: none; color: #fff; font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px #000; background: rgba(0,0,0,0.6); padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); }
-        .hp-bar-container { width: 80px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; border: 1px solid #fff; display: inline-block; vertical-align: middle; margin-left: 6px; }
-        #hpFill { width: 100%; height: 100%; background: #22c55e; transition: width 0.2s; }
-
-        /* Controles Inferiores optimizados */
-        #controlesInferiores { position: absolute; bottom: 25px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; z-index: 5; height: 60px; pointer-events: auto; }
-        .joy-base { width: 110px; height: 50px; border-radius: 25px; background: linear-gradient(135deg, #f59e0b, #d97706); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; color: #fff; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-        .joy-base:active { transform: scale(0.95); }
-        
-        .acciones-derecha { display: flex; gap: 8px; }
-        .btn-accion { width: 48px; height: 48px; border-radius: 50%; background: rgba(30,30,50,0.85); border: 2px solid rgba(255,255,255,0.8); color: #fff; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-        .btn-accion:active { transform: scale(0.9); background: rgba(245,158,11,0.5); }
-
-        #levelsGridContainer { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 60vh; overflow-y: auto; padding: 10px; width: 90%; max-width: 500px; }
-        .level-card { background: #1e1e2f; border: 1px solid #444; padding: 14px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; color: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-        .level-card:active { background: #f59e0b; color: #000; }
-
-        /* Tienda de Equipamiento estilo Tarjetas Comerciales */
-        #skinsContainer { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
-        .skin-card { background: rgba(30,30,50,0.9); border: 2px solid #444; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; width: 130px; box-shadow: 0 6px 12px rgba(0,0,0,0.4); transition: transform 0.2s; }
-        .skin-card:hover { transform: translateY(-3px); }
-        .skin-card.selected { border-color: #22c55e; box-shadow: 0 0 15px rgba(34,197,94,0.5); }
-        .skin-card:active { transform: scale(0.95); }
-
-        #efectoDaño { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 8; }
-        .recibiendo-daño { background: rgba(255, 0, 0, 0.35); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Desert Motero Quest</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif;user-select:none;-webkit-user-select:none}
+body,html{width:100%;height:100%;overflow:hidden;background:#4FC3F7}
+#game{width:100%;height:100%;position:relative}
+canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10}
+.hidden{display:none!important}
+/* MENU VIBRANTE COMO TU EJEMPLO */
+#menu{background:linear-gradient(to bottom, #29B6F6 0%, #81D4FA 35%, #FFE082 100%)}
+.topbar{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:5}
+.coinbar{background:#263238;color:#fff;padding:6px 16px;border-radius:20px;display:flex;gap:8px;align-items:center;font-size:20px;box-shadow:0 4px 0 #000;border:2px solid #fff}
+.coin-icon{width:32px;height:32px;background:radial-gradient(circle at 30% 30%, #FFEB3B, #F9A825);border-radius:50%;display:grid;place-items:center;border:2px solid #FFC107}
+.title{color:#E65100;font-size:42px;text-shadow:3px 3px 0 #fff, 0 0 10px rgba(255,255,255,0.8);letter-spacing:1px;text-align:center;margin-top:60px}
+.btnPlay{width:320px;height:100px;background:linear-gradient(#FFEB3B,#FFC107);border:6px solid #BF360C;border-radius:30px;font-size:50px;color:#BF360C;box-shadow:0 8px 0 #BF360C, 0 0 20px rgba(255,235,59,0.8);cursor:pointer;margin-top:20px;text-shadow:2px 2px 0 #fff}
+.btnPlay:active{transform:translateY(5px);box-shadow:0 3px 0 #BF360C}
+.bonus{position:absolute;left:15px;top:140px;background:linear-gradient(#FFEB3B,#FF9800);padding:8px 12px;border-radius:15px;border:3px solid #fff;transform:rotate(-4deg);text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.3)}
+.removeAd{position:absolute;right:15px;top:160px;background:linear-gradient(#EF5350,#C62828);color:#FFEB3B;padding:10px 14px;border-radius:14px;border:3px solid #FFEB3B;font-weight:bold;transform:rotate(3deg);text-align:center}
+#hud{position:absolute;top:0;left:0;right:0;padding:10px 12px;display:flex;justify-content:space-between;z-index:5;color:#fff;text-shadow:2px 2px 0 #000;font-size:18px;pointer-events:none;background:linear-gradient(to bottom, rgba(0,0,0,0.5), transparent)}
+.controls{position:absolute;bottom:15px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:5}
+.joy{width:78px;height:78px;background:rgba(255,255,255,0.7);border:3px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:28px;box-shadow:0 4px 8px rgba(0,0,0,0.3)}
+.joy:active{background:rgba(255,193,7,0.9);transform:scale(0.95)}
+</style>
 </head>
 <body>
-
-    <div id="gameContainer">
-        <div id="efectoDaño"></div>
-
-        <!-- UI Superior Optimizada -->
-        <div id="uiSuperior" class="oculto">
-            <div>HP: <div class="hp-bar-container"><div id="hpFill"></div></div> <span id="hpText">100/100</span></div>
-            <div>ORO: <span id="txtOro">0</span> 🪙</div>
-            <div>NVL: <span id="lblNivelActual">1</span></div>
-            <div><span id="lblEstadoTransformacion">Normal</span></div>
-            <div>VOL: <input type="range" id="volRange" min="0" max="1" step="0.1" value="0.5" style="width: 45px; pointer-events: auto; vertical-align: middle;"></div>
-        </div>
-
-        <canvas id="gameCanvas"></canvas>
-
-        <!-- Controles Inferiores Elevados -->
-        <div id="controlesInferiores" class="oculto">
-            <div id="joystickBase" class="joy-base">⚡ SALTAR</div>
-            <div class="acciones-derecha">
-                <div class="btn-accion" id="btnAccion1" title="Disparar">🔥</div>
-                <div class="btn-accion" id="btnAccion2" title="Dash">⚡</div>
-                <div class="btn-accion" id="btnAccion3" title="Escudo">🛡️</div>
-                <div class="btn-accion" id="btnAccion4" title="Volar">🚀</div>
-            </div>
-        </div>
-
-        <!-- Pantalla Lobby Principal -->
-        <div id="screenLobby" class="screen">
-            <h1>Free Fire 2D Runner</h1>
-            <button class="btn" id="btnJugarCampana">Modo Campaña</button>
-            <button class="btn" id="btnTiendaSkins">Equipamiento Táctico</button>
-            <button class="btn" id="btnOnlineMenu">Multijugador Online</button>
-        </div>
-
-        <!-- Pantalla Tienda de Skins Estilo Tarjetas Comerciales -->
-        <div id="screenSkins" class="screen oculto">
-            <h1>Equipamiento Táctico</h1>
-            <p style="margin-bottom: 15px; font-size: 15px;">Oro disponible: <span id="txtOroTienda" style="color: #facc15; font-weight: bold;">0</span> 🪙</p>
-            <div id="skinsContainer">
-                <div class="skin-card selected" data-skin="clásico" data-precio="0">
-                    <div style="font-weight: bold; margin: 6px 0; color: #facc15; font-size: 15px;">Comandante</div>
-                    <div style="font-size: 11px; color: #94a3b8;">Casco Nv.2 + Chaleco Táctico</div>
-                    <div style="font-size: 12px; color: #22c55e; margin-top: 8px; font-weight: bold;">Equipado</div>
-                </div>
-                <div class="skin-card" data-skin="cyber" data-precio="50">
-                    <div style="font-weight: bold; margin: 6px 0; color: #38bdf8; font-size: 15px;">Cyber Spec-Ops</div>
-                    <div style="font-size: 11px; color: #94a3b8;">Casco Futurista + Blindaje</div>
-                    <div style="font-size: 12px; color: #facc15; margin-top: 8px; font-weight: bold;">50 🪙</div>
-                </div>
-                <div class="skin-card" data-skin="fuego" data-precio="100">
-                    <div style="font-weight: bold; margin: 6px 0; color: #ef4444; font-size: 15px;">Artillero Fuego</div>
-                    <div style="font-size: 11px; color: #94a3b8;">Casco Pesado + Armadura Roja</div>
-                    <div style="font-size: 12px; color: #facc15; margin-top: 8px; font-weight: bold;">100 🪙</div>
-                </div>
-            </div>
-            <button class="btn" id="btnVolverLobbySkins" style="background: #475569; border-color: #94a3b8;">Volver</button>
-        </div>
-
-        <!-- Pantalla Selección de Niveles (30 Niveles) -->
-        <div id="screenLevels" class="screen oculto">
-            <h1>Selecciona Nivel</h1>
-            <div id="levelsGridContainer"></div>
-            <button class="btn" id="btnVolverLobby" style="margin-top: 15px; background: #475569; border-color: #94a3b8;">Volver</button>
-        </div>
-
-        <!-- Pantalla Game Over Profesional -->
-        <div id="screenGameOver" class="screen oculto">
-            <h1 style="color: #ef4444;">¡Misión Fallida!</h1>
-            <p style="margin-bottom: 15px; font-size: 16px;">Oro Recolectado: <span id="goOro" style="color: #facc15; font-weight: bold;">0</span> 🪙</p>
-            <p style="margin-bottom: 25px; font-size: 16px;">Distancia: <span id="goDistancia" style="color: #38bdf8; font-weight: bold;">0</span>m</p>
-            <button class="btn" id="btnReintentar">Reintentar Nivel</button>
-            <button class="btn" id="btnMenuPrincipal" style="background: #475569; border-color: #94a3b8;">Menú Principal</button>
-        </div>
-
-        <!-- Pantalla Multijugador Online -->
-        <div id="screenMultiplayer" class="screen oculto">
-            <h1>Modo Online</h1>
-            <button class="btn" id="btnCrearSala">Crear Sala</button>
-            <div style="margin: 15px 0; display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="inputCodigoSala" placeholder="Código" maxlength="4" style="padding: 12px; font-size: 16px; border-radius: 8px; border: 2px solid #facc15; width: 130px; text-align: center; background: #1e1e2f; color: #fff;">
-                <button class="btn" id="btnUnirseSala" style="margin: 0; min-width: 130px;">Unirse</button>
-            </div>
-            <div id="infoSalaDiv" style="margin-top: 15px; font-size: 14px; color: #38bdf8;">
-                Sala: <span id="txtSalaInfo">Ninguna</span> | Rol: <span id="txtRolInfo">-</span>
-            </div>
-            <button class="btn" id="btnVolverMenuOnline" style="margin-top: 20px; background: #475569; border-color: #94a3b8;">Volver</button>
-        </div>
-    </div>
-
-    <script>
-        // Configuración inicial de Firebase Realtime Database
-        try {
-            const firebaseConfig = {
-                databaseURL: "https://freefire2d-default-rtdb.firebaseio.com/"
-            };
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-        } catch (e) {
-            console.error("Error al inicializar Firebase:", e);
-        }
-
-        const db = firebase.database();
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Función para ajustar dinámicamente el tamaño del canvas en cualquier dispositivo móvil
-        function ajustarCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight - 40;
-        }
-        window.addEventListener('resize', ajustarCanvas);
-        ajustarCanvas();
-
-        // Variables de estado del juego, estadísticas y físicas del jugador
-        let vida = 100;
-        let oro = 0;
-        let nivelActual = 1;
-        let mundoX = 0;
-        let jugadorX = 70;
-        let jugadorY = 0;
-        let velocidadY = 0;
-        let saltando = false;
-        let gameActive = false;
-
-        // Variables de multijugador y personalización táctica
-        let esOnline = false;
-        let codigoSalaActual = null;
-        let skinActual = 'clásico';
-        let skinsDesbloqueadas = ['clásico'];
-        let miIdJugador = 'p_' + Math.floor(Math.random() * 100000);
-        let datosCompañero = { x: 150, y: 0, vida: 100, skin: 'clásico' };
-
-        // Colecciones de entidades en el escenario de juego
-        let obstacles = [];
-        let coins = [];
-        let enemies = [];
-        let bullets = [];
-        let particles = [];
-        let stars = [];
-        let animacionFrame = 0;
-
-        // Estados especiales de habilidades temporales
-        let escudoActivo = false;
-        let volarActivo = false;
-        let screenShakeTime = 0;
-
-        // Sistema de Audio Web Audio API
-        let audioCtx = null;
-        let masterGain = null;
-
-        // Generación de estrellas de fondo para el entorno realista
-        for(let i=0; i<40; i++) {
-            stars.push({ x: Math.random() * 1000, y: Math.random() * 300, size: Math.random() * 2 + 1 });
-        }
-
-        function inicializarAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                masterGain = audioCtx.createGain();
-                masterGain.gain.value = parseFloat(document.getElementById('volRange').value);
-                masterGain.connect(audioCtx.destination);
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        document.getElementById('volRange').addEventListener('input', (e) => {
-            if (masterGain) {
-                masterGain.gain.value = parseFloat(e.target.value);
-            }
-        });
-
-        function reproducirSonido(freq, tipo, dur) {
-            try {
-                if (!audioCtx || audioCtx.state !== 'running') return;
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = tipo;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.start();
-                osc.stop(audioCtx.currentTime + dur);
-            } catch (e) {}
-        }
-
-        function crearParticulas(x, y, color, cantidad = 6) {
-            for (let i = 0; i < cantidad; i++) {
-                particles.push({
-                    x: x, y: y,
-                    vx: (Math.random() - 0.5) * 6,
-                    vy: (Math.random() - 0.5) * 6 - 2,
-                    alpha: 1.0, color: color, size: Math.random() * 3 + 2
-                });
-            }
-        }
-
-        // Manejo de eventos para la navegación entre pantallas de menús
-        document.getElementById('btnJugarCampana').addEventListener('click', () => {
-            inicializarAudio();
-            document.getElementById('screenLobby').classList.add('oculto');
-            document.getElementById('screenLevels').classList.remove('oculto');
-        });
-
-        document.getElementById('btnTiendaSkins').addEventListener('click', () => {
-            inicializarAudio();
-            document.getElementById('screenLobby').classList.add('oculto');
-            document.getElementById('screenSkins').classList.remove('oculto');
-            document.getElementById('txtOroTienda').textContent = oro;
-        });
-
-        document.getElementById('btnOnlineMenu').addEventListener('click', () => {
-            inicializarAudio();
-            document.getElementById('screenLobby').classList.add('oculto');
-            document.getElementById('screenMultiplayer').classList.remove('oculto');
-        });
-
-        document.getElementById('btnVolverLobby').addEventListener('click', () => {
-            document.getElementById('screenLevels').classList.add('oculto');
-            document.getElementById('screenLobby').classList.remove('oculto');
-        });
-
-        document.getElementById('btnVolverLobbySkins').addEventListener('click', () => {
-            document.getElementById('screenSkins').classList.add('oculto');
-            document.getElementById('screenLobby').classList.remove('oculto');
-        });
-
-        document.getElementById('btnVolverMenuOnline').addEventListener('click', () => {
-            document.getElementById('screenMultiplayer').classList.add('oculto');
-            document.getElementById('screenLobby').classList.remove('oculto');
-        });
-
-        document.getElementById('btnReintentar').addEventListener('click', () => {
-            document.getElementById('screenGameOver').classList.add('oculto');
-            configurarPartidaComun();
-        });
-
-        document.getElementById('btnMenuPrincipal').addEventListener('click', () => {
-            document.getElementById('screenGameOver').classList.add('oculto');
-            document.getElementById('screenLobby').classList.remove('oculto');
-        });
-
-        // Lógica de selección y compra de equipamiento táctico en la tienda
-        document.querySelectorAll('.skin-card').forEach(card => {
-            card.addEventListener('click', () => {
-                let skinNombre = card.getAttribute('data-skin');
-                let precio = parseInt(card.getAttribute('data-precio'));
-
-                if (skinsDesbloqueadas.includes(skinNombre)) {
-                    skinActual = skinNombre;
-                    document.querySelectorAll('.skin-card').forEach(c => {
-                        c.classList.remove('selected');
-                        if(!skinsDesbloqueadas.includes(c.getAttribute('data-skin'))) {
-                            c.querySelector('div:last-child').textContent = c.getAttribute('data-precio') + ' 🪙';
-                        } else {
-                            c.querySelector('div:last-child').textContent = 'Equipado';
-                            c.querySelector('div:last-child').style.color = '#22c55e';
-                        }
-                    });
-                    card.classList.add('selected');
-                    card.querySelector('div:last-child').textContent = 'Equipado';
-                    card.querySelector('div:last-child').style.color = '#38bdf8';
-                } else {
-                    if (oro >= precio) {
-                        oro -= precio;
-                        skinsDesbloqueadas.push(skinNombre);
-                        skinActual = skinNombre;
-                        document.getElementById('txtOroTienda').textContent = oro;
-                        document.querySelectorAll('.skin-card').forEach(c => c.classList.remove('selected'));
-                        card.classList.add('selected');
-                        card.querySelector('div:last-child').textContent = 'Equipado';
-                        card.querySelector('div:last-child').style.color = '#38bdf8';
-                        reproducirSonido(1500, 'sine', 0.1);
-                    } else {
-                        alert("¡No tienes suficiente oro!");
-                    }
-                }
-            });
-        });
-
-        // Configuración de salas multijugador online mediante Firebase
-        document.getElementById('btnCrearSala').addEventListener('click', () => {
-            inicializarAudio();
-            codigoSalaActual = Math.floor(1000 + Math.random() * 9000).toString();
-            esOnline = true;
-            document.getElementById('txtSalaInfo').textContent = codigoSalaActual;
-            document.getElementById('txtRolInfo').textContent = "Host (P1)";
-            alert(`¡Sala creada con éxito!\nComparte este código: ${codigoSalaActual}`);
-            document.getElementById('screenMultiplayer').classList.add('oculto');
-            iniciarPartidaOnline();
-        });
-
-        document.getElementById('btnUnirseSala').addEventListener('click', () => {
-            let codigo = document.getElementById('inputCodigoSala').value.trim();
-            if (codigo.length < 4) {
-                alert("Ingresa un código de sala válido.");
-                return;
-            }
-            inicializarAudio();
-            codigoSalaActual = codigo;
-            esOnline = true;
-            document.getElementById('txtSalaInfo').textContent = codigoSalaActual;
-            document.getElementById('txtRolInfo').textContent = "Invitado (P2)";
-            document.getElementById('screenMultiplayer').classList.add('oculto');
-            iniciarPartidaOnline();
-        });
-
-        // Generador de la cuadrícula de los 30 niveles del modo campaña
-        function construirMenuNiveles() {
-            let container = document.getElementById('levelsGridContainer');
-            container.innerHTML = '';
-            for (let i = 1; i <= 30; i++) {
-                let card = document.createElement('div');
-                card.className = 'level-card';
-                card.textContent = `Nvl ${i}`;
-                card.addEventListener('click', () => iniciarNivelSolo(i));
-                container.appendChild(card);
-            }
-        }
-        construirMenuNiveles();
-
-        function iniciarNivelSolo(num) {
-            esOnline = false;
-            nivelActual = num;
-            document.getElementById('lblNivelActual').textContent = nivelActual;
-            document.getElementById('screenLevels').classList.add('oculto');
-            configurarPartidaComun();
-        }
-
-        function iniciarPartidaOnline() {
-            esOnline = true;
-            nivelActual = 1;
-            document.getElementById('lblNivelActual').textContent = "Online";
-            configurarPartidaComun();
-            let refSala = db.ref('salas/' + codigoSalaActual + '/' + miIdJugador);
-            
-            setInterval(() => {
-                if (!gameActive || !esOnline) return;
-                refSala.set({
-                    x: mundoX + jugadorX,
-                    y: jugadorY,
-                    vida: vida,
-                    skin: skinActual
-                });
-            }, 50);
-
-            db.ref('salas/' + codigoSalaActual).on('value', (snapshot) => {
-                let jugadores = snapshot.val();
-                if (!jugadores) return;
-                Object.keys(jugadores).forEach(id => {
-                    if (id !== miIdJugador) {
-                        datosCompañero = jugadores[id];
-                    }
-                });
-            });
-        }
-
-        // Inicializador común de elementos para iniciar o reintentar una partida
-        function configurarPartidaComun() {
-            vida = 100;
-            document.getElementById('hpFill').style.width = '100%';
-            document.getElementById('hpText').textContent = '100/100';
-            document.getElementById('txtOro').textContent = oro;
-            mundoX = 0;
-            jugadorY = 0;
-            obstacles = [];
-            coins = [];
-            enemies = [];
-            bullets = [];
-            particles = [];
-            escudoActivo = false;
-            volarActivo = false;
-
-            let cantidadObstaculos = 15 + (nivelActual * 3);
-            for (let i = 1; i < cantidadObstaculos; i++) {
-                let posX = i * 220 + Math.random() * 50;
-                obstacles.push({ x: posX, y: 0, w: 35, h: 22, icono: '📦' });
-                coins.push({ x: posX + 20, y: 35, recolectada: false });
-                
-                let hpEnemigo = 30 + (nivelActual * 5);
-                enemies.push({ x: posX + 110, y: 0, hp: hpEnemigo, maxHp: hpEnemigo, animOffset: Math.random() * 100 });
-            }
-            
-            document.getElementById('uiSuperior').classList.remove('oculto');
-            document.getElementById('controlesInferiores').classList.remove('oculto');
-            gameActive = true;
-            ajustarCanvas();
-        }
-
-        // Controles de salto y acciones tácticas inferiores
-        const joyBase = document.getElementById('joystickBase');
-        joyBase.addEventListener('click', () => {
-            if (!gameActive) return;
-            if (!saltando || volarActivo) {
-                saltando = true;
-                velocidadY = volarActivo ? 14 : 12;
-                crearParticulas(jugadorX + 10, canvas.height - 15, '#aaaaaa', 4);
-                reproducirSonido(500, 'triangle', 0.1);
-            }
-        });
-
-        document.getElementById('btnAccion1').addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            if (!gameActive) return;
-            reproducirSonido(800, 'sawtooth', 0.08);
-            bullets.push({ x: mundoX + jugadorX + 25, y: jugadorY + 20 });
-            let jugadorMundoX = mundoX + jugadorX;
-            enemies.forEach(en => {
-                if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 100) {
-                    en.hp -= 35;
-                    crearParticulas(en.x - mundoX + 10, canvas.height - 20, '#ffcc00', 5);
-                    if (en.hp <= 0) { 
-                        oro += 25; 
-                        document.getElementById('txtOro').textContent = oro; 
-                    }
-                }
-            });
-        });
-
-        document.getElementById('btnAccion2').addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            if (!gameActive) return;
-            reproducirSonido(900, 'sine', 0.12);
-            mundoX += 120;
-            crearParticulas(jugadorX, canvas.height - 20, '#00ffcc', 6);
-            document.getElementById('lblEstadoTransformacion').textContent = "Dash!";
-            setTimeout(() => {
-                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
-            }, 400);
-        });
-
-        document.getElementById('btnAccion3').addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            if (!gameActive) return;
-            reproducirSonido(400, 'square', 0.2);
-            escudoActivo = true;
-            document.getElementById('lblEstadoTransformacion').textContent = "Escudo";
-            setTimeout(() => {
-                escudoActivo = false;
-                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
-            }, 4000);
-        });
-
-        document.getElementById('btnAccion4').addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            if (!gameActive) return;
-            reproducirSonido(700, 'triangle', 0.2);
-            volarActivo = true;
-            velocidadY = 8;
-            saltando = true;
-            document.getElementById('lblEstadoTransformacion').textContent = "Vuelo";
-            setTimeout(() => {
-                volarActivo = false;
-                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
-            }, 6000);
-        });
-
-        // --- SISTEMA DE RENDERIZADO TÁCTICO MILITAR DETALLADO ---
-        function dibujarPersonaje(x, y, skin, caminando) {
-            let baseScreenY = canvas.height - 10 - y;
-            let colCasco = '#334155', colChaleco = '#475569', colVisor = '#38bdf8', colArma = '#0f172a';
-            if(skin === 'cyber') { colCasco = '#0284c7'; colChaleco = '#0369a1'; colVisor = '#22d3ee'; colArma = '#0c4a6e'; }
-            if(skin === 'fuego') { colCasco = '#991b1b'; colChaleco = '#7f1d1d'; colVisor = '#f87171'; colArma = '#450a0a'; }
-
-            // Mochila táctica militar
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(x - 2, baseScreenY - 22, 5, 11);
-
-            // Chaleco antibalas con placas
-            ctx.fillStyle = colChaleco;
-            ctx.fillRect(x + 2, baseScreenY - 23, 16, 13);
-            ctx.fillStyle = '#111827';
-            ctx.fillRect(x + 5, baseScreenY - 20, 10, 4);
-
-            // Casco táctico y visor de combate
-            ctx.fillStyle = '#ffccaa';
-            ctx.fillRect(x + 5, baseScreenY - 33, 10, 10);
-            ctx.fillStyle = colCasco;
-            ctx.fillRect(x + 4, baseScreenY - 35, 12, 5);
-            ctx.fillStyle = colVisor;
-            ctx.fillRect(x + 10, baseScreenY - 33, 5, 2);
-
-            // Rifle de asalto con animación al caminar
-            let offsetArma = caminando ? Math.sin(animacionFrame * 0.3) * 3 : 0;
-            ctx.fillStyle = colArma;
-            ctx.fillRect(x + 12, baseScreenY - 18 + offsetArma, 12, 4);
-            ctx.fillRect(x + 18, baseScreenY - 21 + offsetArma, 3, 5);
-
-            // Brazos y extremidades dinámicas
-            let offsetMano = caminando ? Math.sin(animacionFrame * 0.3) * 4 : 0;
-            ctx.fillStyle = colChaleco;
-            ctx.fillRect(x + 10, baseScreenY - 19 + offsetMano, 5, 5);
-
-            let offsetPie1 = caminando ? Math.sin(animacionFrame * 0.3) * 5 : 0;
-            let offsetPie2 = caminando ? -Math.sin(animacionFrame * 0.3) * 5 : 0;
-
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(x + 4, baseScreenY - 10, 5, 8 + offsetPie1);
-            ctx.fillRect(x + 11, baseScreenY - 10, 5, 8 + offsetPie2);
-
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(x + 3, baseScreenY - 2 + offsetPie1, 6, 3);
-            ctx.fillRect(x + 10, baseScreenY - 2 + offsetPie2, 6, 3);
-
-            if (escudoActivo) {
-                ctx.strokeStyle = '#00ffcc';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(x + 10, baseScreenY - 18, 22, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-        }
-
-        function dibujarEnemigo(screenX, animOffset) {
-            let baseScreenY = canvas.height - 10;
-            let frame = animacionFrame + animOffset;
-
-            ctx.fillStyle = '#14532d';
-            ctx.fillRect(screenX + 4, baseScreenY - 34, 12, 11);
-            ctx.fillStyle = '#dc2626';
-            ctx.fillRect(screenX + 6, baseScreenY - 30, 2, 2);
-            ctx.fillRect(screenX + 12, baseScreenY - 30, 2, 2);
-
-            ctx.fillStyle = '#166534';
-            ctx.fillRect(screenX + 3, baseScreenY - 23, 14, 13);
-
-            let offsetMano = Math.sin(frame * 0.25) * 5;
-            ctx.fillStyle = '#14532d';
-            ctx.fillRect(screenX - 3, baseScreenY - 22 + offsetMano, 5, 5);
-            ctx.fillRect(screenX + 16, baseScreenY - 22 - offsetMano, 5, 5);
-        }
-
-        // --- BUCLE PRINCIPAL DE RENDERIZADO Y FÍSICAS ---
-        function loop() {
-            if (gameActive) {
-                animacionFrame++;
-                mundoX += 4 + (nivelActual * 0.2);
-
-                if (saltando) {
-                    jugadorY += velocidadY;
-                    velocidadY -= volarActivo ? 0.3 : 1;
-                    if (jugadorY <= 0) { 
-                        jugadorY = 0; 
-                        saltando = false; 
-                        velocidadY = 0; 
-                    }
-                }
-
-                let jugadorMundoX = mundoX + jugadorX;
-
-                coins.forEach(c => {
-                    if (!c.recolectada && Math.abs(c.x - jugadorMundoX) < 20 && Math.abs(c.y - jugadorY) < 22) {
-                        c.recolectada = true;
-                        oro += 10;
-                        document.getElementById('txtOro').textContent = oro;
-                        crearParticulas(c.x - mundoX, canvas.height - 12 - c.y, '#ffff00', 4);
-                        reproducirSonido(1200, 'sine', 0.05);
-                    }
-                });
-
-                enemies.forEach(en => {
-                    if (en.hp > 0) {
-                        let distanciaX = Math.abs(en.x - jugadorMundoX);
-
-                        if (distanciaX < 18 && jugadorY > 15 && velocidadY < 0) {
-                            en.hp = 0;
-                            oro += 30;
-                            document.getElementById('txtOro').textContent = oro;
-                            velocidadY = 10;
-                            crearParticulas(en.x - mundoX + 10, canvas.height - 20, '#ff0055', 8);
-                            reproducirSonido(950, 'square', 0.1);
-                        } 
-                        else if (distanciaX < 16 && jugadorY <= 10) {
-                            if (!escudoActivo) {
-                                vida = Math.max(0, vida - 0.8);
-                                screenShakeTime = 6;
-                                document.getElementById('hpFill').style.width = vida + '%';
-                                document.getElementById('hpText').textContent = Math.ceil(vida) + '/100';
-                                document.getElementById('efectoDaño').classList.add('recibiendo-daño');
-                                setTimeout(() => document.getElementById('efectoDaño').classList.remove('recibiendo-daño'), 100);
-
-                                if (vida <= 0) {
-                                    gameActive = false;
-                                    document.getElementById('uiSuperior').classList.add('oculto');
-                                    document.getElementById('controlesInferiores').classList.add('oculto');
-                                    document.getElementById('goOro').textContent = oro;
-                                    document.getElementById('goDistancia').textContent = Math.floor(mundoX / 10);
-                                    document.getElementById('screenGameOver').classList.remove('oculto');
-                                }
-                            }
-                        }
-                    }
-                });
-
-                // Renderizado con Screen Shake y Entorno Realista
-                ctx.save();
-                if (screenShakeTime > 0) {
-                    screenShakeTime--;
-                    let shakeX = (Math.random() - 0.5) * 6;
-                    let shakeY = (Math.random() - 0.5) * 6;
-                    ctx.translate(shakeX, shakeY);
-                }
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // Fondo degradado y estrellas parpadeantes
-                let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                gradient.addColorStop(0, '#020205');
-                gradient.addColorStop(0.7, '#0f172a');
-                gradient.addColorStop(1, '#1e1b4b');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#ffffff';
-                stars.forEach(s => {
-                    ctx.globalAlpha = 0.6 + Math.sin(animacionFrame * 0.05 + s.x) * 0.4;
-                    ctx.fillRect(s.x, s.y, s.size, s.size);
-                });
-                ctx.globalAlpha = 1.0;
-
-                // Paralaje de montañas (Capas lejanas y cercanas)
-                ctx.fillStyle = '#1e293b';
-                let p1 = (mundoX * 0.1) % canvas.width;
-                ctx.fillRect(-p1, canvas.height - 120, canvas.width, 80);
-                ctx.fillRect(canvas.width - p1, canvas.height - 120, canvas.width, 80);
-
-                ctx.fillStyle = '#334155';
-                let p2 = (mundoX * 0.3) % canvas.width;
-                ctx.fillRect(-p2, canvas.height - 80, canvas.width, 50);
-                ctx.fillRect(canvas.width - p2, canvas.height - 80, canvas.width, 50);
-
-                // Suelo y plataforma principal
-                ctx.fillStyle = '#0f172a';
-                ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
-                ctx.fillStyle = '#38bdf8';
-                ctx.fillRect(0, canvas.height - 10, canvas.width, 2);
-
-                obstacles.forEach(b => {
-                    let screenX = b.x - mundoX;
-                    if (screenX > -50 && screenX < canvas.width + 50) {
-                        ctx.fillStyle = '#b45309';
-                        ctx.fillRect(screenX, canvas.height - 28 - b.y, b.w, b.h);
-                        ctx.font = '10px sans-serif';
-                        ctx.fillText(b.icono, screenX + 8, canvas.height - 12 - b.y);
-                    }
-                });
-
-                coins.forEach(c => {
-                    if (!c.recolectada) {
-                        let screenX = c.x - mundoX;
-                        if (screenX > -25 && screenX < canvas.width + 25) {
-                            ctx.beginPath();
-                            ctx.arc(screenX, canvas.height - 14 - c.y, 6, 0, Math.PI * 2);
-                            ctx.fillStyle = '#facc15';
-                            ctx.fill();
-                            ctx.strokeStyle = '#ca8a04';
-                            ctx.stroke();
-                        }
-                    }
-                });
-
-                enemies.forEach(en => {
-                    if (en.hp > 0) {
-                        let screenX = en.x - mundoX;
-                        if (screenX > -40 && screenX < canvas.width + 40) {
-                            dibujarEnemigo(screenX, en.animOffset);
-                            ctx.fillStyle = '#333';
-                            ctx.fillRect(screenX - 2, canvas.height - 42, 24, 3);
-                            ctx.fillStyle = '#ef4444';
-                            ctx.fillRect(screenX - 2, canvas.height - 42, (en.hp / en.maxHp) * 24, 3);
-                        }
-                    }
-                });
-
-                particles.forEach((p, idx) => {
-                    p.x += p.vx; 
-                    p.y += p.vy; 
-                    p.alpha -= 0.03;
-                    if (p.alpha <= 0) { 
-                        particles.splice(idx, 1); 
-                        return; 
-                    }
-                    ctx.fillStyle = p.color; 
-                    ctx.globalAlpha = p.alpha;
-                    ctx.fillRect(p.x, canvas.height - 15 - p.y, p.size, p.size);
-                    ctx.globalAlpha = 1.0;
-                });
-
-                dibujarPersonaje(jugadorX, jugadorY, skinActual, true);
-
-                if (esOnline) {
-                    let compScreenX = datosCompañero.x - mundoX;
-                    if (compScreenX > -40 && compScreenX < canvas.width + 40) {
-                        dibujarPersonaje(compScreenX, datosCompañero.y || 0, datosCompañero.skin || 'clásico', true);
-                        ctx.fillStyle = '#38bdf8';
-                        ctx.font = '7px sans-serif';
-                        ctx.fillText('COMPAÑERO', compScreenX - 8, canvas.height - 45 - (datosCompañero.y || 0));
-                    }
-                }
-
-                ctx.fillStyle = '#facc15';
-                bullets.forEach((b, idx) => {
-                    b.x += 12;
-                    let screenX = b.x - mundoX;
-                    ctx.fillRect(screenX, canvas.height - 24 - jugadorY, 10, 3);
-                    if (b.x > mundoX + canvas.width) {
-                        bullets.splice(idx, 1);
-                    }
-                });
-
-                ctx.restore();
-            }
-            requestAnimationFrame(loop);
-        }
-
-        requestAnimationFrame(loop);
-    </script>
+<div id="game">
+<canvas id="cv"></canvas>
+
+<!-- MENU PRINCIPAL LLAMATIVO -->
+<div id="menu" class="screen">
+  <div class="topbar">
+    <div class="coinbar"><div class="coin-icon">💰</div><span id="mCoins">500</span></div>
+    <div style="display:flex;gap:8px"><div class="coinbar">⭐</div><div class="coinbar">⚙️</div><div class="coinbar">🛒</div></div>
+  </div>
+  <div class="bonus"><div style="font-size:28px">🪙</div><div style="color:#B71C1C;font-weight:bold">Bonus</div><div style="background:#000;color:#fff;font-size:12px;padding:2px 6px;border-radius:6px">07:11:55</div></div>
+  <div class="removeAd">REMOVE<br><span style="font-size:22px">Ads</span></div>
+  <h1 class="title">DESERT<br>MOTERO QUEST</h1>
+  <button class="btnPlay" id="btnPlay">PLAY ▶</button>
+  <div style="margin-top:10px;background:rgba(0,0,0,0.2);padding:6px 14px;border-radius:10px;color:#fff">TAP TO RIDE! 🏍️</div>
+</div>
+
+<div id="hud" class="hidden"><div>💰 <span id="coins">0</span> | Score <span id="score">0</span></div><div>HP 100</div></div>
+<div class="controls hidden" id="controls">
+  <div style="display:flex;gap:8px"><div class="joy" id="bLeft">◀</div><div class="joy" id="bRight">▶</div></div>
+  <div style="display:flex;gap:8px"><div class="joy" id="bJump">⬆️</div><div class="joy" id="bFire">🔥</div></div>
+</div>
+</div>
+
+<script>
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+function resize(){cv.width=innerWidth; cv.height=innerHeight} addEventListener('resize',resize); resize();
+
+let world=0, py=0, vy=0, jumping=false, frame=0, active=false, coins=0, score=0;
+let platforms=[], coinsArr=[], cactus=[], stars=[];
+
+// Estrellas fondo
+for(let i=0;i<30;i++) stars.push({x:Math.random()*2000,y:Math.random()*200, s:Math.random()*2+1});
+
+function init(){
+ platforms=[]; coinsArr=[]; cactus=[];
+ for(let i=0;i<30;i++){
+  let px=i*280+Math.random()*60;
+  platforms.push({x:px,y:80+Math.random()*40,w:150+Math.random()*80});
+  coinsArr.push({x:px+60,y:140+Math.random()*20,taken:false});
+  if(i%2==0) cactus.push({x:px+120,y:0,alive:true});
+ }
+ world=0; py=0; vy=0; coins=0; score=0;
+ document.getElementById('coins').textContent='0';
+ document.getElementById('score').textContent='0';
+}
+
+// DIBUJO DE TU MOTERO REAL (sin imagen externa, todo con canvas para que no falle)
+function drawMotero(x,y, anim){
+ ctx.save();
+ ctx.translate(x,y);
+ // sombra
+ ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(32,64,20,6,0,0,Math.PI*2); ctx.fill();
+ // botas
+ ctx.fillStyle='#5D4037'; ctx.fillRect(10,52,14,12); ctx.fillRect(34,52,14,12);
+ // overol jean
+ ctx.fillStyle='#1565C0'; ctx.fillRect(12,28,36,26);
+ ctx.fillStyle='#0D47A1'; ctx.fillRect(12,28,36,4);
+ // camiseta roja
+ ctx.fillStyle='#E53935'; ctx.fillRect(12,18,36,14);
+ // guantes rojos
+ ctx.fillStyle='#D32F2F'; ctx.beginPath(); ctx.arc(6,32,8,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(54,32,8,0,Math.PI*2); ctx.fill();
+ // cabeza
+ ctx.fillStyle='#FFCC80'; ctx.beginPath(); ctx.arc(30,14,14,0,Math.PI*2); ctx.fill();
+ // bigote peruano
+ ctx.fillStyle='#3E2723'; ctx.fillRect(22,18,16,3); 
+ // gorra con bandera Perú
+ ctx.fillStyle='#795548'; ctx.fillRect(14,0,32,10); ctx.fillRect(10,8,40,4);
+ ctx.fillStyle='#fff'; ctx.fillRect(26,2,12,6); ctx.fillStyle='#D32F2F'; ctx.fillRect(26,2,4,6); ctx.fillRect(34,2,4,6);
+ // brillo ojos
+ ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(24,13,2,0,Math.PI*2); ctx.arc(36,13,2,0,Math.PI*2); ctx.fill();
+ ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(25,12,1,0,Math.PI*2); ctx.fill();
+ // animacion piernas
+ if(!jumping){
+  let leg = Math.sin(frame*0.3)*6;
+  ctx.fillStyle='#1565C0'; ctx.fillRect(14,48,10,8+leg); ctx.fillRect(36,48,10,8-leg);
+ }
+ // fuego si dispara
+ if(anim==='fire'){
+  ctx.fillStyle='#FFEB3B'; ctx.beginPath(); ctx.arc(60,28,10+Math.random()*6,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#FF6F00'; ctx.beginPath(); ctx.arc(65,28,6,0,Math.PI*2); ctx.fill();
+ }
+ ctx.restore();
+}
+
+function loop(){
+ if(!active) return; frame++; world+=4;
+ if(jumping){py+=vy; vy-=0.9; if(py<=0){py=0;jumping=false;vy=0}}
+ let pw=world+80;
+ coinsArr.forEach(c=>{if(!c.taken && Math.abs(c.x-pw)<28 && Math.abs(c.y-py)<35){c.taken=true; coins+=10; score+=10; document.getElementById('coins').textContent=coins; document.getElementById('score').textContent=score;}});
+
+ ctx.clearRect(0,0,cv.width,cv.height);
+ // cielo vibrante
+ let g=ctx.createLinearGradient(0,0,0,cv.height);
+ g.addColorStop(0,'#29B6F6'); g.addColorStop(0.4,'#81D4FA'); g.addColorStop(0.7,'#B2EBF2'); g.addColorStop(1,'#FFE082');
+ ctx.fillStyle=g; ctx.fillRect(0,0,cv.width,cv.height);
+ // piramides fondo parallax
+ ctx.fillStyle='#D8B88A'; ctx.globalAlpha=0.6;
+ ctx.beginPath(); ctx.moveTo(-world*0.2+80,cv.height-100); ctx.lineTo(-world*0.2+200,cv.height-240); ctx.lineTo(-world*0.2+320,cv.height-100); ctx.fill();
+ ctx.beginPath(); ctx.moveTo(-world*0.2+500,cv.height-100); ctx.lineTo(-world*0.2+700,cv.height-300); ctx.lineTo(-world*0.2+900,cv.height-100); ctx.fill();
+ ctx.globalAlpha=1;
+ // suelo desierto
+ ctx.fillStyle='#F9A825'; ctx.fillRect(0,cv.height-50,cv.width,50);
+ ctx.fillStyle='#FFCA28'; ctx.fillRect(0,cv.height-54,cv.width,8);
+ // cactus decor
+ ctx.font='24px sans-serif'; ctx.fillText('🌵', -world*0.5+300, cv.height-55); ctx.fillText('🌵', -world*0.5+800, cv.height-55);
+ // plataformas
+ platforms.forEach(p=>{
+  let sx=p.x-world; if(sx>-200 && sx<cv.width+200){
+   ctx.fillStyle='#8D6E63'; ctx.fillRect(sx,cv.height-p.y-20,p.w,20);
+   ctx.fillStyle='#5D4037'; ctx.fillRect(sx,cv.height-p.y-20,p.w,4);
+   ctx.fillStyle='#FFD54F'; ctx.fillRect(sx+5,cv.height-p.y-24,p.w-10,6);
+   ctx.fillStyle='#5D4037'; ctx.font='12px sans-serif'; ctx.fillText('?',sx+p.w/2-4,cv.height-p.y-12);
+  }
+ });
+ // monedas
+ coinsArr.forEach(c=>{if(!c.taken){let sx=c.x-world; ctx.font='28px sans-serif'; ctx.fillText('🪙',sx,cv.height-c.y)}});
+ // enemigos cactus
+ cactus.forEach(e=>{if(e.alive){let sx=e.x-world; if(sx>-60 && sx<cv.width+60){ctx.font='36px sans-serif'; ctx.fillText('🌵',sx,cv.height-50);}}});
+
+ // TU PERSONAJE
+ let anim = frame%10<5 ? 'run1':'run2';
+ if(jumping) anim='jump';
+ drawMotero(80, cv.height-50-64-py, anim);
+
+ requestAnimationFrame(loop);
+}
+
+document.getElementById('btnPlay').addEventListener('click',()=>{
+ document.getElementById('menu').classList.add('hidden');
+ document.getElementById('hud').classList.remove('hidden');
+ document.getElementById('controls').classList.remove('hidden');
+ init(); active=true; loop();
+});
+function doJump(){if(!jumping){jumping=true; vy=14}}
+document.getElementById('bJump').addEventListener('touchstart',e=>{e.preventDefault(); doJump()});
+document.getElementById('bJump').addEventListener('click',doJump);
+document.getElementById('bFire').addEventListener('touchstart',e=>{e.preventDefault(); score+=5; document.getElementById('score').textContent=score;});
+cv.addEventListener('touchstart',e=>{if(active && e.target===cv) doJump()});
+addEventListener('keydown',e=>{if(e.code==='Space') doJump()});
+</script>
 </body>
 </html>

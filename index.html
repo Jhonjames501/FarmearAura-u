@@ -445,7 +445,7 @@
             }
         }
 
-        function dibujarEnemigo(screenX, caminando, animOffset) {
+        function dibujarEnemigo(screenX, animOffset) {
             let baseScreenY = canvas.height - 10;
             let frame = animacionFrame + animOffset;
 
@@ -458,13 +458,13 @@
             ctx.fillStyle = '#226622';
             ctx.fillRect(screenX + 3, baseScreenY - 23, 14, 13);
 
-            let offsetMano = caminando ? Math.sin(frame * 0.25) * 5 : 0;
+            let offsetMano = Math.sin(frame * 0.25) * 5;
             ctx.fillStyle = '#44aa44';
             ctx.fillRect(screenX - 3, baseScreenY - 22 + offsetMano, 5, 5);
             ctx.fillRect(screenX + 16, baseScreenY - 22 - offsetMano, 5, 5);
 
-            let offsetPie1 = caminando ? Math.sin(frame * 0.25) * 6 : 0;
-            let offsetPie2 = caminando ? -Math.sin(frame * 0.25) * 6 : 0;
+            let offsetPie1 = Math.sin(frame * 0.25) * 6;
+            let offsetPie2 = -Math.sin(frame * 0.25) * 6;
 
             ctx.fillStyle = '#113311';
             ctx.fillRect(screenX + 4, baseScreenY - 10, 5, 8 + offsetPie1);
@@ -513,7 +513,7 @@
                         else if (distanciaX < 16 && jugadorY <= 10) {
                             if (!escudoActivo) {
                                 vida = Math.max(0, vida - 0.8);
-                                screenShakeTime = 6; // Activar sacudida de pantalla
+                                screenShakeTime = 6;
                                 document.getElementById('hpFill').style.width = vida + '%';
                                 document.getElementById('hpText').textContent = Math.ceil(vida) + '/100';
                                 document.getElementById('efectoDaño').classList.add('recibiendo-daño');
@@ -578,7 +578,7 @@
                     if (en.hp > 0) {
                         let screenX = en.x - mundoX;
                         if (screenX > -40 && screenX < canvas.width + 40) {
-                            dibujarEnemigo(screenX, true, en.animOffset);
+                            dibujarEnemigo(screenX, en.animOffset);
                             ctx.fillStyle = '#444';
                             ctx.fillRect(screenX - 2, canvas.height - 42, 24, 3);
                             ctx.fillStyle = '#ff0055';

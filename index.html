@@ -1,67 +1,214 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Peruvian Motero Hero</title>
-<style>
- body{margin:0;background:#F2D6A6;display:grid;place-items:center;height:100vh;font-family:system-ui}
- canvas{background:linear-gradient(#87CEEB 0%, #F2D6A6 60%);border:4px solid #8B4513;border-radius:12px;box-shadow:0 10px 30px #0005}
- #hud{position:absolute;top:10px;font-weight:900;color:#5D4037}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Free Fire 2D - Master Edition 5000</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #030307; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #gameContainer { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; background: #030307; }
+        canvas { display: block; width: 100%; flex: 1; background: linear-gradient(to bottom, #010104, #0b0f19); }
+        
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3,3,7,0.98); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; color: #fff; overflow-y: auto; padding: 15px; }
+        .oculto { display: none !important; }
+        
+        h1 { color: #f59e0b; margin-bottom: 12px; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 12px rgba(245,158,11,0.7); }
+        
+        .btn { background: linear-gradient(135deg, #f59e0b, #d97706); border: 2px solid #fde68a; padding: 10px 24px; margin: 6px; color: #fff; font-weight: bold; border-radius: 10px; font-size: 15px; cursor: pointer; min-width: 210px; text-align: center; box-shadow: 0 5px 12px rgba(0,0,0,0.5); text-transform: uppercase; }
+        .btn:active { transform: scale(0.95); }
+
+        .panel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 450px; margin-bottom: 15px; }
+        .card-box { background: rgba(20,20,35,0.9); border: 2px solid #334155; border-radius: 12px; padding: 12px; text-align: center; }
+
+        #uiSuperior { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 5; pointer-events: none; color: #fff; font-size: 10px; font-weight: bold; text-shadow: 1px 1px 2px #000; background: rgba(0,0,0,0.8); padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); }
+        .hp-bar-container { width: 60px; height: 8px; background: #333; border-radius: 4px; overflow: hidden; border: 1px solid #fff; display: inline-block; vertical-align: middle; }
+        #hpFill { width: 100%; height: 100%; background: #22c55e; transition: width 0.2s; }
+
+        #controlesInferiores { position: absolute; bottom: 15px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 5; height: 55px; pointer-events: auto; }
+        .joy-base { width: 90px; height: 45px; border-radius: 22px; background: linear-gradient(135deg, #f59e0b, #d97706); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; color: #fff; font-weight: bold; font-size: 12px; }
+        
+        .acciones-derecha { display: flex; gap: 5px; }
+        .btn-accion { width: 42px; height: 42px; border-radius: 50%; background: rgba(30,30,50,0.9); border: 2px solid rgba(255,255,255,0.8); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.4); }
+
+        #lootAnimBox { width: 140px; height: 140px; background: radial-gradient(circle, #3b82f6, #1e3a8a); border: 3px solid #facc15; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 45px; margin: 15px auto; box-shadow: 0 0 25px rgba(250,204,21,0.5); animation: pulseLoot 1.5s infinite alternate; }
+        @keyframes pulseLoot { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+    </style>
 </head>
 <body>
-<div id="hud">🪙 <span id="coins">0</span> | ❤️ <span id="life">3</span></div>
-<canvas id="g" width="800" height="400"></canvas>
-<script>
-const c=document.getElementById('g'),x=c.getContext('2d');
-let coins=0,life=3, hero={x:100,y:280,w:60,h:40,vy:0,onGround:true};
-let keys={}, obstacles=[], coinList=[], py=280;
-let frame=0;
 
-function spawn(){
- if(Math.random()<0.03){
-  let type=['cactus','mummy','scorpion'][Math.floor(Math.random()*3)];
-  obstacles.push({x:800,y:py,type,w:40,h:50});
- }
- if(Math.random()<0.04) coinList.push({x:800,y:py-60,w:30,h:30,taken:false});
-}
-function drawHero(){
- x.fillStyle='#FF6F00'; x.fillRect(hero.x,hero.y,hero.w,hero.h/2); // moto
- x.fillStyle='#C62828'; x.fillRect(hero.x+10,hero.y-20,30,20); // chullo
- x.fillStyle='#FFCC80'; x.fillRect(hero.x+15,hero.y-10,20,10);
-}
-function drawObs(o){
- if(o.type=='cactus'){x.fillStyle='#2E7D32'; x.fillRect(o.x,o.y,o.w,o.h); x.fillStyle='#1B5E20'; x.fillRect(o.x-5,o.y+10,10,10); x.fillRect(o.x+35,o.y+10,10,10);}
- if(o.type=='mummy'){x.fillStyle='#D7CCC8'; x.fillRect(o.x,o.y,o.w,o.h); x.fillStyle='#8D6E63'; x.fillRect(o.x+5,o.y-10,30,10);}
- if(o.type=='scorpion'){x.fillStyle='#FFA000'; x.fillRect(o.x,o.y,o.w,o.h); x.beginPath(); x.arc(o.x+20,o.y-10,15,0,6); x.fill();}
-}
-function loop(){
- frame++; x.clearRect(0,0,800,400);
- // piso
- x.fillStyle='#8D6E63'; x.fillRect(0,330,800,70);
- x.fillStyle='#A1887F'; for(let i=0;i<800;i+=40) x.fillRect(i,330,20,20);
- 
- spawn();
- // gravedad
- if(!hero.onGround){hero.vy+=0.8; hero.y+=hero.vy; if(hero.y>=280){hero.y=280; hero.onGround=true; hero.vy=0;}}
- if((keys[' ']||keys['w']||keys['ArrowUp'])&&hero.onGround){hero.vy=-14; hero.onGround=false;}
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
 
- // mover obstáculos
- obstacles.forEach(o=>{o.x-=5; drawObs(o);
-  if(hero.x<o.x+o.w && hero.x+hero.w>o.x && hero.y<o.y+o.h && hero.y+hero.h>o.y){o.x=-100; life--; document.getElementById('life').textContent=life; if(life<=0) location.reload();}
- });
- coinList.forEach(co=>{co.x-=5; if(!co.taken){x.fillStyle='gold'; x.beginPath(); x.arc(co.x+15,co.y+15,14,0,6); x.fill(); x.fillStyle='#000'; x.fillText('★',co.x+7,co.y+20); if(hero.x<co.x+co.w&&hero.x+hero.w>co.x&&hero.y<co.y+co.h&&hero.y+hero.h>co.y){co.taken=true; coins++; document.getElementById('coins').textContent=coins;}}});
- 
- drawHero();
- obstacles=obstacles.filter(o=>o.x>-100);
- coinList=coinList.filter(c=>!c.taken&&c.x>-100);
- requestAnimationFrame(loop);
-}
-addEventListener('keydown',e=>keys[e.key]=true);
-addEventListener('keyup',e=>keys[e.key]=false);
-c.addEventListener('touchstart',()=>{if(hero.onGround){hero.vy=-14; hero.onGround=false;}});
-loop();
-</script>
+        <div id="uiSuperior" class="oculto">
+            <div>HP:<div class="hp-bar-container"><div id="hpFill"></div></div></div>
+            <div>ORO: <span id="txtOro">0</span>🪙</div>
+            <div>RANGO: <span id="txtRangoUser" style="color: #facc15;">Bronce</span></div>
+            <div>EXP: <span id="txtExpUser">0</span>/100</div>
+        </div>
+
+        <div id="controlesInferiores" class="oculto">
+            <div id="joystickBase" class="joy-base">⚡ SALTAR</div>
+            <div class="acciones-derecha">
+                <div class="btn-accion" id="btnAccion1">🔥</div>
+                <div class="btn-accion" id="btnAccion2">⚡</div>
+                <div class="btn-accion" id="btnAccion3">🛡️</div>
+                <div class="btn-accion" id="btnAccion4">🚀</div>
+                <div class="btn-accion" id="btnAccion5">💣</div>
+            </div>
+        </div>
+
+        <!-- Lobby Principal Master -->
+        <div id="screenLobby" class="screen">
+            <h1>Free Fire 2D Master</h1>
+            <button class="btn" id="btnJugarCampana">Modo Campaña / Niveles</button>
+            <button class="btn" id="btnPaseBatalla">Pase de Batalla 🏆</button>
+            <button class="btn" id="btnCajasLoot">Cajas de Botín (Gacha) 🎁</button>
+            <button class="btn" id="btnEditorNiveles">Editor de Mapas 🛠️</button>
+        </div>
+
+        <!-- Pantalla Pase de Batalla y Rangos -->
+        <div id="screenPase" class="screen oculto">
+            <h1>Pase de Batalla & Rangos</h1>
+            <div class="panel-grid">
+                <div class="card-box">
+                    <div style="font-size: 12px; color: #94a3b8;">Rango Actual</div>
+                    <div id="lblRangoDisplay" style="font-size: 16px; font-weight: bold; color: #facc15; margin-top: 5px;">Bronce III</div>
+                </div>
+                <div class="card-box">
+                    <div style="font-size: 12px; color: #94a3b8;">Puntos EXP</div>
+                    <div id="lblExpDisplay" style="font-size: 16px; font-weight: bold; color: #38bdf8; margin-top: 5px;">0 PTS</div>
+                </div>
+            </div>
+            <p style="font-size: 13px; margin-bottom: 15px; color: #cbd5e1;">Gana partidas para subir de rango (Plata, Oro, Platino, Diamante, Heroico, Gran Maestro) y desbloquear recompensas exclusivas.</p>
+            <button class="btn" id="btnVolverLobbyPase" style="background: #475569;">Volver</button>
+        </div>
+
+        <!-- Pantalla Apertura de Cajas Gacha -->
+        <div id="screenCajas" class="screen oculto">
+            <h1>Armería de Cajas Gacha</h1>
+            <p style="font-size: 14px; margin-bottom: 5px;">Oro disponible: <span id="txtOroCaja" style="color: #facc15; font-weight: bold;">0</span> 🪙</p>
+            <div id="lootAnimBox">🎁</div>
+            <div id="resultadoCajaText" style="font-size: 15px; font-weight: bold; color: #38bdf8; min-height: 25px; margin-bottom: 10px;">¡Abre una caja por 50 🪙!</div>
+            <button class="btn" id="btnAbrirCaja">Abrir Caja Militar</button>
+            <button class="btn" id="btnVolverLobbyCajas" style="background: #475569; margin-top: 10px;">Volver</button>
+        </div>
+
+        <!-- Pantalla Editor de Niveles -->
+        <div id="screenEditor" class="screen oculto">
+            <h1>Editor de Mapas Pro</h1>
+            <p style="font-size: 13px; margin-bottom: 15px; color: #94a3b8;">Crea y prueba tus propios circuitos personalizados con obstáculos y enemigos dinámicos.</p>
+            <button class="btn" id="btnGuardarTestMapa">Guardar y Jugar Nivel Custom</button>
+            <button class="btn" id="btnVolverLobbyEditor" style="background: #475569;">Volver</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function ajustarCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight - 40;
+        }
+        window.addEventListener('resize', ajustarCanvas);
+        ajustarCanvas();
+
+        let vida = 100, oro = 150, expUser = 0, rangoUser = 'Bronce', gameActive = false;
+        let mundoX = 0, jugadorX = 70, jugadorY = 0, velocidadY = 0, saltando = false;
+        let obstacles = [], coins = [], enemies = [], bullets = [], particles = [];
+
+        // Navegación de menús ampliados
+        document.getElementById('btnJugarCampana').addEventListener('click', () => { iniciarPartidaNormal(); });
+        document.getElementById('btnPaseBatalla').addEventListener('click', () => { document.getElementById('screenLobby').classList.add('oculto'); document.getElementById('screenPase').classList.remove('oculto'); });
+        document.getElementById('btnCajasLoot').addEventListener('click', () => { document.getElementById('screenLobby').classList.add('oculto'); document.getElementById('screenCajas').classList.remove('oculto'); document.getElementById('txtOroCaja').textContent = oro; });
+        document.getElementById('btnEditorNiveles').addEventListener('click', () => { document.getElementById('screenLobby').classList.add('oculto'); document.getElementById('screenEditor').classList.remove('oculto'); });
+
+        document.getElementById('btnVolverLobbyPase').addEventListener('click', () => { document.getElementById('screenPase').classList.add('oculto'); document.getElementById('screenLobby').classList.remove('oculto'); });
+        document.getElementById('btnVolverLobbyCajas').addEventListener('click', () => { document.getElementById('screenCajas').classList.add('oculto'); document.getElementById('screenLobby').classList.remove('oculto'); });
+        document.getElementById('btnVolverLobbyEditor').addEventListener('click', () => { document.getElementById('screenEditor').classList.add('oculto'); document.getElementById('screenLobby').classList.remove('oculto'); });
+
+        // Sistema de Cajas Gacha
+        document.getElementById('btnAbrirCaja').addEventListener('click', () => {
+            if (oro < 50) { alert("¡No tienes suficiente oro (Costo: 50 🪙)!"); return; }
+            oro -= 50; document.getElementById('txtOroCaja').textContent = oro;
+            let premios = ["¡Skin Legendaria M4A1 Dragón!", "¡500 Monedas Extra!", "¡Mascota Panda Táctica!", "¡Skin Cyberpunk Exclusiva!"];
+            let premioObtenido = premios[Math.floor(Math.random() * premios.length)];
+            document.getElementById('resultadoCajaText').textContent = premioObtenido;
+        });
+
+        function actualizarRangos() {
+            if (expUser >= 500) rangoUser = 'Gran Maestro 👑';
+            else if (expUser >= 350) rangoUser = 'Heroico 🌟';
+            else if (expUser >= 200) rangoUser = 'Diamante 💎';
+            else if (expUser >= 100) rangoUser = 'Platino 🛡️';
+            else if (expUser >= 50) rangoUser = 'Oro 🪙';
+            else rangoUser = 'Bronce 🥉';
+
+            document.getElementById('txtRangoUser').textContent = rangoUser;
+            document.getElementById('txtExpUser').textContent = expUser;
+            document.getElementById('lblRangoDisplay').textContent = rangoUser;
+            document.getElementById('lblExpDisplay').textContent = expUser + ' PTS';
+        }
+
+        function iniciarPartidaNormal() {
+            document.getElementById('screenLobby').classList.add('oculto');
+            document.getElementById('uiSuperior').classList.remove('oculto');
+            document.getElementById('controlesInferiores').classList.remove('oculto');
+            vida = 100; mundoX = 0; jugadorY = 0; obstacles = []; coins = []; enemies = [];
+            for (let i = 1; i <= 20; i++) {
+                let px = i * 220;
+                obstacles.push({ x: px, y: 0, w: 30, h: 20 });
+                coins.push({ x: px + 25, y: 35, recolectada: false });
+                enemies.push({ x: px + 110, y: 0, hp: 40, maxHp: 40 });
+            }
+            gameActive = true; ajustarCanvas();
+        }
+
+        document.getElementById('joystickBase').addEventListener('click', () => {
+            if (!gameActive) return;
+            if (!saltando) { saltando = true; velocidadY = 12; }
+        });
+
+        function loop() {
+            if (gameActive) {
+                mundoX += 4.5;
+                if (saltando) {
+                    jugadorY += velocidadY; velocidadY -= 0.95;
+                    if (jugadorY <= 0) { jugadorY = 0; saltando = false; }
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#0b0f19'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Suelo
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
+
+                obstacles.forEach(b => {
+                    let sx = b.x - mundoX;
+                    if (sx > -40 && sx < canvas.width + 40) {
+                        ctx.fillStyle = '#d97706'; ctx.fillRect(sx, canvas.height - 30, b.w, b.h);
+                    }
+                });
+
+                coins.forEach(c => {
+                    if (!c.recolectada) {
+                        let sx = c.x - mundoX;
+                        if (sx > -20 && sx < canvas.width + 20) {
+                            ctx.beginPath(); ctx.arc(sx, canvas.height - 15 - c.y, 6, 0, Math.PI * 2);
+                            ctx.fillStyle = '#facc15'; ctx.fill();
+                        }
+                    }
+                });
+
+                // Render jugador
+                ctx.fillStyle = '#38bdf8'; ctx.fillRect(jugadorX, canvas.height - 32 - jugadorY, 16, 22);
+            }
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+    </script>
 </body>
 </html>

@@ -20,13 +20,14 @@
         .btn { background: linear-gradient(135deg, #ffaa00, #ff5500); border: none; padding: 12px 24px; margin: 8px; color: #fff; font-weight: bold; border-radius: 8px; font-size: 16px; cursor: pointer; min-width: 200px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .btn:active { transform: scale(0.95); }
         
-        /* UI Superior */
-        #uiSuperior { position: absolute; top: 8px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; z-index: 5; pointer-events: none; color: #fff; font-size: 11px; font-weight: bold; text-shadow: 1px 1px 2px #000; background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
+        /* UI Superior más limpia flotando sobre el canvas */
+        #uiSuperior { position: absolute; top: 8px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; z-index: 5; pointer-events: none; color: #fff; font-size: 11px; font-weight: bold; text-shadow: 1px 1px 2px #000; background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
         .hp-bar-container { width: 70px; height: 8px; background: #444; border-radius: 4px; overflow: hidden; border: 1px solid #fff; display: inline-block; vertical-align: middle; margin-left: 4px; }
         #hpFill { width: 100%; height: 100%; background: #00ff66; transition: width 0.2s; }
 
-        /* Controles Inferiores */
-        #controlesInferiores { position: absolute; bottom: 20px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; z-index: 5; height: 60px; pointer-events: auto; }
+        /* Controles Inferiores elevados para no chocar con la barra de navegación del celular */
+        #controlesInferiores { position: absolute; bottom: 25px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; z-index: 5; height: 60px; pointer-events: auto; }
+        
         .joy-base { width: 110px; height: 50px; border-radius: 25px; background: linear-gradient(135deg, rgba(255,170,0,0.9), rgba(255,85,0,0.9)); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; color: #fff; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         .joy-base:active { transform: scale(0.95); }
         
@@ -38,7 +39,7 @@
         .level-card { background: #222233; border: 1px solid #444; padding: 12px; text-align: center; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; color: #fff; }
         .level-card:active { background: #ffaa00; color: #000; }
 
-        /* Tienda de Skins */
+        /* Tienda de Equipamiento Táctico */
         #skinsContainer { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px; }
         .skin-card { background: #1a1a2e; border: 2px solid #444; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; width: 120px; }
         .skin-card.selected { border-color: #00ff66; box-shadow: 0 0 10px rgba(0,255,102,0.4); }
@@ -53,7 +54,7 @@
     <div id="gameContainer">
         <div id="efectoDaño"></div>
 
-        <!-- UI Superior -->
+        <!-- UI Superior Optimizada -->
         <div id="uiSuperior" class="oculto">
             <div>HP: <div class="hp-bar-container"><div id="hpFill"></div></div> <span id="hpText">100/100</span></div>
             <div>ORO: <span id="txtOro">0</span></div>
@@ -64,7 +65,7 @@
 
         <canvas id="gameCanvas"></canvas>
 
-        <!-- Controles Inferiores -->
+        <!-- Controles Inferiores Elevados -->
         <div id="controlesInferiores" class="oculto">
             <div id="joystickBase" class="joy-base">⚡ SALTAR</div>
             <div class="acciones-derecha">
@@ -77,7 +78,7 @@
 
         <!-- Pantalla Lobby Principal -->
         <div id="screenLobby" class="screen">
-            <h1>Free Fire 2D Pro</h1>
+            <h1>Free Fire 2D Runner</h1>
             <button class="btn" id="btnJugarCampana">Modo Campaña</button>
             <button class="btn" id="btnTiendaSkins">Equipamiento Táctico</button>
             <button class="btn" id="btnOnlineMenu">Multijugador Online</button>
@@ -128,7 +129,7 @@
             <h1>Modo Online</h1>
             <button class="btn" id="btnCrearSala">Crear Sala</button>
             <div style="margin: 15px 0; display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="inputCodigoSala" placeholder="Código" maxlength="4" style="padding: 10px; font-size: 16px; border-radius: 6px; border: none; width: 130px; text-align: center;">
+                <input type="text" id="inputCodigoSala" placeholder="Código de Sala" maxlength="4" style="padding: 10px; font-size: 16px; border-radius: 6px; border: none; width: 130px; text-align: center;">
                 <button class="btn" id="btnUnirseSala" style="margin: 0; min-width: 130px;">Unirse</button>
             </div>
             <div id="infoSalaDiv" style="margin-top: 15px; font-size: 14px; color: #00ffcc;">
@@ -140,9 +141,15 @@
 
     <script>
         try {
-            const firebaseConfig = { databaseURL: "https://freefire2d-default-rtdb.firebaseio.com/" };
-            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        } catch (e) {}
+            const firebaseConfig = {
+                databaseURL: "https://freefire2d-default-rtdb.firebaseio.com/"
+            };
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+        } catch (e) {
+            console.error("Error al inicializar Firebase:", e);
+        }
 
         const db = firebase.database();
         const canvas = document.getElementById('gameCanvas');
@@ -150,21 +157,42 @@
 
         function ajustarCanvas() {
             canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight - 60;
+            canvas.height = canvas.parentElement.clientHeight - 40;
         }
         window.addEventListener('resize', ajustarCanvas);
         ajustarCanvas();
 
-        let vida = 100, oro = 0, nivelActual = 1, mundoX = 0, jugadorX = 70, jugadorY = 0, velocidadY = 0;
-        let saltando = false, gameActive = false, esOnline = false, codigoSalaActual = null;
+        let vida = 100;
+        let oro = 0;
+        let nivelActual = 1;
+        let mundoX = 0;
+        let jugadorX = 70;
+        let jugadorY = 0;
+        let velocidadY = 0;
+        let saltando = false;
+        let gameActive = false;
+
+        let esOnline = false;
+        let codigoSalaActual = null;
         let skinActual = 'clásico';
         let skinsDesbloqueadas = ['clásico'];
         let miIdJugador = 'p_' + Math.floor(Math.random() * 100000);
         let datosCompañero = { x: 150, y: 0, vida: 100, skin: 'clásico' };
 
-        let obstacles = [], coins = [], enemies = [], bullets = [], particles = [], stars = [];
-        let animacionFrame = 0, escudoActivo = false, volarActivo = false, screenShakeTime = 0;
-        let audioCtx = null, masterGain = null;
+        let obstacles = [];
+        let coins = [];
+        let enemies = [];
+        let bullets = [];
+        let particles = [];
+        let stars = [];
+        let animacionFrame = 0;
+
+        let escudoActivo = false;
+        let volarActivo = false;
+        let screenShakeTime = 0;
+
+        let audioCtx = null;
+        let masterGain = null;
 
         for(let i=0; i<40; i++) {
             stars.push({ x: Math.random() * 1000, y: Math.random() * 300, size: Math.random() * 2 + 1 });
@@ -177,7 +205,7 @@
                 masterGain.gain.value = parseFloat(document.getElementById('volRange').value);
                 masterGain.connect(audioCtx.destination);
             }
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
         }
 
         document.getElementById('volRange').addEventListener('input', (e) => {
@@ -189,11 +217,14 @@
                 if (!audioCtx || audioCtx.state !== 'running') return;
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
-                osc.type = tipo; osc.frequency.value = freq;
+                osc.type = tipo;
+                osc.frequency.value = freq;
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-                osc.connect(gain); gain.connect(masterGain);
-                osc.start(); osc.stop(audioCtx.currentTime + dur);
+                osc.connect(gain);
+                gain.connect(masterGain);
+                osc.start();
+                osc.stop(audioCtx.currentTime + dur);
             } catch (e) {}
         }
 
@@ -208,18 +239,52 @@
             }
         }
 
-        document.getElementById('btnJugarCampana').onclick = () => { inicializarAudio(); document.getElementById('screenLobby').classList.add('oculto'); document.getElementById('screenLevels').classList.remove('oculto'); };
-        document.getElementById('btnTiendaSkins').onclick = () => { inicializarAudio(); document.getElementById('screenLobby').classList.add('oculto'); document.getElementById('screenSkins').classList.remove('oculto'); document.getElementById('txtOroTienda').textContent = oro; };
-        document.getElementById('btnOnlineMenu').onclick = () => { inicializarAudio(); document.getElementById('screenLobby').classList.add('oculto'); document.getElementById('screenMultiplayer').classList.remove('oculto'); };
-        document.getElementById('btnVolverLobby').onclick = () => { document.getElementById('screenLevels').classList.add('oculto'); document.getElementById('screenLobby').classList.remove('oculto'); };
-        document.getElementById('btnVolverLobbySkins').onclick = () => { document.getElementById('screenSkins').classList.add('oculto'); document.getElementById('screenLobby').classList.remove('oculto'); };
-        document.getElementById('btnVolverMenuOnline').onclick = () => { document.getElementById('screenMultiplayer').classList.add('oculto'); document.getElementById('screenLobby').classList.remove('oculto'); };
-        
-        document.getElementById('btnReintentar').onclick = () => { document.getElementById('screenGameOver').classList.add('oculto'); configurarPartidaComun(); };
-        document.getElementById('btnMenuPrincipal').onclick = () => { document.getElementById('screenGameOver').classList.add('oculto'); document.getElementById('screenLobby').classList.remove('oculto'); };
+        document.getElementById('btnJugarCampana').addEventListener('click', () => {
+            inicializarAudio();
+            document.getElementById('screenLobby').classList.add('oculto');
+            document.getElementById('screenLevels').classList.remove('oculto');
+        });
+
+        document.getElementById('btnTiendaSkins').addEventListener('click', () => {
+            inicializarAudio();
+            document.getElementById('screenLobby').classList.add('oculto');
+            document.getElementById('screenSkins').classList.remove('oculto');
+            document.getElementById('txtOroTienda').textContent = oro;
+        });
+
+        document.getElementById('btnOnlineMenu').addEventListener('click', () => {
+            inicializarAudio();
+            document.getElementById('screenLobby').classList.add('oculto');
+            document.getElementById('screenMultiplayer').classList.remove('oculto');
+        });
+
+        document.getElementById('btnVolverLobby').addEventListener('click', () => {
+            document.getElementById('screenLevels').classList.add('oculto');
+            document.getElementById('screenLobby').classList.remove('oculto');
+        });
+
+        document.getElementById('btnVolverLobbySkins').addEventListener('click', () => {
+            document.getElementById('screenSkins').classList.add('oculto');
+            document.getElementById('screenLobby').classList.remove('oculto');
+        });
+
+        document.getElementById('btnVolverMenuOnline').addEventListener('click', () => {
+            document.getElementById('screenMultiplayer').classList.add('oculto');
+            document.getElementById('screenLobby').classList.remove('oculto');
+        });
+
+        document.getElementById('btnReintentar').addEventListener('click', () => {
+            document.getElementById('screenGameOver').classList.add('oculto');
+            configurarPartidaComun();
+        });
+
+        document.getElementById('btnMenuPrincipal').addEventListener('click', () => {
+            document.getElementById('screenGameOver').classList.add('oculto');
+            document.getElementById('screenLobby').classList.remove('oculto');
+        });
 
         document.querySelectorAll('.skin-card').forEach(card => {
-            card.onclick = () => {
+            card.addEventListener('click', () => {
                 let skinNombre = card.getAttribute('data-skin');
                 let precio = parseInt(card.getAttribute('data-precio'));
 
@@ -252,23 +317,26 @@
                         alert("¡No tienes suficiente oro!");
                     }
                 }
-            };
+            });
         });
 
-        document.getElementById('btnCrearSala').onclick = () => {
+        document.getElementById('btnCrearSala').addEventListener('click', () => {
             inicializarAudio();
             codigoSalaActual = Math.floor(1000 + Math.random() * 9000).toString();
             esOnline = true;
             document.getElementById('txtSalaInfo').textContent = codigoSalaActual;
             document.getElementById('txtRolInfo').textContent = "Host (P1)";
-            alert(`¡Sala creada! Código: ${codigoSalaActual}`);
+            alert(`¡Sala creada con éxito!\nComparte este código: ${codigoSalaActual}`);
             document.getElementById('screenMultiplayer').classList.add('oculto');
             iniciarPartidaOnline();
-        };
+        });
 
-        document.getElementById('btnUnirseSala').onclick = () => {
+        document.getElementById('btnUnirseSala').addEventListener('click', () => {
             let codigo = document.getElementById('inputCodigoSala').value.trim();
-            if (codigo.length < 4) return alert("Ingresa un código válido.");
+            if (codigo.length < 4) {
+                alert("Ingresa un código de sala válido.");
+                return;
+            }
             inicializarAudio();
             codigoSalaActual = codigo;
             esOnline = true;
@@ -276,7 +344,7 @@
             document.getElementById('txtRolInfo').textContent = "Invitado (P2)";
             document.getElementById('screenMultiplayer').classList.add('oculto');
             iniciarPartidaOnline();
-        };
+        });
 
         function construirMenuNiveles() {
             let container = document.getElementById('levelsGridContainer');
@@ -285,11 +353,19 @@
                 let card = document.createElement('div');
                 card.className = 'level-card';
                 card.textContent = `Nvl ${i}`;
-                card.onclick = () => { esOnline = false; nivelActual = i; document.getElementById('lblNivelActual').textContent = i; document.getElementById('screenLevels').classList.add('oculto'); configurarPartidaComun(); };
+                card.addEventListener('click', () => iniciarNivelSolo(i));
                 container.appendChild(card);
             }
         }
         construirMenuNiveles();
+
+        function iniciarNivelSolo(num) {
+            esOnline = false;
+            nivelActual = num;
+            document.getElementById('lblNivelActual').textContent = nivelActual;
+            document.getElementById('screenLevels').classList.add('oculto');
+            configurarPartidaComun();
+        }
 
         function iniciarPartidaOnline() {
             esOnline = true;
@@ -297,42 +373,61 @@
             document.getElementById('lblNivelActual').textContent = "Online";
             configurarPartidaComun();
             let refSala = db.ref('salas/' + codigoSalaActual + '/' + miIdJugador);
+            
             setInterval(() => {
                 if (!gameActive || !esOnline) return;
-                refSala.set({ x: mundoX + jugadorX, y: jugadorY, vida: vida, skin: skinActual });
+                refSala.set({
+                    x: mundoX + jugadorX,
+                    y: jugadorY,
+                    vida: vida,
+                    skin: skinActual
+                });
             }, 50);
+
             db.ref('salas/' + codigoSalaActual).on('value', (snapshot) => {
                 let jugadores = snapshot.val();
                 if (!jugadores) return;
                 Object.keys(jugadores).forEach(id => {
-                    if (id !== miIdJugador) datosCompañero = jugadores[id];
+                    if (id !== miIdJugador) {
+                        datosCompañero = jugadores[id];
+                    }
                 });
             });
         }
 
         function configurarPartidaComun() {
-            vida = 100; mundoX = 0; jugadorY = 0; velocidadY = 0;
+            vida = 100;
             document.getElementById('hpFill').style.width = '100%';
             document.getElementById('hpText').textContent = '100/100';
             document.getElementById('txtOro').textContent = oro;
-            obstacles = []; coins = []; enemies = []; bullets = []; particles = [];
-            escudoActivo = false; volarActivo = false;
+            mundoX = 0;
+            jugadorY = 0;
+            obstacles = [];
+            coins = [];
+            enemies = [];
+            bullets = [];
+            particles = [];
+            escudoActivo = false;
+            volarActivo = false;
 
             let cantidadObstaculos = 15 + (nivelActual * 3);
             for (let i = 1; i < cantidadObstaculos; i++) {
                 let posX = i * 220 + Math.random() * 50;
                 obstacles.push({ x: posX, y: 0, w: 35, h: 22, icono: '📦' });
                 coins.push({ x: posX + 20, y: 35, recolectada: false });
+                
                 let hpEnemigo = 30 + (nivelActual * 5);
                 enemies.push({ x: posX + 110, y: 0, hp: hpEnemigo, maxHp: hpEnemigo, animOffset: Math.random() * 100 });
             }
+            
             document.getElementById('uiSuperior').classList.remove('oculto');
             document.getElementById('controlesInferiores').classList.remove('oculto');
             gameActive = true;
             ajustarCanvas();
         }
 
-        document.getElementById('joystickbase').onclick = () => {
+        const joyBase = document.getElementById('joystickBase');
+        joyBase.addEventListener('click', () => {
             if (!gameActive) return;
             if (!saltando || volarActivo) {
                 saltando = true;
@@ -340,20 +435,11 @@
                 crearParticulas(jugadorX + 10, canvas.height - 15, '#aaaaaa', 4);
                 reproducirSonido(500, 'triangle', 0.1);
             }
-        };
-        // Corrección de referencia al joystick ID
-        document.getElementById('joystickBase').onclick = () => {
-            if (!gameActive) return;
-            if (!saltando || volarActivo) {
-                saltando = true;
-                velocidadY = volarActivo ? 14 : 12;
-                crearParticulas(jugadorX + 10, canvas.height - 15, '#aaaaaa', 4);
-                reproducirSonido(500, 'triangle', 0.1);
-            }
-        };
+        });
 
-        document.getElementById('btnAccion1').onpointerdown = (e) => {
-            e.preventDefault(); if (!gameActive) return;
+        document.getElementById('btnAccion1').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (!gameActive) return;
             reproducirSonido(800, 'sawtooth', 0.08);
             bullets.push({ x: mundoX + jugadorX + 25, y: jugadorY + 20 });
             let jugadorMundoX = mundoX + jugadorX;
@@ -361,99 +447,121 @@
                 if (en.hp > 0 && Math.abs(en.x - jugadorMundoX) < 100) {
                     en.hp -= 35;
                     crearParticulas(en.x - mundoX + 10, canvas.height - 20, '#ffcc00', 5);
-                    if (en.hp <= 0) { oro += 25; document.getElementById('txtOro').textContent = oro; }
+                    if (en.hp <= 0) { 
+                        oro += 25; 
+                        document.getElementById('txtOro').textContent = oro; 
+                    }
                 }
             });
-        };
+        });
 
-        document.getElementById('btnAccion2').onpointerdown = (e) => {
-            e.preventDefault(); if (!gameActive) return;
+        document.getElementById('btnAccion2').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (!gameActive) return;
             reproducirSonido(900, 'sine', 0.12);
             mundoX += 120;
             crearParticulas(jugadorX, canvas.height - 20, '#00ffcc', 6);
             document.getElementById('lblEstadoTransformacion').textContent = "Dash!";
-            setTimeout(() => document.getElementById('lblEstadoTransformacion').textContent = "Normal", 400);
-        };
+            setTimeout(() => {
+                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
+            }, 400);
+        });
 
-        document.getElementById('btnAccion3').onpointerdown = (e) => {
-            e.preventDefault(); if (!gameActive) return;
+        document.getElementById('btnAccion3').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (!gameActive) return;
             reproducirSonido(400, 'square', 0.2);
             escudoActivo = true;
             document.getElementById('lblEstadoTransformacion').textContent = "Escudo";
-            setTimeout(() => { escudoActivo = false; document.getElementById('lblEstadoTransformacion').textContent = "Normal"; }, 4000);
-        };
+            setTimeout(() => {
+                escudoActivo = false;
+                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
+            }, 4000);
+        });
 
-        document.getElementById('btnAccion4').onpointerdown = (e) => {
-            e.preventDefault(); if (!gameActive) return;
+        document.getElementById('btnAccion4').addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (!gameActive) return;
             reproducirSonido(700, 'triangle', 0.2);
-            volarActivo = true; velocidadY = 8; saltando = true;
+            volarActivo = true;
+            velocidadY = 8;
+            saltando = true;
             document.getElementById('lblEstadoTransformacion').textContent = "Vuelo";
-            setTimeout(() => { volarActivo = false; document.getElementById('lblEstadoTransformacion').textContent = "Normal"; }, 6000);
-        };
+            setTimeout(() => {
+                volarActivo = false;
+                document.getElementById('lblEstadoTransformacion').textContent = "Normal";
+            }, 6000);
+        });
 
-        // --- SISTEMA DE RENDERIZADO DE EQUIPAMIENTO TÁCTICO PROFESIONAL ---
+        // --- SISTEMA DE RENDERIZADO TÁCTICO MILITAR COMPLETO ---
         function dibujarPersonaje(x, y, skin, caminando) {
             let baseScreenY = canvas.height - 10 - y;
-            
-            // Colores según el equipamiento táctico elegido
             let colCasco = '#334155', colChaleco = '#475569', colVisor = '#38bdf8', colArma = '#0f172a';
             if(skin === 'cyber') { colCasco = '#0284c7'; colChaleco = '#0369a1'; colVisor = '#22d3ee'; colArma = '#0c4a6e'; }
             if(skin === 'fuego') { colCasco = '#991b1b'; colChaleco = '#7f1d1d'; colVisor = '#f87171'; colArma = '#450a0a'; }
 
-            // Mochila táctica a la espalda
+            // Mochila táctica
             ctx.fillStyle = '#1e293b';
             ctx.fillRect(x - 2, baseScreenY - 22, 5, 11);
 
-            // Cuerpo base y Chaleco antibalas táctico con placas
+            // Chaleco antibalas
             ctx.fillStyle = colChaleco;
             ctx.fillRect(x + 2, baseScreenY - 23, 16, 13);
-            ctx.fillStyle = '#111827'; // Detalles de bolsillos del chaleco
+            ctx.fillStyle = '#111827';
             ctx.fillRect(x + 5, baseScreenY - 20, 10, 4);
 
-            // Cabeza y Casco Táctico con Visor de combate
+            // Casco y Visor
             ctx.fillStyle = '#ffccaa';
             ctx.fillRect(x + 5, baseScreenY - 33, 10, 10);
-            ctx.fillStyle = colCasco; // Casco militar
+            ctx.fillStyle = colCasco;
             ctx.fillRect(x + 4, baseScreenY - 35, 12, 5);
-            ctx.fillStyle = colVisor; // Visor táctico brillante
+            ctx.fillStyle = colVisor;
             ctx.fillRect(x + 10, baseScreenY - 33, 5, 2);
 
-            // Arma táctica en las manos (Rifle de asalto compacto)
+            // Rifle de asalto
             let offsetArma = caminando ? Math.sin(animacionFrame * 0.3) * 3 : 0;
             ctx.fillStyle = colArma;
-            ctx.fillRect(x + 12, baseScreenY - 18 + offsetArma, 12, 4); // Cañón / Cuerpo
-            ctx.fillRect(x + 18, baseScreenY - 21 + offsetArma, 3, 5);  // Mira
+            ctx.fillRect(x + 12, baseScreenY - 18 + offsetArma, 12, 4);
+            ctx.fillRect(x + 18, baseScreenY - 21 + offsetArma, 3, 5);
 
-            // Brazos y extremidades con movimiento fluido
+            // Brazos y piernas con animación
             let offsetMano = caminando ? Math.sin(animacionFrame * 0.3) * 4 : 0;
             ctx.fillStyle = colChaleco;
             ctx.fillRect(x + 10, baseScreenY - 19 + offsetMano, 5, 5);
 
             let offsetPie1 = caminando ? Math.sin(animacionFrame * 0.3) * 5 : 0;
             let offsetPie2 = caminando ? -Math.sin(animacionFrame * 0.3) * 5 : 0;
-            ctx.fillStyle = '#1e293b'; // Pantalón táctico
+
+            ctx.fillStyle = '#1e293b';
             ctx.fillRect(x + 4, baseScreenY - 10, 5, 8 + offsetPie1);
             ctx.fillRect(x + 11, baseScreenY - 10, 5, 8 + offsetPie2);
-            ctx.fillStyle = '#0f172a'; // Botas militares
+
+            ctx.fillStyle = '#0f172a';
             ctx.fillRect(x + 3, baseScreenY - 2 + offsetPie1, 6, 3);
             ctx.fillRect(x + 10, baseScreenY - 2 + offsetPie2, 6, 3);
 
-            // Escudo energético si está activo
             if (escudoActivo) {
-                ctx.strokeStyle = '#00ffcc'; ctx.lineWidth = 2; ctx.beginPath();
-                ctx.arc(x + 10, baseScreenY - 18, 22, 0, Math.PI * 2); ctx.stroke();
+                ctx.strokeStyle = '#00ffcc';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x + 10, baseScreenY - 18, 22, 0, Math.PI * 2);
+                ctx.stroke();
             }
         }
 
         function dibujarEnemigo(screenX, animOffset) {
             let baseScreenY = canvas.height - 10;
             let frame = animacionFrame + animOffset;
-            
-            // Enemigo con equipo militar hostil (Renegado)
-            ctx.fillStyle = '#14532d'; ctx.fillRect(x = screenX + 4, baseScreenY - 34, 12, 11);
-            ctx.fillStyle = '#dc2626'; ctx.fillRect(screenX + 6, baseScreenY - 30, 2, 2); ctx.fillRect(screenX + 12, baseScreenY - 30, 2, 2); // Gafas hostiles rojas
-            ctx.fillStyle = '#166534'; ctx.fillRect(screenX + 3, baseScreenY - 23, 14, 13);
-            
+
+            ctx.fillStyle = '#14532d';
+            ctx.fillRect(screenX + 4, baseScreenY - 34, 12, 11);
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(screenX + 6, baseScreenY - 30, 2, 2);
+            ctx.fillRect(screenX + 12, baseScreenY - 30, 2, 2);
+
+            ctx.fillStyle = '#166534';
+            ctx.fillRect(screenX + 3, baseScreenY - 23, 14, 13);
+
             let offsetMano = Math.sin(frame * 0.25) * 5;
             ctx.fillStyle = '#14532d';
             ctx.fillRect(screenX - 3, baseScreenY - 22 + offsetMano, 5, 5);
@@ -475,7 +583,8 @@
 
                 coins.forEach(c => {
                     if (!c.recolectada && Math.abs(c.x - jugadorMundoX) < 20 && Math.abs(c.y - jugadorY) < 22) {
-                        c.recolectada = true; oro += 10;
+                        c.recolectada = true;
+                        oro += 10;
                         document.getElementById('txtOro').textContent = oro;
                         crearParticulas(c.x - mundoX, canvas.height - 12 - c.y, '#ffff00', 4);
                         reproducirSonido(1200, 'sine', 0.05);
@@ -485,13 +594,16 @@
                 enemies.forEach(en => {
                     if (en.hp > 0) {
                         let distanciaX = Math.abs(en.x - jugadorMundoX);
+
                         if (distanciaX < 18 && jugadorY > 15 && velocidadY < 0) {
-                            en.hp = 0; oro += 30;
+                            en.hp = 0;
+                            oro += 30;
                             document.getElementById('txtOro').textContent = oro;
                             velocidadY = 10;
                             crearParticulas(en.x - mundoX + 10, canvas.height - 20, '#ff0055', 8);
                             reproducirSonido(950, 'square', 0.1);
-                        } else if (distanciaX < 16 && jugadorY <= 10) {
+                        } 
+                        else if (distanciaX < 16 && jugadorY <= 10) {
                             if (!escudoActivo) {
                                 vida = Math.max(0, vida - 0.8);
                                 screenShakeTime = 6;
@@ -513,6 +625,7 @@
                     }
                 });
 
+                // Renderizado con Screen Shake y Estilo Realista
                 ctx.save();
                 if (screenShakeTime > 0) {
                     screenShakeTime--;
@@ -523,7 +636,7 @@
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // --- MUNDO REALISTA ---
+                // Fondo degradado y estrellas
                 let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
                 gradient.addColorStop(0, '#020205');
                 gradient.addColorStop(0.7, '#0f172a');
@@ -538,6 +651,7 @@
                 });
                 ctx.globalAlpha = 1.0;
 
+                // Paralaje de montañas
                 ctx.fillStyle = '#1e293b';
                 let p1 = (mundoX * 0.1) % canvas.width;
                 ctx.fillRect(-p1, canvas.height - 120, canvas.width, 80);
@@ -548,6 +662,7 @@
                 ctx.fillRect(-p2, canvas.height - 80, canvas.width, 50);
                 ctx.fillRect(canvas.width - p2, canvas.height - 80, canvas.width, 50);
 
+                // Suelo
                 ctx.fillStyle = '#0f172a';
                 ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
                 ctx.fillStyle = '#38bdf8';
@@ -558,7 +673,8 @@
                     if (screenX > -50 && screenX < canvas.width + 50) {
                         ctx.fillStyle = '#b45309';
                         ctx.fillRect(screenX, canvas.height - 28 - b.y, b.w, b.h);
-                        ctx.font = '10px sans-serif'; ctx.fillText(b.icono, screenX + 8, canvas.height - 12 - b.y);
+                        ctx.font = '10px sans-serif';
+                        ctx.fillText(b.icono, screenX + 8, canvas.height - 12 - b.y);
                     }
                 });
 
@@ -566,9 +682,12 @@
                     if (!c.recolectada) {
                         let screenX = c.x - mundoX;
                         if (screenX > -25 && screenX < canvas.width + 25) {
-                            ctx.beginPath(); ctx.arc(screenX, canvas.height - 14 - c.y, 6, 0, Math.PI * 2);
-                            ctx.fillStyle = '#facc15'; ctx.fill();
-                            ctx.strokeStyle = '#ca8a04'; ctx.stroke();
+                            ctx.beginPath();
+                            ctx.arc(screenX, canvas.height - 14 - c.y, 6, 0, Math.PI * 2);
+                            ctx.fillStyle = '#facc15';
+                            ctx.fill();
+                            ctx.strokeStyle = '#ca8a04';
+                            ctx.stroke();
                         }
                     }
                 });
@@ -578,8 +697,10 @@
                         let screenX = en.x - mundoX;
                         if (screenX > -40 && screenX < canvas.width + 40) {
                             dibujarEnemigo(screenX, en.animOffset);
-                            ctx.fillStyle = '#333'; ctx.fillRect(screenX - 2, canvas.height - 42, 24, 3);
-                            ctx.fillStyle = '#ef4444'; ctx.fillRect(screenX - 2, canvas.height - 42, (en.hp / en.maxHp) * 24, 3);
+                            ctx.fillStyle = '#333';
+                            ctx.fillRect(screenX - 2, canvas.height - 42, 24, 3);
+                            ctx.fillStyle = '#ef4444';
+                            ctx.fillRect(screenX - 2, canvas.height - 42, (en.hp / en.maxHp) * 24, 3);
                         }
                     }
                 });
@@ -592,14 +713,14 @@
                     ctx.globalAlpha = 1.0;
                 });
 
-                // Renderizar Jugador con Equipamiento Táctico
                 dibujarPersonaje(jugadorX, jugadorY, skinActual, true);
 
                 if (esOnline) {
                     let compScreenX = datosCompañero.x - mundoX;
                     if (compScreenX > -40 && compScreenX < canvas.width + 40) {
                         dibujarPersonaje(compScreenX, datosCompañero.y || 0, datosCompañero.skin || 'clásico', true);
-                        ctx.fillStyle = '#38bdf8'; ctx.font = '7px sans-serif';
+                        ctx.fillStyle = '#38bdf8';
+                        ctx.font = '7px sans-serif';
                         ctx.fillText('COMPAÑERO', compScreenX - 8, canvas.height - 45 - (datosCompañero.y || 0));
                     }
                 }

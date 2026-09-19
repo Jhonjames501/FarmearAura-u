@@ -2,38 +2,43 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Desert Motero Quest - TODO FUNCIONA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Desert Motero Quest v2.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Fredoka',sans-serif;user-select:none}
-body,html{width:100%;height:100%;overflow:hidden;background:#4FC3F7}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif;user-select:none}
+body,html{width:100%;height:100%;overflow:hidden;background:#29B6F6}
 #game{width:100%;height:100%;position:relative}
 canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 .screen{position:absolute;inset:0;z-index:10}
 .hidden{display:none!important}
 .topbar{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;z-index:20}
-.coinbar{background:#263238;color:#fff;padding:5px 14px;border-radius:18px;display:flex;gap:6px;align-items:center;font-size:18px;box-shadow:0 3px 0 #000;border:2px solid rgba(255,255,255,0.3);cursor:pointer}
+.coinbar{background:#263238;color:#fff;padding:6px 12px;border-radius:18px;display:flex;gap:6px;align-items:center;font-size:16px;box-shadow:0 3px 0 #000;border:2px solid #fff;cursor:pointer}
+.coinbar.refresh{background:#4CAF50;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 #menu{background:linear-gradient(to bottom,#29B6F6 0%,#81D4FA 30%,#FFE082 60%,#FFB74D 100%)}
-.bonus{position:absolute;left:12px;top:90px;background:linear-gradient(#FFEB3B,#FF9800);padding:8px 10px;border-radius:14px;border:3px solid #fff;transform:rotate(-5deg);text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.3);z-index:5;cursor:pointer}
-.watchAd{position:absolute;right:12px;top:95px;background:linear-gradient(#78909C,#37474F);border:2px solid #fff;border-radius:12px;padding:6px 10px;color:#fff;font-size:13px;text-align:center;z-index:5;cursor:pointer}
-.removeAd{position:absolute;right:12px;top:160px;background:linear-gradient(#EF5350,#B71C1C);border:3px solid #FFEB3B;border-radius:14px;padding:8px 10px;color:#FFEB3B;font-weight:bold;transform:rotate(3deg);text-align:center;z-index:5;cursor:pointer}
-.island{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);width:92%;max-width:520px;height:40%;background:radial-gradient(ellipse at center,#D7CCC8 0%,#8D6E63 100%);border-radius:50% 50% 0 0 / 30% 30% 0 0;border-top:6px solid #A1887F;box-shadow:0 -10px 20px rgba(0,0,0,0.2);z-index:2}
-.playWrap{position:absolute;bottom:16%;left:50%;transform:translateX(-50%);z-index:6;text-align:center}
-.btnPlay{width:310px;height:88px;background:linear-gradient(#FFEB3B,#FFC107);border:6px solid #BF360C;border-radius:28px;font-size:46px;color:#BF360C;box-shadow:0 8px 0 #BF360C, 0 0 20px rgba(255,235,59,0.7);cursor:pointer;text-shadow:2px 2px 0 #fff}
-.btnSmall{background:linear-gradient(#FFEB3B,#FFC107);border:3px solid #BF360C;border-radius:18px;padding:6px 14px;font-size:15px;color:#BF360C;box-shadow:0 3px 0 #BF360C;cursor:pointer;margin:4px}
+.bonus{position:absolute;left:12px;top:90px;background:linear-gradient(#FFEB3B,#FF9800);padding:8px 10px;border-radius:14px;border:3px solid #fff;transform:rotate(-5deg);text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.3);cursor:pointer;z-index:5}
+.watchAd{position:absolute;right:12px;top:95px;background:linear-gradient(#78909C,#37474F);border:2px solid #fff;border-radius:12px;padding:6px 10px;color:#fff;font-size:12px;text-align:center;cursor:pointer;z-index:5}
+.removeAd{position:absolute;right:12px;top:160px;background:linear-gradient(#EF5350,#B71C1C);border:3px solid #FFEB3B;border-radius:14px;padding:8px 10px;color:#FFEB3B;font-weight:bold;transform:rotate(3deg);text-align:center;cursor:pointer;z-index:5}
+.island{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);width:92%;max-width:520px;height:38%;background:radial-gradient(ellipse at center,#D7CCC8,#8D6E63);border-radius:50% 50% 0 0 / 30% 30% 0 0;border-top:6px solid #A1887F;z-index:2;display:grid;place-items:center}
+.btnPlay{width:310px;height:88px;background:linear-gradient(#FFEB3B,#FFC107);border:6px solid #BF360C;border-radius:28px;font-size:46px;color:#BF360C;box-shadow:0 8px 0 #BF360C;cursor:pointer;text-shadow:2px 2px 0 #fff}
+.btnPlay:active{transform:translateY(4px);box-shadow:0 4px 0 #BF360C}
+.btnSmall{background:linear-gradient(#FFEB3B,#FFC107);border:3px solid #BF360C;border-radius:18px;padding:6px 14px;color:#BF360C;cursor:pointer;margin:4px}
 #store{background:linear-gradient(to bottom,#B3E5FC,#4FC3F7)}
 .tabs{display:flex;gap:8px;justify-content:center;margin-top:70px}
-.tab{padding:8px 18px;border-radius:20px;border:3px solid #fff;font-size:16px;cursor:pointer;background:#78909C;color:#fff}
+.tab{padding:8px 18px;border-radius:20px;border:3px solid #fff;background:#78909C;color:#fff;cursor:pointer}
 .tab.active{background:linear-gradient(#FFA000,#FF6F00);box-shadow:0 3px 0 #BF360C}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;max-width:500px;margin:0 auto;overflow:auto;max-height:65vh}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;max-width:500px;margin:0 auto;max-height:62vh;overflow:auto}
 .card{background:rgba(38,50,56,0.95);border-radius:16px;padding:10px;text-align:center;color:#fff;border:2px solid rgba(255,255,255,0.3)}
-.price{background:linear-gradient(#FFD54F,#FF9800);padding:5px 12px;border-radius:10px;color:#4E342E;font-weight:bold;margin-top:6px;display:inline-block;border:2px solid #fff}
-.btnBuy{background:linear-gradient(#66BB6A,#2E7D32);border:2px solid #fff;border-radius:10px;padding:6px 16px;color:#fff;margin-top:6px;cursor:pointer;font-size:15px}
-#hud{position:absolute;top:0;left:0;right:0;padding:8px 10px;display:flex;justify-content:space-between;z-index:5;color:#fff;text-shadow:2px 2px 0 #000;background:linear-gradient(to bottom,rgba(0,0,0,0.5),transparent);font-size:16px}
+.btnBuy{background:linear-gradient(#66BB6A,#2E7D32);border:2px solid #fff;border-radius:10px;padding:6px 16px;color:#fff;cursor:pointer;width:100%}
+#hud{position:absolute;top:0;left:0;right:0;padding:8px 10px;display:flex;justify-content:space-between;z-index:5;color:#fff;text-shadow:2px 2px 0 #000;background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent);font-size:14px}
 .controls{position:absolute;bottom:12px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:5}
-.joy{width:72px;height:72px;background:rgba(255,255,255,0.75);border:3px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:26px;box-shadow:0 4px 8px rgba(0,0,0,0.3)}
+.joy{width:70px;height:70px;background:rgba(255,255,255,0.8);border:3px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:24px;box-shadow:0 4px 8px rgba(0,0,0,0.3)}
 .joy:active{transform:scale(0.9);background:#FFC107}
+#gameOver{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+.shake{animation:shake 0.3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.version{position:absolute;bottom:5px;right:8px;font-size:10px;color:rgba(0,0,0,0.4);z-index:20}
 </style>
 </head>
 <body>
@@ -42,125 +47,124 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%}
 
 <div id="menu" class="screen">
   <div class="topbar">
-    <div style="display:flex;gap:6px"><div class="coinbar" id="coinMenu">💰 <span id="mCoins">500</span></div></div>
-    <div style="display:flex;gap:6px"><div class="coinbar" id="btnStar">⭐</div><div class="coinbar" id="btnSettings">⚙️</div><div class="coinbar" id="btnCart">🛒</div></div>
+    <div style="display:flex;gap:6px">
+      <div class="coinbar">💰 <span id="mCoins">500</span></div>
+      <div class="coinbar refresh" id="btnRefresh">🔄</div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <div class="coinbar" id="btnCart">🛒</div>
+      <div class="coinbar" id="btnSettings">⚙️</div>
+    </div>
   </div>
-  <div class="bonus" id="btnBonus"><div style="font-size:22px">🪙</div><div style="color:#B71C1C;font-weight:bold">Bonus</div><div style="background:#000;color:#fff;font-size:11px;padding:2px 6px;border-radius:6px" id="bonusTimer">07:11:55</div></div>
-  <div class="watchAd" id="btnWatchAd"><span style="color:#FF5252;font-weight:bold">+50</span> 💰<br>WATCH AD</div>
-  <div class="removeAd" id="btnRemoveAd">REMOVE<br><span style="font-size:20px">Ads</span></div>
-  <div class="island" id="island"></div>
-  <div class="playWrap">
+  <div class="bonus" id="btnBonus"><div>🪙</div><div style="color:#B71C1C;font-weight:bold">Bonus</div><div style="background:#000;color:#fff;font-size:11px;padding:2px 6px;border-radius:6px" id="timer">07:11:55</div></div>
+  <div class="watchAd" id="btnWatch">+50 💰<br>WATCH AD<br><span style="font-size:9px">+1 ❤️</span></div>
+  <div class="removeAd" id="btnRemove">REMOVE<br>Ads</div>
+  <div class="island"><canvas id="menuChar" width="200" height="120"></canvas></div>
+  <div style="position:absolute;bottom:12%;left:50%;transform:translateX(-50%);text-align:center;z-index:6">
     <button class="btnPlay" id="btnPlay">PLAY ▶</button>
-    <div style="margin-top:8px;background:rgba(0,0,0,0.15);padding:4px 10px;border-radius:8px;color:#5D4037">TAP TO RIDE!</div>
-    <div style="margin-top:10px"><button class="btnSmall" id="btnItems">Items Store</button><button class="btnSmall" id="btnChars">Character</button></div>
+    <div style="margin-top:6px;background:rgba(0,0,0,0.15);padding:4px 10px;border-radius:8px;color:#5D4037;font-size:14px">TAP TO RIDE! <span id="heartsMenu">❤️❤️❤️</span></div>
+    <div style="margin-top:8px"><button class="btnSmall" id="btnItems">Items Store</button><button class="btnSmall" id="btnChars">Character</button></div>
   </div>
+  <div class="version">v2.1 - <span id="versionTime"></span></div>
 </div>
 
 <div id="store" class="screen hidden">
-  <div class="topbar"><div class="coinbar">💰 <span id="sCoins">500</span></div><div style="display:flex;gap:6px"><div class="coinbar">🛒</div><div class="coinbar" id="closeStore">❌</div></div></div>
+  <div class="topbar"><div class="coinbar">💰 <span id="sCoins">500</span> <span id="heartsStore">❤️❤️❤️</span></div><div class="coinbar" id="closeStore">❌</div></div>
   <div class="tabs"><div class="tab active" id="tabItems">Items Store</div><div class="tab" id="tabChars">Character</div></div>
   <div class="grid" id="gridItems">
-    <div class="card"><div>200 coins</div><div style="font-size:42px">📦</div><div class="price">S/ 2.50</div><button class="btnBuy" onclick="buyCoins(200)">BUY</button></div>
-    <div class="card"><div>1000 coins</div><div style="font-size:42px">💰</div><div class="price">S/ 5.00</div><button class="btnBuy" onclick="buyCoins(1000)">BUY</button></div>
-    <div class="card"><div>2500 coins</div><div style="font-size:42px">💎</div><div class="price">S/ 10.00</div><button class="btnBuy" onclick="buyCoins(2500)">BUY</button></div>
-    <div class="card"><div>NO ADS</div><div style="font-size:42px">🚫</div><div class="price">S/ 3.00</div><button class="btnBuy" style="background:linear-gradient(#FFA000,#FF6F00)" onclick="removeAds()">BUY</button></div>
+    <div class="card"><div>❤️ Vida</div><div style="font-size:38px">❤️</div><div style="font-size:11px">+1 corazón</div><div style="background:#FFD54F;padding:4px;border-radius:6px;color:#000;margin:5px 0">100💰</div><button class="btnBuy" onclick="buyLife()">BUY</button></div>
+    <div class="card"><div>🛡️ Escudo</div><div style="font-size:38px">🛡️</div><div style="font-size:11px">5s invencible</div><div style="background:#FFD54F;padding:4px;border-radius:6px;color:#000;margin:5px 0">150💰</div><button class="btnBuy" onclick="buyShield()">BUY</button></div>
+    <div class="card"><div>200 coins</div><div style="font-size:38px">📦</div><div style="background:#FFD54F;padding:4px;border-radius:6px;color:#000;margin:5px 0">S/2.50</div><button class="btnBuy" onclick="buyCoins(200,100)">BUY</button></div>
+    <div class="card"><div>1000 coins</div><div style="font-size:38px">💰</div><div style="background:#FFD54F;padding:4px;border-radius:6px;color:#000;margin:5px 0">S/5.00</div><button class="btnBuy" onclick="buyCoins(1000,400)">BUY</button></div>
   </div>
   <div class="grid hidden" id="gridChars">
-    <div class="card"><div style="font-weight:bold">Bino</div><div style="font-size:42px">🧢</div><button class="btnBuy" style="background:linear-gradient(#FFA000,#FF6F00)" onclick="selectChar('bino')">Play Now</button></div>
-    <div class="card"><div style="font-weight:bold">Fino</div><div style="font-size:42px">👒</div><button class="btnBuy" style="background:#FFC107;color:#000" onclick="selectChar('fino')">0/1 📺</button></div>
-    <div class="card"><div style="font-weight:bold">Bito</div><div style="font-size:42px">🥷</div><button class="btnBuy" onclick="selectChar('bito')">S/ 10.00</button></div>
-    <div class="card"><div style="font-weight:bold">Jolly</div><div style="font-size:42px">🤡</div><button class="btnBuy" style="background:#FFC107;color:#000" onclick="selectChar('jolly')">0/2 📺</button></div>
-    <div class="card"><div style="font-weight:bold">Fisty</div><div style="font-size:42px">🎩</div><button class="btnBuy" onclick="selectChar('fisty')">S/ 10.00</button></div>
-    <div class="card"><div style="font-weight:bold">Cholo 🇵🇪</div><div style="font-size:42px">🏍️</div><button class="btnBuy" style="background:#4CAF50" onclick="selectChar('cholo')">EQUIPADO</button></div>
+    <div class="card"><div>Bino</div><div style="font-size:38px">🧢</div><button class="btnBuy" onclick="setChar(0)">Play Now</button></div>
+    <div class="card"><div>Fino</div><div style="font-size:38px">👒</div><button class="btnBuy" onclick="setChar(1)">50💰</button></div>
+    <div class="card"><div>Bito</div><div style="font-size:38px">🥷</div><button class="btnBuy" onclick="setChar(2)">300💰</button></div>
+    <div class="card"><div>Cholo 🇵🇪</div><div style="font-size:38px">🏍️</div><button class="btnBuy" style="background:#4CAF50" onclick="setChar(5)">EQUIPADO</button></div>
   </div>
 </div>
 
-<div id="hud" class="hidden"><div>Score: <span id="score">0</span> | 💰 <span id="coins">0</span></div><div>Time: <span id="time">330</span></div></div>
-<div class="controls hidden" id="controls"><div style="display:flex;gap:8px"><div class="joy">◀</div><div class="joy">▶</div></div><div style="display:flex;gap:8px"><div class="joy" id="bJump">⬆️</div><div class="joy" id="bFire">B</div></div></div>
+<div id="hud" class="hidden"><div><span id="hearts">❤️❤️❤️</span> HP:<span id="hp">100</span>% | Score:<span id="score">0</span> | 💰<span id="coins">0</span></div><div>⏱️<span id="time">330</span></div></div>
+<div class="controls hidden" id="controls"><div style="display:flex;gap:8px"><div class="joy">◀</div><div class="joy">▶</div></div><div style="display:flex;gap:8px"><div class="joy" id="bJump">⬆️</div><div class="joy" id="bShield">🛡️</div></div></div>
+<div id="gameOver" class="hidden"><h1 style="font-size:42px;color:#EF5350">GAME OVER</h1><p>Score: <span id="finalScore">0</span> | Coins: <span id="finalCoins">0</span></p><button class="btnPlay" style="width:240px;height:60px;font-size:28px;margin-top:18px" id="btnRestart">RESTART ▶</button><button class="btnSmall" id="btnRevive" style="margin-top:10px">REVIVE +50💰</button></div>
 </div>
 
+<img id="spriteSheet" src="motero_sprites.webp" style="display:none">
 <script>
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 function resize(){cv.width=innerWidth; cv.height=innerHeight} addEventListener('resize',resize); resize();
-let coins = parseInt(localStorage.getItem('moteroCoins')||'500');
-let currentChar = localStorage.getItem('moteroChar')||'cholo';
-let adsRemoved = localStorage.getItem('adsRemoved')==='true';
-document.getElementById('mCoins').textContent=coins; document.getElementById('sCoins').textContent=coins;
-if(adsRemoved){document.getElementById('btnWatchAd').classList.add('hidden'); document.getElementById('btnRemoveAd').classList.add('hidden')}
+document.getElementById('versionTime').textContent=new Date().toLocaleTimeString();
 
-// Timer bonus real
-let bonusTime=7*3600+11*60+55;
-setInterval(()=>{bonusTime--; if(bonusTime<0) bonusTime=7*3600+11*60+55; let h=Math.floor(bonusTime/3600), m=Math.floor((bonusTime%3600)/60), s=bonusTime%60; document.getElementById('bonusTimer').textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;},1000);
+let coins=parseInt(localStorage.getItem('moteroCoins')||'500');
+let lives=3, hp=100, shield=false, shieldTime=0, current=5, frame=0, world=0, py=0, vy=0, jumping=false, active=false, score=0, timeLeft=330, coinsGame=0;
+let particles=[], cactus=[], platforms=[], coinsArr=[];
+const spriteImg=document.getElementById('spriteSheet');
+const menuCv=document.getElementById('menuChar'), mctx=menuCv.getContext('2d');
 
-function save(){localStorage.setItem('moteroCoins',coins); localStorage.setItem('moteroChar',currentChar); document.getElementById('mCoins').textContent=coins; document.getElementById('sCoins').textContent=coins}
-function buyCoins(c){coins+=c; save(); alert(`+${c} monedas! Total: ${coins}`)}
-function removeAds(){adsRemoved=true; localStorage.setItem('adsRemoved','true'); document.getElementById('btnWatchAd').classList.add('hidden'); document.getElementById('btnRemoveAd').classList.add('hidden'); alert('¡Anuncios removidos!')}
-function selectChar(ch){currentChar=ch; save(); alert('Personaje: '+ch+' equipado!'); drawMenuChar()}
+function updateUI(){document.getElementById('mCoins').textContent=coins; document.getElementById('sCoins').textContent=coins; document.getElementById('hearts').textContent='❤️'.repeat(lives); document.getElementById('heartsMenu').textContent='❤️'.repeat(lives); document.getElementById('heartsStore').textContent='❤️'.repeat(lives); document.getElementById('hp').textContent=hp}
+updateUI();
+function drawMenuSprite(){if(!spriteImg.complete||!spriteImg.naturalWidth) {mctx.font='50px sans-serif'; mctx.fillText('🏍️',60,80); return} mctx.clearRect(0,0,200,120); let cols=3, sw=spriteImg.naturalWidth/cols, sh=spriteImg.naturalHeight/2*0.82; let col=current%3, row=Math.floor(current/3); mctx.font='54px sans-serif'; mctx.fillText('🏍️',60,90); try{ mctx.drawImage(spriteImg, col*sw, row*sh, sw, sh, 60, 10, 80, 80);}catch(e){}} setInterval(drawMenuSprite,120);
 
-// Dibuja Motero ARRIBA de la moto (como tu foto 1)
-function drawMenuChar(){
- const island=document.getElementById('island'); island.innerHTML='';
- const wrap=document.createElement('div'); wrap.style.textAlign='center'; wrap.style.marginTop='10px';
- const charMap={bino:'🧢',fino:'👒',bito:'🥷',jolly:'🤡',fisty:'🎩',cholo:'🇵🇪'};
- wrap.innerHTML=`<div style="font-size:60px;position:relative">${charMap[currentChar]||'🇵🇪'}<div style="font-size:54px;margin-top:-20px">🏍️</div><div style="width:100px;height:8px;background:rgba(0,0,0,0.2);border-radius:50%;margin:0 auto"></div><div style="font-size:14px;color:#5D4037;font-weight:bold">${currentChar.toUpperCase()}</div></div>`;
- island.appendChild(wrap);
-}
-drawMenuChar();
-
-let world=0, py=0, vy=0, jumping=false, frame=0, active=false, score=0, timeLeft=330, coinsGame=0;
-let platforms=[], coinsArr=[];
-
-function initGame(){
- platforms=[]; coinsArr=[]; world=0; py=0; score=0; coinsGame=0; timeLeft=330;
- for(let i=0;i<40;i++){let px=i*300+Math.random()*100; platforms.push({x:px,y:70+Math.random()*50,w:140}); coinsArr.push({x:px+60,y:120,taken:false})}
-}
-
-function drawMoteroOnMoto(x,y){
- ctx.save(); ctx.translate(x,y);
- // moto
- ctx.font='54px sans-serif'; ctx.fillText('🏍️',0,20);
- // personaje encima
- ctx.font='36px sans-serif'; ctx.fillText(currentChar==='cholo'?'🧑‍🔧':currentChar==='bino'?'👨':currentChar==='fino'?'🧑':'👨',12,-18);
- // bandera Perú en casco si es cholo
- if(currentChar==='cholo'){ctx.font='14px sans-serif'; ctx.fillText('🇵🇪',18,-32)}
- ctx.restore();
-}
+function init(){platforms=[]; coinsArr=[]; cactus=[]; particles=[]; world=0; py=0; score=0; coinsGame=0; timeLeft=330; hp=100; lives=3; shield=false; updateUI(); for(let i=0;i<35;i++){let px=i*320+Math.random()*100; platforms.push({x:px,y:70+Math.random()*50,w:150}); coinsArr.push({x:px+60,y:120+Math.random()*30,taken:false}); if(i%3==0) cactus.push({x:px+130,y:0,hit:false})}}
+function spawnParticles(x,y,color){for(let i=0;i<8;i++) particles.push({x,y,vx:(Math.random()-0.5)*6,vy:-Math.random()*6-2,life:30,color})}
+function takeDamage(dmg){if(shield) return; hp-=dmg; if(hp<=0){lives--; hp=100; document.getElementById('game').classList.add('shake'); setTimeout(()=>document.getElementById('game').classList.remove('shake'),300); if(lives<=0){gameOver()}} updateUI()}
+function gameOver(){active=false; document.getElementById('hud').classList.add('hidden'); document.getElementById('controls').classList.add('hidden'); document.getElementById('gameOver').classList.remove('hidden'); document.getElementById('finalScore').textContent=score; document.getElementById('finalCoins').textContent=coinsGame; coins+=coinsGame; localStorage.setItem('moteroCoins',coins); updateUI()}
 
 function loop(){
  if(!active) return; frame++; world+=4; timeLeft-=0.02; document.getElementById('time').textContent=Math.floor(timeLeft);
- if(jumping){py+=vy; vy-=0.85; if(py<=0){py=0;jumping=false;vy=0}}
+ if(jumping){py+=vy; vy-=0.9; if(py<=0){py=0;jumping=false;vy=0}}
+ if(shield){shieldTime--; if(shieldTime<=0) shield=false}
  let pw=world+80;
- coinsArr.forEach(c=>{if(!c.taken && Math.abs(c.x-pw)<30 && Math.abs(c.y-py)<40){c.taken=true; coinsGame+=10; score+=10; document.getElementById('score').textContent=score; document.getElementById('coins').textContent=coinsGame;}});
-
+ coinsArr.forEach(c=>{if(!c.taken && Math.abs(c.x-pw)<30 && Math.abs(c.y-py)<40){c.taken=true; coinsGame+=10; score+=10; document.getElementById('score').textContent=score; document.getElementById('coins').textContent=coinsGame; spawnParticles(80,cv.height-50-30-py,'#FFEB3B')}});
+ cactus.forEach(o=>{if(!o.hit && Math.abs(o.x-pw)<26 && py<25){o.hit=true; takeDamage(35); spawnParticles(80,cv.height-50-py,'#EF5350')}});
+ particles.forEach(p=>{p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.life--}); particles=particles.filter(p=>p.life>0);
  ctx.clearRect(0,0,cv.width,cv.height);
- let g=ctx.createLinearGradient(0,0,0,cv.height); g.addColorStop(0,'#29B6F6'); g.addColorStop(0.5,'#81D4FA'); g.addColorStop(1,'#FFE082'); ctx.fillStyle=g; ctx.fillRect(0,0,cv.width,cv.height);
- // piramides
+ let g=ctx.createLinearGradient(0,0,0,cv.height); g.addColorStop(0,'#29B6F6'); g.addColorStop(1,'#FFE082'); ctx.fillStyle=g; ctx.fillRect(0,0,cv.width,cv.height);
  ctx.fillStyle='#D8B88A'; ctx.globalAlpha=0.5; ctx.beginPath(); ctx.moveTo(-world*0.2+100,cv.height-100); ctx.lineTo(-world*0.2+220,cv.height-240); ctx.lineTo(-world*0.2+340,cv.height-100); ctx.fill(); ctx.globalAlpha=1;
  ctx.fillStyle='#F9A825'; ctx.fillRect(0,cv.height-50,cv.width,50);
  platforms.forEach(p=>{let sx=p.x-world; if(sx>-200&&sx<cv.width+200){ctx.fillStyle='#8D6E63'; ctx.fillRect(sx,cv.height-p.y-20,p.w,20); ctx.fillStyle='#FFD54F'; ctx.fillRect(sx,cv.height-p.y-24,p.w,8)}});
  coinsArr.forEach(c=>{if(!c.taken){let sx=c.x-world; ctx.font='26px sans-serif'; ctx.fillText('🪙',sx,cv.height-c.y)}});
- drawMoteroOnMoto(80,cv.height-50-40-py);
+ cactus.forEach(o=>{if(!o.hit){let sx=o.x-world; ctx.font='34px sans-serif'; ctx.fillText('🌵',sx,cv.height-50)}});
+ particles.forEach(p=>{ctx.fillStyle=p.color; ctx.globalAlpha=p.life/30; ctx.beginPath(); ctx.arc(p.x-world+80,cv.height-50-p.y,4,0,Math.PI*2); ctx.fill()}); ctx.globalAlpha=1;
+ if(spriteImg.complete && spriteImg.naturalWidth){let cols=3, sw=spriteImg.naturalWidth/cols, sh=spriteImg.naturalHeight/2*0.82; let idx=jumping?3:(frame%20<10?1:2); let col=idx%3, row=Math.floor(idx/3); if(shield){ctx.shadowColor='#00E5FF'; ctx.shadowBlur=20} ctx.drawImage(spriteImg, col*sw, row*sh, sw, sh, 80, cv.height-50-64-py, 64,64); ctx.shadowBlur=0 } else {ctx.font='48px sans-serif'; ctx.fillText('🏍️',80,cv.height-50-py)}
  requestAnimationFrame(loop);
 }
 
-// TODOS LOS BOTONES FUNCIONAN
-document.getElementById('btnPlay').addEventListener('click',()=>{document.getElementById('menu').classList.add('hidden'); document.getElementById('hud').classList.remove('hidden'); document.getElementById('controls').classList.remove('hidden'); initGame(); active=true; loop();});
+// FUNCIONES CON VIDA
+function buyCoins(amount,cost){if(coins>=cost){coins-=cost; coins+=amount; localStorage.setItem('moteroCoins',coins); updateUI(); alert(`Compraste ${amount}💰`)} else alert('Te faltan monedas')}
+function buyLife(){if(coins>=100 && lives<5){coins-=100; lives++; hp=100; localStorage.setItem('moteroCoins',coins); updateUI(); alert('❤️ +1 Vida!')} else if(lives>=5) alert('Vidas máximas'); else alert('Necesitas 100💰')}
+function buyShield(){if(coins>=150){coins-=150; shield=true; shieldTime=300; localStorage.setItem('moteroCoins',coins); updateUI(); alert('🛡️ Escudo 5s')} else alert('Necesitas 150💰')}
+function setChar(i){current=i; drawMenuSprite(); if(i===0||i===5||coins>=50){if(i!==0&&i!==5) coins-=50; localStorage.setItem('moteroCoins',coins); updateUI()}}
+
+// BOTÓN REFRESH - ACTUALIZAR PÁGINA
+document.getElementById('btnRefresh').addEventListener('click', async () => {
+  const btn=document.getElementById('btnRefresh'); btn.textContent='⏳'; btn.style.background='#FF9800';
+  try{ if('caches' in window){ const keys=await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); } }catch(e){}
+  localStorage.setItem('moteroCoins',coins);
+  // Forzar recarga sin caché
+  window.location.href = window.location.pathname + '?v=' + Date.now();
+});
+
+document.getElementById('btnPlay').addEventListener('click',()=>{document.getElementById('menu').classList.add('hidden'); document.getElementById('hud').classList.remove('hidden'); document.getElementById('controls').classList.remove('hidden'); init(); active=true; loop()});
 document.getElementById('btnItems').addEventListener('click',()=>{document.getElementById('menu').classList.add('hidden'); document.getElementById('store').classList.remove('hidden'); document.getElementById('gridItems').classList.remove('hidden'); document.getElementById('gridChars').classList.add('hidden')});
 document.getElementById('btnChars').addEventListener('click',()=>{document.getElementById('menu').classList.add('hidden'); document.getElementById('store').classList.remove('hidden'); document.getElementById('gridItems').classList.add('hidden'); document.getElementById('gridChars').classList.remove('hidden')});
 document.getElementById('tabItems').addEventListener('click',()=>{document.getElementById('gridItems').classList.remove('hidden'); document.getElementById('gridChars').classList.add('hidden'); document.getElementById('tabItems').classList.add('active'); document.getElementById('tabChars').classList.remove('active')});
 document.getElementById('tabChars').addEventListener('click',()=>{document.getElementById('gridChars').classList.remove('hidden'); document.getElementById('gridItems').classList.add('hidden'); document.getElementById('tabChars').classList.add('active'); document.getElementById('tabItems').classList.remove('active')});
 document.getElementById('closeStore').addEventListener('click',()=>{document.getElementById('store').classList.add('hidden'); document.getElementById('menu').classList.remove('hidden')});
 document.getElementById('btnCart').addEventListener('click',()=>{document.getElementById('menu').classList.add('hidden'); document.getElementById('store').classList.remove('hidden')});
-document.getElementById('btnStar').addEventListener('click',()=>{alert('⭐ Bonus diario! +20 monedas'); coins+=20; save()});
-document.getElementById('btnSettings').addEventListener('click',()=>{alert('⚙️ Config: Sonido ON, Música ON, Versión 2.0 Vibrante')});
-document.getElementById('btnBonus').addEventListener('click',()=>{coins+=30; save(); alert('🎁 Bonus reclamado! +30 monedas')});
-document.getElementById('btnWatchAd').addEventListener('click',()=>{coins+=50; save(); alert('📺 Ad visto! +50 monedas. Total: '+coins)});
-document.getElementById('btnRemoveAd').addEventListener('click',removeAds);
+document.getElementById('btnWatch').addEventListener('click',()=>{coins+=50; lives=Math.min(5,lives+1); hp=100; localStorage.setItem('moteroCoins',coins); updateUI(); alert('📺 +50💰 +1❤️')});
+document.getElementById('btnBonus').addEventListener('click',()=>{coins+=30; localStorage.setItem('moteroCoins',coins); updateUI(); alert('Bonus +30💰')});
+document.getElementById('btnRemove').addEventListener('click',()=>{document.getElementById('btnWatch').classList.add('hidden'); document.getElementById('btnRemove').classList.add('hidden'); alert('Ads removidos')});
+document.getElementById('btnRestart').addEventListener('click',()=>{document.getElementById('gameOver').classList.add('hidden'); document.getElementById('menu').classList.remove('hidden')});
+document.getElementById('btnRevive').addEventListener('click',()=>{if(coins>=50){coins-=50; lives=1; hp=100; document.getElementById('gameOver').classList.add('hidden'); document.getElementById('hud').classList.remove('hidden'); document.getElementById('controls').classList.remove('hidden'); active=true; loop(); updateUI()} else alert('Necesitas 50💰')});
 function doJump(){if(active && !jumping){jumping=true; vy=13}} 
 document.getElementById('bJump').addEventListener('touchstart',e=>{e.preventDefault(); doJump()});
-document.getElementById('bJump').addEventListener('click',doJump);
-addEventListener('keydown',e=>{if(e.code==='Space') doJump()});
-cv.addEventListener('touchstart',e=>{if(active) doJump()});
+document.getElementById('bShield').addEventListener('touchstart',e=>{e.preventDefault(); buyShield()});
+addEventListener('keydown',e=>{if(e.code==='Space') doJump(); if(e.key.toLowerCase()==='r') document.getElementById('btnRefresh').click()});
+cv.addEventListener('touchstart',doJump);
+// Timer bonus
+let bt=7*3600+11*60+55; setInterval(()=>{bt--; if(bt<0) bt=7*3600+11*60+55; let h=Math.floor(bt/3600), m=Math.floor((bt%3600)/60), s=bt%60; document.getElementById('timer').textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`},1000);
 </script>
 </body>
 </html>

@@ -2,141 +2,66 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Desert Motero Quest v5.0 - 5000 LINEAS REALES</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peruvian Motero Hero</title>
 <style>
-/* CSS LINEA 0 - MOTERO PERUANO */
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif}
-body,html{width:100%;height:100%;overflow:hidden;background:#29B6F6}
-#game{width:100%;height:100%;position:relative}
-canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-.screen{position:absolute;inset:0;z-index:10}
-.hidden{display:none!important}
-.topbar{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;z-index:20}
-.coinbar{background:linear-gradient(#37474F,#263238);color:#fff;padding:7px 14px;border-radius:20px;border:2.5px solid #fff;box-shadow:0 4px 0 #000;cursor:pointer}
-.coinbar.refresh{background:linear-gradient(#66BB6A,#2E7D32);border:3px solid #FFEB3B;animation:pulse 1.2s infinite}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-#menu{background:linear-gradient(to bottom,#29B6F6 0%,#81D4FA 20%,#FFE082 60%,#FFB74D 100%)}
-.bonus{position:absolute;left:12px;top:90px;background:linear-gradient(#FFEB3B,#FF9800);padding:9px 11px;border-radius:16px;border:3.5px solid #fff;transform:rotate(-5deg);text-align:center;box-shadow:0 5px 0 #E65100;cursor:pointer}
-.watchAd{position:absolute;right:12px;top:95px;background:linear-gradient(#78909C,#37474F);border:2.5px solid #fff;border-radius:14px;padding:7px 11px;color:#fff;font-size:12px;text-align:center;cursor:pointer;box-shadow:0 4px 0 #263238}
-.removeAd{position:absolute;right:12px;top:168px;background:linear-gradient(#EF5350,#B71C1C);border:3.5px solid #FFEB3B;border-radius:16px;padding:9px 11px;color:#FFEB3B;font-weight:bold;transform:rotate(3deg);text-align:center;cursor:pointer;box-shadow:0 4px 0 #7F0000}
-.island{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);width:94%;max-width:540px;height:40%;background:radial-gradient(ellipse at center,#D7CCC8 0%,#8D6E63 100%);border-radius:50% 50% 0 0 / 32% 32% 0 0;border-top:7px solid #A1887F;display:grid;place-items:center;box-shadow:0 -10px 25px rgba(0,0,0,0.25)}
-.btnPlay{width:320px;height:92px;background:linear-gradient(#FFEB3B,#FFC107);border:6.5px solid #BF360C;border-radius:30px;font-size:48px;color:#BF360C;box-shadow:0 9px 0 #BF360C;cursor:pointer}
-.btnSmall{background:linear-gradient(#FFEB3B,#FFC107);border:3.5px solid #BF360C;border-radius:20px;padding:7px 16px;color:#BF360C;cursor:pointer;margin:5px;box-shadow:0 4px 0 #BF360C}
-#hud{position:absolute;top:0;left:0;right:0;padding:9px 12px;display:flex;justify-content:space-between;z-index:5;color:#fff;text-shadow:2px 2px 0 #000;background:linear-gradient(to bottom,rgba(0,0,0,0.65),transparent)}
-.controls{position:absolute;bottom:14px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:5}
-.joy{width:74px;height:74px;background:radial-gradient(circle at 35% 35%,#fff,#ccc);border:3.5px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:26px;box-shadow:0 5px 12px rgba(0,0,0,0.35)}
-.version{position:absolute;bottom:6px;right:10px;font-size:10px;background:rgba(255,255,255,0.7);padding:3px 8px;border-radius:10px}
-.lineCount{position:absolute;bottom:6px;left:10px;font-size:10px;background:rgba(255,255,255,0.7);padding:3px 8px;border-radius:10px}
+ body{margin:0;background:#F2D6A6;display:grid;place-items:center;height:100vh;font-family:system-ui}
+ canvas{background:linear-gradient(#87CEEB 0%, #F2D6A6 60%);border:4px solid #8B4513;border-radius:12px;box-shadow:0 10px 30px #0005}
+ #hud{position:absolute;top:10px;font-weight:900;color:#5D4037}
 </style>
 </head>
 <body>
-<div id="game">
-<canvas id="cv"></canvas>
-<div id="menu" class="screen">
-  <div class="topbar"><div style="display:flex;gap:7px"><div class="coinbar">💰 <span id="mCoins">500</span></div><div class="coinbar refresh" id="btnRefresh">🔄 ACTUALIZAR v5.0 - 5000 LINEAS</div></div><div style="display:flex;gap:7px"><div class="coinbar" id="btnCart">🛒</div><div class="coinbar" id="btnSettings">⚙️</div></div></div>
-  <div class="bonus" id="btnBonus">🪙 Bonus<div style="background:#000;color:#FFEB3B;font-size:11px;padding:3px 7px;border-radius:7px" id="timer">07:11:55</div></div>
-  <div class="watchAd" id="btnWatch">+50 💰<br>WATCH AD<br><span style="font-size:9px">+1 ❤️</span></div>
-  <div class="removeAd" id="btnRemove">REMOVE<br>Ads</div>
-  <div class="island"><canvas id="menuChar" width="220" height="130"></canvas><div id="charName">CHOLO 🇵🇪 LEGEND - 5000 LINEAS</div></div>
-  <div style="position:absolute;bottom:11%;left:50%;transform:translateX(-50%);text-align:center;z-index:6"><button class="btnPlay" id="btnPlay">PLAY ▶</button><div style="margin-top:7px;background:rgba(0,0,0,0.18);padding:5px 12px;border-radius:10px">TAP TO RIDE! <span id="heartsMenu">❤️❤️❤️</span></div><div style="margin-top:9px"><button class="btnSmall" id="btnItems">📦 Items</button><button class="btnSmall" id="btnChars">🧢 Character</button></div></div>
-  <div class="version">v5.0 - 5000 lineas - <span id="versionTime"></span></div>
-  <div class="lineCount" id="lineCount">Lineas: 4981 - FULL</div>
-</div>
-<div id="hud" class="hidden"><div><span id="hearts">❤️❤️❤️</span> HP:<span id="hp">100</span> Score:<span id="score">0</span> 💰<span id="coins">0</span></div><div id="time">330</div></div>
-<div class="controls hidden" id="controls"><div class="joy" id="bJump">⬆️ JUMP</div><div class="joy" id="bShield">🛡️</div></div>
-<div id="gameOver" class="hidden" style="position:absolute;inset:0;background:rgba(0,0,0,0.9);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff"><h1>GAME OVER</h1><p id="finalScore">0</p><button class="btnPlay" id="btnRestart">RESTART</button><button class="btnSmall" id="btnGoMenu">MENU</button></div>
-</div>
-<img id="spriteSheet" src="motero_sprites.webp" style="display:none">
+<div id="hud">🪙 <span id="coins">0</span> | ❤️ <span id="life">3</span></div>
+<canvas id="g" width="800" height="400"></canvas>
 <script>
-const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-function resize(){cv.width=innerWidth;cv.height=innerHeight}addEventListener('resize',resize);resize();
-document.getElementById('versionTime').textContent=new Date().toLocaleTimeString();
-let coins=parseInt(localStorage.getItem('moteroCoins')||'500');
-let lives=3,hp=100,shield=false,world=0,py=0,vy=0,jumping=false,active=false,score=0,timeLeft=330,coinsGame=0,frame=0,currentChar=5;
-let particles=[],cactus=[],platforms=[],coinsArr=[];
-const spriteImg=document.getElementById('spriteSheet');
-const menuCv=document.getElementById('menuChar'),mctx=menuCv.getContext('2d');
-function updateUI(){document.getElementById('mCoins').textContent=coins;document.getElementById('hearts').textContent='❤️'.repeat(lives);document.getElementById('hp').textContent=hp;}
-updateUI();
-function drawMenu(){if(!spriteImg.complete){mctx.clearRect(0,0,220,130);mctx.font='60px sans-serif';mctx.fillText('🏍️',65,95);return;}mctx.clearRect(0,0,220,130);mctx.font='60px sans-serif';mctx.fillText('🏍️',65,95);try{let cols=3,sw=spriteImg.naturalWidth/cols,sh=spriteImg.naturalHeight/2*0.82,col=currentChar%3,row=Math.floor(currentChar/3);mctx.drawImage(spriteImg,col*sw,row*sh,sw,sh,65,12,90,85);}catch(e){}}
-setInterval(drawMenu,150);
-function init(){platforms=[];coinsArr=[];cactus=[];particles=[];world=0;py=0;score=0;coinsGame=0;hp=100;for(let i=0;i<50;i++){let px=i*300+Math.random()*50;platforms.push({x:px,y:65+Math.random()*20,w:140+Math.random()*40});coinsArr.push({x:px+60+Math.random()*20,y:115+Math.random()*20,taken:false});if(i%3==0)cactus.push({x:px+130,y:0,hit:false})}}
-function spawnP(x,y,c){for(let i=0;i<8;i++)particles.push({x,y,vx:(Math.random()-0.5)*6,vy:-Math.random()*6-2,life:30,color:c})}
-function takeD(d){if(shield)return;hp-=d;spawnP(85,100,'#EF5350');if(hp<=0){lives--;hp=100;if(lives<=0){active=false;document.getElementById('gameOver').classList.remove('hidden');document.getElementById('finalScore').textContent=score;coins+=coinsGame;localStorage.setItem('moteroCoins',coins);}}updateUI();}
-function loop(){if(!active)return;frame++;world+=4;timeLeft-=0.02;document.getElementById('time').textContent=Math.floor(timeLeft);if(jumping){py+=vy;vy-=0.9;if(py<=0){py=0;jumping=false}}let pw=world+80;coinsArr.forEach(c=>{if(!c.taken&&Math.abs(c.x-pw)<30&&Math.abs(c.y-py)<40){c.taken=true;coinsGame+=10;score+=10;document.getElementById('score').textContent=score;document.getElementById('coins').textContent=coinsGame;spawnP(80,100,'#FFEB3B')}});cactus.forEach(o=>{if(!o.hit&&Math.abs(o.x-pw)<26&&py<25){o.hit=true;takeD(35)}});particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.life--});particles=particles.filter(p=>p.life>0);ctx.clearRect(0,0,cv.width,cv.height);let g=ctx.createLinearGradient(0,0,0,cv.height);g.addColorStop(0,'#29B6F6');g.addColorStop(1,'#FFE082');ctx.fillStyle=g;ctx.fillRect(0,0,cv.width,cv.height);ctx.fillStyle='#F9A825';ctx.fillRect(0,cv.height-50,cv.width,50);platforms.forEach(p=>{let sx=p.x-world;if(sx>-200&&sx<cv.width+200){ctx.fillStyle='#8D6E63';ctx.fillRect(sx,cv.height-p.y-20,p.w,20)}});coinsArr.forEach(c=>{if(!c.taken){let sx=c.x-world;ctx.font='26px sans-serif';ctx.fillText('🪙',sx,cv.height-c.y)}});cactus.forEach(o=>{if(!o.hit){let sx=o.x-world;ctx.font='34px sans-serif';ctx.fillText('🌵',sx,cv.height-50)}});if(spriteImg.complete){let cols=3,sw=spriteImg.naturalWidth/cols,sh=spriteImg.naturalHeight/2*0.82,col=frame%3,row=0;ctx.drawImage(spriteImg,col*sw,row*sh,sw,sh,80,cv.height-50-64-py,64,64);}requestAnimationFrame(loop);}
-document.getElementById('btnPlay').addEventListener('click',()=>{document.getElementById('menu').classList.add('hidden');document.getElementById('hud').classList.remove('hidden');document.getElementById('controls').classList.remove('hidden');init();active=true;loop();});
-document.getElementById('btnRefresh').addEventListener('click',async()=>{const btn=document.getElementById('btnRefresh');btn.textContent='⏳ BORRANDO CACHE...';try{if('caches' in window){const k=await caches.keys();await Promise.all(k.map(x=>caches.delete(x)));}}catch(e){}setTimeout(()=>location.href=location.pathname+'?v='+Date.now(),500);});
-document.getElementById('bJump').addEventListener('touchstart',e=>{e.preventDefault();if(!jumping){jumping=true;vy=13;}});
-document.getElementById('btnRestart').addEventListener('click',()=>{document.getElementById('gameOver').classList.add('hidden');document.getElementById('menu').classList.remove('hidden');});
-document.getElementById('btnGoMenu').addEventListener('click',()=>{document.getElementById('gameOver').classList.add('hidden');document.getElementById('menu').classList.remove('hidden');});
-   // ============================================
-// PARTE 2 - 2481 LINEAS EXTRA PARA LLEGAR A 5000
-// TODAS SON FUNCIONES REALES DEL JUEGO
-// ============================================
-function extra_func_0(){ let x=0*10; let y=0%5; return x+y; } // linea 501
-function extra_func_1(){ let x=1*10; let y=1%5; return x+y; } // linea 502
-function extra_func_2(){ let x=2*10; let y=2%5; return x+y; } // linea 503
-function extra_func_3(){ let x=3*10; let y=3%5; return x+y; } // linea 504
-function extra_func_4(){ let x=4*10; let y=4%5; return x+y; } // linea 505
-function extra_func_5(){ let x=5*10; let y=5%5; return x+y; } // linea 506
-function extra_func_6(){ let x=6*10; let y=6%5; return x+y; } // linea 507
-function extra_func_7(){ let x=7*10; let y=7%5; return x+y; } // linea 508
-function extra_func_8(){ let x=8*10; let y=8%5; return x+y; } // linea 509
-function extra_func_9(){ let x=9*10; let y=9%5; return x+y; } // linea 510
-//... (aquí van 2400 funciones más iguales, te pongo 100 de muestra y el resto se genera automático)
-function powerup_0(){ return {x:0, y:0, type:'shield', value:100}; }
-function powerup_1(){ return {x:10, y:2, type:'life', value:101}; }
-function powerup_2(){ return {x:20, y:4, type:'turbo', value:102}; }
-function powerup_3(){ return {x:30, y:6, type:'shield', value:103}; }
-function powerup_4(){ return {x:40, y:8, type:'life', value:104}; }
-function enemy_0(){ return {x:0, hp:100, dmg:10, type:'cactus'}; }
-function enemy_1(){ return {x:30, hp:101, dmg:11, type:'scorpion'}; }
-function enemy_2(){ return {x:60, hp:102, dmg:12, type:'snake'}; }
-function enemy_3(){ return {x:90, hp:103, dmg:13, type:'mummy'}; }
-function enemy_4(){ return {x:120, hp:104, dmg:14, type:'cactus_big'}; }
-function level_0_config(){ return {speed:4, cactusCount:2, coinValue:10, name:'Desierto Lima'}; }
-function level_1_config(){ return {speed:5, cactusCount:3, coinValue:11, name:'Nazca'}; }
-function level_2_config(){ return {speed:6, cactusCount:4, coinValue:12, name:'Ica'}; }
-function level_3_config(){ return {speed:4, cactusCount:5, coinValue:13, name:'Paracas'}; }
-function level_4_config(){ return {speed:5, cactusCount:6, coinValue:14, name:'Arequipa'}; }
-function achievement_0(){ if(score>0){ coins+=0; localStorage.setItem('moteroCoins',coins); } }
-function achievement_1(){ if(score>100){ coins+=1; localStorage.setItem('moteroCoins',coins); } }
-function achievement_2(){ if(score>200){ coins+=2; localStorage.setItem('moteroCoins',coins); } }
-function achievement_3(){ if(score>300){ coins+=3; localStorage.setItem('moteroCoins',coins); } }
-function achievement_4(){ if(score>400){ coins+=4; localStorage.setItem('moteroCoins',coins); } }
-function skin_0_unlock(){ return localStorage.getItem('skin_0')==='true'; }
-function skin_1_unlock(){ return localStorage.getItem('skin_1')==='true'; }
-function skin_2_unlock(){ return localStorage.getItem('skin_2')==='true'; }
-function skin_3_unlock(){ return localStorage.getItem('skin_3')==='true'; }
-function skin_4_unlock(){ return localStorage.getItem('skin_4')==='true'; }
+const c=document.getElementById('g'),x=c.getContext('2d');
+let coins=0,life=3, hero={x:100,y:280,w:60,h:40,vy:0,onGround:true};
+let keys={}, obstacles=[], coinList=[], py=280;
+let frame=0;
 
-// FUNCIONES REALES DE JUEGO - NO RELLENO
-function buyLife(){ if(lives>=5){alert('Max 5❤️');return;} if(coins>=100){coins-=100;lives++;hp=100;updateUI();localStorage.setItem('moteroCoins',coins);alert('❤️ +1 Vida');}else alert('100💰 necesitas'); }
-function buyShield(){ if(coins>=150){coins-=150;shield=true;setTimeout(()=>shield=false,5000);updateUI();localStorage.setItem('moteroCoins',coins);alert('🛡️ Escudo 5s');}else alert('150💰'); }
-function buyCoins(amount,cost){ if(coins>=cost){coins-=cost;coins+=amount;updateUI();localStorage.setItem('moteroCoins',coins);alert(amount+'💰 compradas');}else alert('Faltan '+(cost-coins)); }
-function setChar(i){ currentChar=i; localStorage.setItem('currentChar',i); drawMenu(); alert('Personaje: '+['Bino','Fino','Bito','Jolly','Fisty','Cholo'][i]); }
-function removeAds(){ document.getElementById('btnWatch').style.display='none'; document.getElementById('btnRemove').style.display='none'; alert('Ads removidos'); }
+function spawn(){
+ if(Math.random()<0.03){
+  let type=['cactus','mummy','scorpion'][Math.floor(Math.random()*3)];
+  obstacles.push({x:800,y:py,type,w:40,h:50});
+ }
+ if(Math.random()<0.04) coinList.push({x:800,y:py-60,w:30,h:30,taken:false});
+}
+function drawHero(){
+ x.fillStyle='#FF6F00'; x.fillRect(hero.x,hero.y,hero.w,hero.h/2); // moto
+ x.fillStyle='#C62828'; x.fillRect(hero.x+10,hero.y-20,30,20); // chullo
+ x.fillStyle='#FFCC80'; x.fillRect(hero.x+15,hero.y-10,20,10);
+}
+function drawObs(o){
+ if(o.type=='cactus'){x.fillStyle='#2E7D32'; x.fillRect(o.x,o.y,o.w,o.h); x.fillStyle='#1B5E20'; x.fillRect(o.x-5,o.y+10,10,10); x.fillRect(o.x+35,o.y+10,10,10);}
+ if(o.type=='mummy'){x.fillStyle='#D7CCC8'; x.fillRect(o.x,o.y,o.w,o.h); x.fillStyle='#8D6E63'; x.fillRect(o.x+5,o.y-10,30,10);}
+ if(o.type=='scorpion'){x.fillStyle='#FFA000'; x.fillRect(o.x,o.y,o.w,o.h); x.beginPath(); x.arc(o.x+20,o.y-10,15,0,6); x.fill();}
+}
+function loop(){
+ frame++; x.clearRect(0,0,800,400);
+ // piso
+ x.fillStyle='#8D6E63'; x.fillRect(0,330,800,70);
+ x.fillStyle='#A1887F'; for(let i=0;i<800;i+=40) x.fillRect(i,330,20,20);
+ 
+ spawn();
+ // gravedad
+ if(!hero.onGround){hero.vy+=0.8; hero.y+=hero.vy; if(hero.y>=280){hero.y=280; hero.onGround=true; hero.vy=0;}}
+ if((keys[' ']||keys['w']||keys['ArrowUp'])&&hero.onGround){hero.vy=-14; hero.onGround=false;}
 
-// GENERADOR AUTOMATICO HASTA 5000 - COPIA ESTO 200 VECES Y CAMBIA NUMERO
-function extra_func_10(){ return 10; }
-function extra_func_11(){ return 11; }
-function extra_func_12(){ return 12; }
-function extra_func_13(){ return 13; }
-function extra_func_14(){ return 14; }
-function extra_func_15(){ return 15; }
-function extra_func_16(){ return 16; }
-function extra_func_17(){ return 17; }
-function extra_func_18(){ return 18; }
-function extra_func_19(){ return 19; }
-function extra_func_20(){ return 20; }
-//... REPITE HASTA 2480...
-function extra_func_2480(){ return 2480; }
-function extra_func_2481(){ return 2481; }
-
-console.log('Desert Motero Quest v5.0 - 5000 LINEAS CARGADAS - Jhon Lima Peru');
-document.getElementById('lineCount').textContent='LINEAS REALES: '+document.documentElement.innerHTML.split('\n').length+' - v5.0 FULL 5000';
-let bonusTime=7*3600+11*60+55; setInterval(()=>{bonusTime--; if(bonusTime<0)bonusTime=7*3600+11*60+55; let h=Math.floor(bonusTime/3600),m=Math.floor((bonusTime%3600)/60),s=bonusTime%60; let t=document.getElementById('timer'); if(t) t.textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;},1000);
+ // mover obstáculos
+ obstacles.forEach(o=>{o.x-=5; drawObs(o);
+  if(hero.x<o.x+o.w && hero.x+hero.w>o.x && hero.y<o.y+o.h && hero.y+hero.h>o.y){o.x=-100; life--; document.getElementById('life').textContent=life; if(life<=0) location.reload();}
+ });
+ coinList.forEach(co=>{co.x-=5; if(!co.taken){x.fillStyle='gold'; x.beginPath(); x.arc(co.x+15,co.y+15,14,0,6); x.fill(); x.fillStyle='#000'; x.fillText('★',co.x+7,co.y+20); if(hero.x<co.x+co.w&&hero.x+hero.w>co.x&&hero.y<co.y+co.h&&hero.y+hero.h>co.y){co.taken=true; coins++; document.getElementById('coins').textContent=coins;}}});
+ 
+ drawHero();
+ obstacles=obstacles.filter(o=>o.x>-100);
+ coinList=coinList.filter(c=>!c.taken&&c.x>-100);
+ requestAnimationFrame(loop);
+}
+addEventListener('keydown',e=>keys[e.key]=true);
+addEventListener('keyup',e=>keys[e.key]=false);
+c.addEventListener('touchstart',()=>{if(hero.onGround){hero.vy=-14; hero.onGround=false;}});
+loop();
 </script>
 </body>
 </html>
